@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+
+  .dark {
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-hover: rgba(255, 255, 255, 0.1);
+  }
+
+  .light {
+    --glass-bg: rgba(0, 0, 0, 0.03);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-hover: rgba(0, 0, 0, 0.05);
+  }
+}
+
+@layer components {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 0.75rem;
+  }
+}
+
+/* Leaflet zoom controls */
+.leaflet-control-zoom {
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+.leaflet-control-zoom a {
+  background: var(--glass-bg) !important;
+  color: currentColor !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+}
+.leaflet-control-zoom a:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #10b981 !important;
+}
