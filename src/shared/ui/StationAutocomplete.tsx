@@ -1,11 +1,11 @@
-import { Autocomplete, AutocompleteItem } from '@heroui/react';
+import { Autocomplete, AutocompleteItem } from "@heroui/react";
 
-import { useStationSearch } from '@modules/mapa/hooks/useStationSearch';
+import { useStationSearch } from "@modules/mapa/hooks/useStationSearch";
 
 interface StationAutocompleteProps {
   label: string;
   placeholder?: string;
-  icon?: 'origin' | 'destination';
+  icon?: "origin" | "destination";
   value: string;
   onChange: (stationId: string) => void;
 }
@@ -16,15 +16,15 @@ interface StationAutocompleteProps {
  */
 export function StationAutocomplete({
   label,
-  placeholder = 'Buscar estación...',
-  icon = 'origin',
+  placeholder = "Buscar estación...",
+  icon = "origin",
   value,
   onChange,
 }: StationAutocompleteProps) {
   const { stations, isLoading, query, setQuery } = useStationSearch();
 
-  const iconColor = icon === 'origin' ? 'text-green-400' : 'text-red-400';
-  const iconSymbol = icon === 'origin' ? '◉' : '◎';
+  const iconColor = icon === "origin" ? "text-green-400" : "text-red-400";
+  const iconSymbol = icon === "origin" ? "◉" : "◎";
 
   return (
     <div className="space-y-1">
@@ -36,18 +36,22 @@ export function StationAutocomplete({
         onInputChange={setQuery}
         selectedKey={value}
         onSelectionChange={(key) => onChange(key as string)}
-        startContent={<span className={`${iconColor} text-lg`}>{iconSymbol}</span>}
+        startContent={
+          <span className={`${iconColor} text-lg`}>{iconSymbol}</span>
+        }
         variant="bordered"
         classNames={{
-          base: 'w-full',
-          listboxWrapper: 'max-h-[200px]',
+          base: "w-full",
+          listboxWrapper: "max-h-[200px]",
         }}
       >
         {stations.map((station) => (
           <AutocompleteItem key={station.id} textValue={station.name}>
             <div className="flex flex-col">
               <span className="text-sm">{station.name}</span>
-              <span className="text-xs text-default-400">{station.route || 'Sin ruta'}</span>
+              <span className="text-xs text-default-400">
+                {station.route || "Sin ruta"}
+              </span>
             </div>
           </AutocompleteItem>
         ))}

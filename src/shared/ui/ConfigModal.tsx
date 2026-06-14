@@ -1,7 +1,10 @@
-import { AppModal } from '@shared/ui/AppModal';
-import { useTheme } from '@shared/hooks/useTheme';
+import { AppModal } from "@shared/ui/AppModal";
+import { useTheme } from "@shared/hooks/useTheme";
 
-interface Props { isOpen: boolean; onClose: () => void; }
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 export function ConfigModal({ isOpen, onClose }: Props) {
   const { theme, toggle } = useTheme();
@@ -12,10 +15,15 @@ export function ConfigModal({ isOpen, onClose }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">Tema</p>
-            <p className="text-xs text-default-400">Apariencia de la aplicación</p>
+            <p className="text-xs text-default-400">
+              Apariencia de la aplicación
+            </p>
           </div>
-          <button onClick={toggle} className="px-3 py-1.5 rounded-lg bg-default-100 text-xs font-semibold hover:bg-default-200 transition-colors">
-            {theme === 'dark' ? '🌙 Oscuro' : '☀️ Claro'}
+          <button
+            onClick={toggle}
+            className="px-3 py-1.5 rounded-lg bg-default-100 text-xs font-semibold hover:bg-default-200 transition-colors"
+          >
+            {theme === "dark" ? "🌙 Oscuro" : "☀️ Claro"}
           </button>
         </div>
         <div className="flex items-center justify-between">
@@ -28,7 +36,9 @@ export function ConfigModal({ isOpen, onClose }: Props) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">Notificaciones</p>
-            <p className="text-xs text-default-400">Alertas de rutas y tráfico</p>
+            <p className="text-xs text-default-400">
+              Alertas de rutas y tráfico
+            </p>
           </div>
           <span className="text-xs text-success">Activadas</span>
         </div>

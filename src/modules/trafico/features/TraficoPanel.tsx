@@ -1,9 +1,11 @@
-import { GlassCard } from '@shared/ui/GlassCard';
+import { GlassCard } from "@shared/ui/GlassCard";
 
 export function TraficoPanel() {
   return (
     <div className="space-y-4">
-      <p className="text-xs text-default-400">Estado del tráfico vehicular en tiempo real.</p>
+      <p className="text-xs text-default-400">
+        Estado del tráfico vehicular en tiempo real.
+      </p>
       <GlassCard>
         <p className="text-sm text-default-500">Velocidad promedio</p>
         <p className="text-3xl font-bold">24 km/h</p>

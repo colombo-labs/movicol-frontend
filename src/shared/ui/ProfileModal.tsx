@@ -1,7 +1,10 @@
-import { AppModal } from '@shared/ui/AppModal';
-import { User } from 'lucide-react';
+import { AppModal } from "@shared/ui/AppModal";
+import { User } from "lucide-react";
 
-interface Props { isOpen: boolean; onClose: () => void; }
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 export function ProfileModal({ isOpen, onClose }: Props) {
   return (
