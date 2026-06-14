@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 interface RequestOptions {
   method?: string;
@@ -6,11 +6,14 @@ interface RequestOptions {
   headers?: Record<string, string>;
 }
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
-    method: options.method ?? 'GET',
+    method: options.method ?? "GET",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options.headers,
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
@@ -25,5 +28,6 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
 export const api = {
   get: <T>(path: string) => request<T>(path),
-  post: <T>(path: string, body: unknown) => request<T>(path, { method: 'POST', body }),
+  post: <T>(path: string, body: unknown) =>
+    request<T>(path, { method: "POST", body }),
 };

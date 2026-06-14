@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import { Socket } from 'socket.io-client';
+import { useEffect, useRef, useState } from "react";
+import { Socket } from "socket.io-client";
 
-import { createWsClient } from '../api/ws-client';
+import { createWsClient } from "../api/ws-client";
 
 /**
  * Reusable hook for WebSocket connections.
@@ -15,8 +15,8 @@ export function useSocket(namespace: string) {
     const socket = createWsClient(namespace);
     socketRef.current = socket;
 
-    socket.on('connect', () => setIsConnected(true));
-    socket.on('disconnect', () => setIsConnected(false));
+    socket.on("connect", () => setIsConnected(true));
+    socket.on("disconnect", () => setIsConnected(false));
 
     return () => {
       socket.disconnect();

@@ -1,28 +1,18 @@
-import { io, Socket } from 'socket.io-client';
+import { io, Socket } from "socket.io-client";
 
-const WS_URL = import.meta.env.VITE_WS_URL ?? 'ws://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 /**
  * Create a namespaced WebSocket connection.
- * Handles auto-reconnect and heartbeat.
+ * Socket.io handles the ws:// upgrade internally — use http:// base URL.
  */
 export function createWsClient(namespace: string): Socket {
-  const socket = io(`${WS_URL}/${namespace}`, {
-    transports: ['websocket'],
+  const socket = io(`${API_URL}/${namespace}`, {
+    transports: ["websocket", "polling"],
     reconnection: true,
-    reconnectionAttempts: 10,
-    reconnectionDelay: 1000,
-  });
-
-  // Heartbeat
-  const heartbeatInterval = setInterval(() => {
-    if (socket.connected) {
-      socket.emit('heartbeat');
-    }
-  }, 30000);
-
-  socket.on('disconnect', () => {
-    clearInterval(heartbeatInterval);
+    reconnectionAttempts: 5,
+    reconnectionDelay: 2000,
+    timeout: 5000,
   });
 
   return socket;

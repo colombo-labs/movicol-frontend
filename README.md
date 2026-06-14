@@ -1,79 +1,60 @@
-# 🗺️ MoviCol Frontend
+# MoviCol Frontend
 
-Aplicación web de movilidad inteligente para Bogotá.
+Frontend React + Vite para visualización y planificación de transporte público en Bogotá.
 
 ## Stack
+- **React 18** + TypeScript
+- **Vite** — bundler
+- **HeroUI** (NextUI v2.4+) — componentes UI
+- **Tailwind CSS** — estilos
+- **Leaflet** — mapas interactivos
+- **Lucide React** — iconos
 
-- **React** 19 + **TypeScript** 5.5
-- **Vite** 5 (bundler)
-- **Hero UI** 2.4 (componentes UI)
-- **Tailwind CSS** 3.4 (utilidades)
-- **Leaflet** 1.9 + react-leaflet (mapas)
-- **Socket.io-client** 4.7 (WebSocket real-time)
-- **Zustand** 4.5 (state management)
-- **Vitest** 1.6 (testing)
-
-## Arquitectura
-
-Modular por feature — estilo Agrotech mejorado.
+## Estructura
 
 ```
 src/
-├── app/                         # Router + Layout principal
-├── shared/                      # Reutilizable en TODOS los módulos
-│   ├── ui/                      # Componentes UI globales (GlassCard, AppModal, Sidebar)
-│   ├── hooks/                   # Hooks globales (useModal, useSocket)
-│   ├── api/                     # HTTP client + WS client
-│   ├── types/                   # Types globales
-│   └── config/
-└── modules/
-    ├── mapa/                    # 🗺️ Mapa interactivo
-    ├── predicciones/            # 🔮 Predicción de rutas
-    ├── siniestralidad/          # 🚨 Zonas de riesgo
-    ├── accesibilidad/           # ♿ Closeness centrality
-    ├── metricas/                # 📊 Dashboard
-    └── chat/                    # 🤖 Widget flotante IA
+├── modules/
+│   ├── rutas/          → Tab TM (20 troncales) + Tab SITP (689 rutas)
+│   ├── planificar/     → Planificador de viaje con búsqueda de rutas reales
+│   ├── accesibilidad/  → Panel de métricas de infraestructura
+│   └── ...
+├── shared/
+│   ├── ui/             → AppModal, Header, componentes reutilizables
+│   └── hooks/          → useTheme, etc.
+└── public/
+    └── data/           → GeoJSON reales (troncales, estaciones)
 ```
 
-### Estructura de cada módulo
+## Datos Reales
+- `public/data/tm_troncales.geojson` — 20 troncales con geometría
+- `public/data/tm_estaciones.geojson` — 332 estaciones TM
 
-```
-modules/{modulo}/
-├── models/index.ts              # Types + Interfaces + Schemas + Mappers
-├── components/
-│   ├── ui/                      # Componentes pequeños (atómicos)
-│   └── widgets/                 # Componentes grandes (compuestos)
-├── features/                    # Bloques funcionales (integran hooks+api+widgets)
-├── hooks/                       # Lógica de estado del módulo
-├── api/                         # Llamadas al backend
-└── pages/                       # Página del módulo (usa features)
-```
+## Funcionalidades Implementadas
+- ✅ Mapa interactivo con capas TM/SITP
+- ✅ Planificador origen→destino con selección en mapa
+- ✅ Búsqueda de rutas reales que conectan origen↔destino
+- ✅ Cálculo local de distancia/tiempo cuando el backend no responde
+- ✅ Modales de configuración y perfil
+- ✅ Tarifa real $3,550 COP
+- ✅ Sin datos mock/fake
 
-## Quick Start
+## Desarrollo
 
 ```bash
-npm install --legacy-peer-deps
-npm run dev     # http://localhost:3000
+npm install
+npm run dev         # Dev server :3000
+npm run build       # Build producción
+npm run lint        # ESLint
+npm run format      # Prettier
 ```
 
-## Scripts
+## Docker
 
-| Script | Descripción |
-|--------|-------------|
-| `npm run dev` | Dev server (port 3000) |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint |
-| `npm test` | Vitest |
+```bash
+docker build -t colombolabs/movicol-frontend:latest .
+docker run -d --name movicol-frontend -p 3000:3000 colombolabs/movicol-frontend:latest
+```
 
-## Diseño
-
-- **Glassmorphism** dark mode (backdrop-blur, bordes sutiles)
-- **Sidebar** vertical con iconos (navegación por módulos)
-- **Modals** para acciones rápidas dentro de cada módulo
-- **Chat IA** como widget flotante abajo a la derecha
-- **Responsive** (mobile-first)
-
-## Requisitos
-
-- Node.js 20+
-- Backend corriendo en :3001
+## Variables de entorno
+- `VITE_API_URL` — URL del backend (default: `http://localhost:3001`)

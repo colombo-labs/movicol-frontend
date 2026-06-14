@@ -1,10 +1,10 @@
-import { Search, Navigation, X, Route } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Navigation, X, Route } from "lucide-react";
+import { useState } from "react";
 
 export function SearchBar() {
   const [showRoute, setShowRoute] = useState(false);
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
 
   return (
     <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-[90%] max-w-md">
@@ -28,8 +28,17 @@ export function SearchBar() {
       ) : (
         <div className="rounded-2xl bg-background/95 backdrop-blur-xl border border-divider shadow-lg p-4 space-y-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-default-500">Planificar ruta</span>
-            <button onClick={() => { setShowRoute(false); setOrigin(''); setDestination(''); }} className="text-default-400 hover:text-foreground">
+            <span className="text-xs font-medium text-default-500">
+              Planificar ruta
+            </span>
+            <button
+              onClick={() => {
+                setShowRoute(false);
+                setOrigin("");
+                setDestination("");
+              }}
+              className="text-default-400 hover:text-foreground"
+            >
               <X size={14} />
             </button>
           </div>
