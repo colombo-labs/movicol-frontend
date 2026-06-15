@@ -29,6 +29,7 @@ import { GlassCard } from "@shared/ui/GlassCard";
 import type { RoutePrediction } from "@modules/predicciones/models";
 import type { TripPoint } from "@/app/Layout";
 import { geocodeAddress, type GeoResult } from "@shared/utils/geocode";
+import { API_URL } from "@/shared/config";
 
 type TransportMode = "transmilenio" | "sitp" | "vehiculo";
 // Calculate real distance between two points (Haversine)
@@ -165,7 +166,7 @@ export function PlanificarViajePanel({
     }
     const fetchRutas = async () => {
       try {
-        const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
+        const API = API_URL;
         const radius = 600;
         const [resO, resD] = await Promise.all([
           fetch(
@@ -187,6 +188,7 @@ export function PlanificarViajePanel({
       }
     };
     fetchRutas();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, mode]);
 
   // Swap first and last points
@@ -219,11 +221,13 @@ export function PlanificarViajePanel({
   };
 
   // Auto-buscar ruta cuando hay 2+ puntos (estilo Waze/Moovit)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (tripPoints.length >= 2 && !prediction && !isLoading) {
       const timer = setTimeout(() => handleSearch(), 500);
       return () => clearTimeout(timer);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripPoints]);
   const formatCoord = (pt: TripPoint) =>
     pt.label || `${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}`;

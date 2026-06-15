@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
-const API = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+import { API_URL as API } from "@/shared/config";
 
 export interface GeoResult {
   lat: number;

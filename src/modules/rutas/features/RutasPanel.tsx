@@ -1,3 +1,4 @@
+import { API_URL } from "@/shared/config";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { Train, Bus, Search, Clock, MapPin, AlertCircle } from "lucide-react";
@@ -90,7 +91,7 @@ export function RutasPanel({
   const [filter, setFilter] = useState<string>("todas");
   const [selected, setSelected] = useState<any>(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+  // API_URL from shared config
 
   const handleTab = (t: Tab) => {
     if (sitpRutas.length === 0) {

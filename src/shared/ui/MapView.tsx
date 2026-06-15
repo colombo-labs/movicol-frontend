@@ -18,7 +18,7 @@ import { TroncalesLayer } from "./TroncalesLayer";
 import type { TripPoint } from "../../app/Layout";
 import type { RoutePrediction } from "../../modules/predicciones/models";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+import { API_URL } from "@/shared/config";
 
 const RISK_COLORS: Record<string, string> = {
   low: "#22c55e",
@@ -214,6 +214,7 @@ function FitRouteBounds({
   tripPoints: any[];
 }) {
   const map = useMap();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     try {
       if (prediction?.risk_segments?.length > 0) {
@@ -254,6 +255,7 @@ function FitRouteBounds({
     } catch {
       // Silently ignore bounds errors
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prediction, tripPoints.length]);
   return null;
 }
@@ -264,6 +266,7 @@ function InvalidateSize() {
   useEffect(() => {
     const t = setTimeout(() => map.invalidateSize(), 200);
     return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return null;
 }
