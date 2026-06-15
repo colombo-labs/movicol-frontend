@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
+import { API_URL } from "@/shared/config";
 import { Polyline, CircleMarker, Tooltip } from "react-leaflet";
 
 interface Props {
@@ -40,8 +41,8 @@ export function SelectedTroncalLayer({ troncalName }: Props) {
 
   useEffect(() => {
     Promise.all([
-      fetch("/data/tm_troncales.geojson").then((r) => r.json()),
-      fetch("/data/tm_estaciones.geojson").then((r) => r.json()),
+      fetch(`${API_URL}/graph/tm/troncales`).then((r) => r.json()),
+      fetch(`${API_URL}/graph/tm/estaciones`).then((r) => r.json()),
     ]).then(([tData, eData]) => {
       const matching = tData.features.filter(
         (f: any) =>

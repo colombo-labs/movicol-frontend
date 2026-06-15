@@ -18,8 +18,8 @@ export function useRutasData() {
   if (tmTroncales.length === 0) {
     const prefix = "transmisig2.tecnica.estacion_troncal.";
     Promise.all([
-      fetch("/data/tm_troncales.geojson").then((r) => r.json()),
-      fetch("/data/tm_estaciones.geojson").then((r) => r.json()),
+      fetch(`${API_URL}/graph/tm/troncales`).then((r) => r.json()),
+      fetch(`${API_URL}/graph/tm/estaciones`).then((r) => r.json()),
     ])
       .then(([tData, eData]) => {
         const stnsByTz: Record<string, string[]> = {};
