@@ -40,8 +40,10 @@ export function Layout() {
     stops: { lat: number; lon: number; nombre: string }[];
   } | null>(null);
   const [tripPoints, setTripPoints] = useState<TripPoint[]>([]);
-  const [_showRoutesOnMap, setShowRoutesOnMap] = useState(false);
-  const [_routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
+  const showRoutesOnMapState = useState(false);
+  const setShowRoutesOnMap = showRoutesOnMapState[1];
+  const routeFilterState = useState<"all" | "tm" | "sitp">("all");
+  const setRouteFilter = routeFilterState[1];
   const [showCongestion] = useState(false);
   const { predict, prediction, isLoading, error, clear } = useRoutePredict();
 

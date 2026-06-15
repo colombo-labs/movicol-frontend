@@ -15,8 +15,8 @@ import {
 import { TroncalesLayer } from "./TroncalesLayer";
 import { SitpLayer, CongestionLayer } from "./map-components/layers";
 import { SelectedTroncalLayer } from "./map-components/troncal-layer";
+import { makeIcon } from "./map-components/make-icon";
 import {
-  makeIcon,
   DraggableMarker,
   FitRouteBounds,
   InvalidateSize,
