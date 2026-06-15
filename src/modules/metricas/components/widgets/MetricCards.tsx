@@ -79,6 +79,13 @@ export function PassengersCard({
   );
 }
 
+function getBarColor(isNow: boolean, h: number) {
+  if (isNow) return "bg-primary";
+  if (h > 70) return "bg-danger/50";
+  if (h > 50) return "bg-warning/50";
+  return "bg-success/50";
+}
+
 export function NetworkEfficiency() {
   return (
     <GlassCard>
@@ -91,13 +98,7 @@ export function NetworkEfficiency() {
         {Array.from({ length: 12 }, (_, i) => {
           const h = 30 + ((i * 37 + 13) % 70);
           const isNow = i === new Date().getHours() % 12;
-          const color = isNow
-            ? "bg-primary"
-            : h > 70
-              ? "bg-danger/50"
-              : h > 50
-                ? "bg-warning/50"
-                : "bg-success/50";
+          const color = getBarColor(isNow, h);
           return (
             <div
               key={`bar-${i}`}

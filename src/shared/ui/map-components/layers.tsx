@@ -3,6 +3,19 @@ import { useEffect, useState } from "react";
 import { CircleMarker, Popup } from "react-leaflet";
 import { API_URL } from "@/shared/config";
 
+function getRiskColor(risk: string) {
+  if (risk === "critical") return "#ef4444";
+  if (risk === "high") return "#f97316";
+  if (risk === "medium") return "#eab308";
+  return "#22c55e";
+}
+
+function getRiskLabel(risk: string) {
+  if (risk === "high") return "Alto";
+  if (risk === "medium") return "Medio";
+  return "Bajo";
+}
+
 export function SitpLayer() {
   const [paraderos, setParaderos] = useState<
     { lat: number; lon: number; nombre: string; direccion: string }[]
@@ -28,9 +41,9 @@ export function SitpLayer() {
   }, []);
   return (
     <>
-      {paraderos.map((p, i) => (
+      {paraderos.map((p) => (
         <CircleMarker
-          key={`sitp-${i}`}
+          key={`sitp-${p.lat}-${p.lon}`}
           center={[p.lat, p.lon]}
           radius={3}
           pathOptions={{
@@ -79,14 +92,7 @@ export function CongestionLayer() {
       })
       .catch(() => {});
   }, []);
-  const riskColor = (risk: string) =>
-    risk === "critical"
-      ? "#ef4444"
-      : risk === "high"
-        ? "#f97316"
-        : risk === "medium"
-          ? "#eab308"
-          : "#22c55e";
+  const riskColor = getRiskColor;
   return (
     <>
       {stations.map((s) => (
@@ -112,13 +118,7 @@ export function CongestionLayer() {
               <br />
               <span style={{ color: "#888" }}>
                 Nivel:{" "}
-                {s.risk === "critical"
-                  ? "Crítico"
-                  : s.risk === "high"
-                    ? "Alto"
-                    : s.risk === "medium"
-                      ? "Medio"
-                      : "Bajo"}
+                {s.risk === "critical" ? "Crítico" : getRiskLabel(s.risk)}
               </span>
             </div>
           </Popup>

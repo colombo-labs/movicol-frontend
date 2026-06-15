@@ -2,62 +2,62 @@
 import { useEffect, useState } from "react";
 import { Polyline, CircleMarker, Tooltip } from "react-leaflet";
 
-export function SelectedTroncalLayer({ troncalName }: { troncalName: string }) {
+interface Props {
+  readonly troncalName: string;
+}
+
+function extractCoords(features: any[]): [number, number][] {
+  const allCoords: [number, number][] = [];
+  for (const f of features) {
+    const geom = f.geometry;
+    const lines =
+      geom.type === "MultiLineString" ? geom.coordinates : [geom.coordinates];
+    for (const line of lines) {
+      for (const c of line) {
+        if (c?.[0] != null && c?.[1] != null) allCoords.push([c[1], c[0]]);
+      }
+    }
+  }
+  return allCoords;
+}
+
+function extractStations(features: any[], trazadoIds: Set<string>) {
+  const prefix = "transmisig2.tecnica.estacion_troncal.";
+  return features
+    .filter((f: any) => trazadoIds.has(f.properties[prefix + "id_trazado"]))
+    .map((f: any) => ({
+      lat: f.geometry.coordinates[1],
+      lon: f.geometry.coordinates[0],
+      nombre: f.properties[prefix + "nom_est"] || "",
+    }));
+}
+
+export function SelectedTroncalLayer({ troncalName }: Props) {
   const [coords, setCoords] = useState<[number, number][]>([]);
   const [stations, setStations] = useState<
     { lat: number; lon: number; nombre: string }[]
   >([]);
 
   useEffect(() => {
-    fetch("/data/tm_troncales.geojson")
-      .then((r) => r.json())
-      .then((data) => {
-        const matching = data.features.filter(
-          (f: any) =>
-            f.properties.troncal
-              ?.toUpperCase()
-              .includes(troncalName.toUpperCase()) ||
-            f.properties.nombre_trazado_troncal
-              ?.toUpperCase()
-              .includes(troncalName.toUpperCase()),
-        );
-        const allCoords: [number, number][] = [];
-        matching.forEach((f: any) => {
-          const geom = f.geometry;
-          if (geom.type === "MultiLineString") {
-            geom.coordinates.forEach((line: number[][]) => {
-              line.forEach((c: number[]) => {
-                if (c && c[0] != null && c[1] != null)
-                  allCoords.push([c[1], c[0]]);
-              });
-            });
-          } else {
-            geom.coordinates.forEach((c: number[]) => {
-              if (c && c[0] != null && c[1] != null)
-                allCoords.push([c[1], c[0]]);
-            });
-          }
-        });
-        setCoords(allCoords);
-        const trazadoIds = matching.map(
-          (f: any) => f.properties.id_trazado_troncal,
-        );
-        fetch("/data/tm_estaciones.geojson")
-          .then((r2) => r2.json())
-          .then((eData) => {
-            const prefix = "transmisig2.tecnica.estacion_troncal.";
-            const stns = eData.features
-              .filter((f: any) =>
-                trazadoIds.includes(f.properties[prefix + "id_trazado"]),
-              )
-              .map((f: any) => ({
-                lat: f.geometry.coordinates[1],
-                lon: f.geometry.coordinates[0],
-                nombre: f.properties[prefix + "nom_est"] || "",
-              }));
-            setStations(stns);
-          });
-      });
+    Promise.all([
+      fetch("/data/tm_troncales.geojson").then((r) => r.json()),
+      fetch("/data/tm_estaciones.geojson").then((r) => r.json()),
+    ]).then(([tData, eData]) => {
+      const matching = tData.features.filter(
+        (f: any) =>
+          f.properties.troncal
+            ?.toUpperCase()
+            .includes(troncalName.toUpperCase()) ||
+          f.properties.nombre_trazado_troncal
+            ?.toUpperCase()
+            .includes(troncalName.toUpperCase()),
+      );
+      setCoords(extractCoords(matching));
+      const trazadoIds = new Set<string>(
+        matching.map((f: any) => f.properties.id_trazado_troncal),
+      );
+      setStations(extractStations(eData.features, trazadoIds));
+    });
   }, [troncalName]);
 
   return (
@@ -68,9 +68,9 @@ export function SelectedTroncalLayer({ troncalName }: { troncalName: string }) {
           pathOptions={{ color: "#ef4444", weight: 5, opacity: 0.8 }}
         />
       )}
-      {stations.map((s, i) => (
+      {stations.map((s) => (
         <CircleMarker
-          key={"tm-st-" + i}
+          key={`tm-${s.nombre}`}
           center={[s.lat, s.lon]}
           radius={5}
           pathOptions={{

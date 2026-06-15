@@ -41,7 +41,7 @@ export function Layout() {
   } | null>(null);
   const [tripPoints, setTripPoints] = useState<TripPoint[]>([]);
   const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
-  const [showRoutesOnMap, setShowRoutesOnMap] = useState(false);
+  const [, setShowRoutesOnMap] = useState(false);
   const [showCongestion] = useState(false);
   const { predict, prediction, isLoading, error, clear } = useRoutePredict();
 
@@ -95,7 +95,7 @@ export function Layout() {
           }
           return [pt, ...prev];
         });
-        const targetIdx = index !== undefined ? index : 0;
+        const targetIdx = index ?? 0;
         updateLabel(setTripPoints, targetIdx, lat, lng);
       },
       (err) => {
@@ -216,7 +216,6 @@ export function Layout() {
             sitpRouteCoords={sitpRouteCoords || undefined}
             onMapClick={handleMapClick}
             predictionMode={activePanel === "planificar"}
-            showRouteFilters={showRoutesOnMap}
             routeFilter={routeFilter}
             prediction={prediction}
             tripPoints={tripPoints}

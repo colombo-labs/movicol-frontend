@@ -31,13 +31,14 @@ export function GridStats({ stats }: { readonly stats: Stats | null }) {
   );
 }
 
+function getBarColor(risk: string) {
+  if (risk === "critical") return "bg-danger";
+  if (risk === "high") return "bg-orange-500";
+  return "bg-warning";
+}
+
 export function TopCongested({ items }: { readonly items: HeatmapItem[] }) {
   if (items.length === 0) return null;
-  function getBarColor(risk: string) {
-    if (risk === "critical") return "bg-danger";
-    if (risk === "high") return "bg-orange-500";
-    return "bg-warning";
-  }
   return (
     <GlassCard>
       <div className="flex items-center gap-2 mb-2">
@@ -67,17 +68,19 @@ export function TopCongested({ items }: { readonly items: HeatmapItem[] }) {
   );
 }
 
+function getPeakColor(level: number) {
+  if (level > 85) return "bg-danger";
+  if (level > 60) return "bg-warning";
+  return "bg-success";
+}
+
 export function PeakHours() {
   const peaks = [
     { range: "6:00 - 8:30", level: 92, label: "Muy alta" },
     { range: "11:30 - 13:00", level: 65, label: "Moderada" },
     { range: "17:00 - 19:30", level: 88, label: "Alta" },
   ];
-  function getColor(level: number) {
-    if (level > 85) return "bg-danger";
-    if (level > 60) return "bg-warning";
-    return "bg-success";
-  }
+
   return (
     <GlassCard>
       <div className="flex items-center gap-2 mb-2">
@@ -90,7 +93,7 @@ export function PeakHours() {
             <span className="text-[10px] text-default-500 w-20">{h.range}</span>
             <div className="flex-1 h-1.5 rounded-full bg-default-100 overflow-hidden">
               <div
-                className={`h-full rounded-full ${getColor(h.level)}`}
+                className={`h-full rounded-full ${getPeakColor(h.level)}`}
                 style={{ width: `${h.level}%` }}
               />
             </div>

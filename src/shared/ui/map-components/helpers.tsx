@@ -94,7 +94,9 @@ export function FitRouteBounds({
         const coords = tripPoints.map(
           (p: any) => [p.lat, p.lng] as [number, number],
         );
-        if (coords.every((c) => isFinite(c[0]) && isFinite(c[1]))) {
+        if (
+          coords.every((c) => Number.isFinite(c[0]) && Number.isFinite(c[1]))
+        ) {
           const bounds = L.latLngBounds(coords);
           if (bounds.isValid()) {
             map.fitBounds(bounds, { padding: [60, 60], maxZoom: 14 });

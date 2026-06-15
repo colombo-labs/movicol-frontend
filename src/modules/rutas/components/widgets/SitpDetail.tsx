@@ -7,6 +7,12 @@ interface Props {
   readonly onBack: () => void;
 }
 
+function getStopColor(i: number, total: number) {
+  if (i === 0) return "bg-success";
+  if (i === total - 1) return "bg-danger";
+  return "bg-blue-500";
+}
+
 export function SitpDetail({ ruta, onBack }: Props) {
   return (
     <div className="space-y-3">
@@ -42,7 +48,7 @@ export function SitpDetail({ ruta, onBack }: Props) {
               className="flex items-center gap-2 py-1 border-b border-default-100 last:border-0"
             >
               <div
-                className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0 ${i === 0 ? "bg-success" : i === ruta.paraderos.length - 1 ? "bg-danger" : "bg-blue-500"}`}
+                className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0 ${getStopColor(i, ruta.paraderos.length)}`}
               >
                 {i + 1}
               </div>
