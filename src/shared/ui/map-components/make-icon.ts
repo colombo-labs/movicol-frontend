@@ -14,4 +14,3 @@ export function makeIcon(color: string, size = 32, label?: string) {
     </div>`,
   });
 }
-

@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef } from "react";
 import { Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 
-
 // Draggable Marker component
 
 export function DraggableMarker({

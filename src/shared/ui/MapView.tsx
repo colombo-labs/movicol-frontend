@@ -24,6 +24,8 @@ import {
 } from "./map-components/helpers";
 
 interface MapViewProps {
+  readonly showRouteFilters?: boolean;
+  readonly routeFilter?: "all" | "tm" | "sitp";
   onMapClick?: (lat: number, lng: number) => void;
   predictionMode?: boolean;
   prediction?: RoutePrediction | null;

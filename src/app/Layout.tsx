@@ -29,6 +29,24 @@ function updateLabel(
   });
 }
 
+function handleGeoSuccess(
+  pos: GeolocationPosition,
+  index: number | undefined,
+  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
+) {
+  const lat = pos.coords.latitude;
+  const lng = pos.coords.longitude;
+  const pt: TripPoint = { lat, lng, label: "Obteniendo dirección..." };
+  setTripPoints((prev) => {
+    if (index !== undefined && index < prev.length) {
+      return prev.map((p, i) => (i === index ? pt : p));
+    }
+    return [pt, ...prev];
+  });
+  const targetIdx = index ?? 0;
+  updateLabel(setTripPoints, targetIdx, lat, lng);
+}
+
 export function Layout() {
   const [activePanel, setActivePanel] = useState<PanelId>(null);
   const [showTroncales, setShowTroncales] = useState(false);
@@ -40,10 +58,8 @@ export function Layout() {
     stops: { lat: number; lon: number; nombre: string }[];
   } | null>(null);
   const [tripPoints, setTripPoints] = useState<TripPoint[]>([]);
-  const showRoutesOnMapState = useState(false);
-  const setShowRoutesOnMap = showRoutesOnMapState[1];
-  const routeFilterState = useState<"all" | "tm" | "sitp">("all");
-  const setRouteFilter = routeFilterState[1];
+  const [showRoutesOnMap, setShowRoutesOnMap] = useState(false);
+  const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
   const [showCongestion] = useState(false);
   const { predict, prediction, isLoading, error, clear } = useRoutePredict();
 
@@ -87,19 +103,7 @@ export function Layout() {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const pt: TripPoint = { lat, lng, label: "Obteniendo dirección..." };
-        setTripPoints((prev) => {
-          if (index !== undefined && index < prev.length) {
-            return prev.map((p, i) => (i === index ? pt : p));
-          }
-          return [pt, ...prev];
-        });
-        const targetIdx = index ?? 0;
-        updateLabel(setTripPoints, targetIdx, lat, lng);
-      },
+      (pos) => handleGeoSuccess(pos, index, setTripPoints),
       (err) => {
         if (err.code === 1)
           alert("Permiso de ubicación denegado. Actívalo en tu navegador.");
@@ -222,6 +226,8 @@ export function Layout() {
             tripPoints={tripPoints}
             onMovePoint={handleMovePoint}
             showCongestion={showCongestion}
+            showRouteFilters={showRoutesOnMap}
+            routeFilter={routeFilter}
           />
         </main>
 
