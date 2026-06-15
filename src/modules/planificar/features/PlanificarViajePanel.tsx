@@ -189,36 +189,6 @@ export function PlanificarViajePanel({
     fetchRutas();
   }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, mode]);
 
-  // Fetch available routes when origin+destination are set and mode is transit
-  useEffect(() => {
-    if (!origin || !destination || mode === "vehiculo") {
-      setRutasDisponibles([]);
-      return;
-    }
-    const fetchRutas = async () => {
-      try {
-        const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
-        const radius = 600;
-        const [resO, resD] = await Promise.all([
-          fetch(
-            `${API}/graph/rutas-cercanas?lat=${origin.lat}&lng=${origin.lng}&radius=${radius}`,
-          ).then((r) => r.json()),
-          fetch(
-            `${API}/graph/rutas-cercanas?lat=${destination.lat}&lng=${destination.lng}&radius=${radius}`,
-          ).then((r) => r.json()),
-        ]);
-        const rutasOrigen = new Set((resO.rutas || []).map((r: any) => r.ruta));
-        const comunes = (resD.rutas || []).filter((r: any) =>
-          rutasOrigen.has(r.ruta),
-        );
-        setRutasDisponibles(comunes.slice(0, 5));
-      } catch {
-        setRutasDisponibles([]);
-      }
-    };
-    fetchRutas();
-  }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, mode]);
-
   // Swap first and last points
   const handleSwap = () => {
     if (tripPoints.length >= 2) {
