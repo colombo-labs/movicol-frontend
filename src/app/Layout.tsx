@@ -16,6 +16,19 @@ import { reverseGeocode } from "@shared/utils/reverseGeocode";
 
 export type TripPoint = { lat: number; lng: number; label?: string };
 
+function updateLabel(
+  setter: React.Dispatch<React.SetStateAction<TripPoint[]>>,
+  index: number,
+  lat: number,
+  lng: number,
+) {
+  reverseGeocode(lat, lng).then((address) => {
+    setter((prev) =>
+      prev.map((p, i) => (i === index ? { ...p, label: address } : p)),
+    );
+  });
+}
+
 export function Layout() {
   const [activePanel, setActivePanel] = useState<PanelId>(null);
   const [showTroncales, setShowTroncales] = useState(false);
@@ -42,11 +55,7 @@ export function Layout() {
       if (activePanel !== "planificar") return;
       const newIndex = tripPoints.length;
       setTripPoints((prev) => [...prev, { lat, lng, label: "Buscando..." }]);
-      reverseGeocode(lat, lng).then((address) => {
-        setTripPoints((prev) =>
-          prev.map((p, i) => (i === newIndex ? { ...p, label: address } : p)),
-        );
-      });
+      updateLabel(setTripPoints, newIndex, lat, lng);
     },
     [activePanel, tripPoints.length],
   );
@@ -59,11 +68,7 @@ export function Layout() {
           i === index ? { ...p, lat, lng, label: "Buscando..." } : p,
         ),
       );
-      reverseGeocode(lat, lng).then((address) => {
-        setTripPoints((prev) =>
-          prev.map((p, i) => (i === index ? { ...p, label: address } : p)),
-        );
-      });
+      updateLabel(setTripPoints, index, lat, lng);
     },
     [],
   );
@@ -90,15 +95,8 @@ export function Layout() {
           }
           return [pt, ...prev];
         });
-        reverseGeocode(lat, lng).then((address) => {
-          setTripPoints((prev) => {
-            const targetIdx =
-              index !== undefined && index < prev.length ? index : 0;
-            return prev.map((p, i) =>
-              i === targetIdx ? { ...p, label: address } : p,
-            );
-          });
-        });
+        const targetIdx = index !== undefined ? index : 0;
+        updateLabel(setTripPoints, targetIdx, lat, lng);
       },
       (err) => {
         if (err.code === 1)
