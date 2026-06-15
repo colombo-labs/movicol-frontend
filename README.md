@@ -1,3 +1,8 @@
+![CI](https://github.com/colombo-labs/movicol-frontend/actions/workflows/ci.yml/badge.svg)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=colombo-labs_movicol-frontend&metric=alert_status)](https://sonarcloud.io/dashboard?id=colombo-labs_movicol-frontend)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=colombo-labs_movicol-frontend&metric=bugs)](https://sonarcloud.io/dashboard?id=colombo-labs_movicol-frontend)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=colombo-labs_movicol-frontend&metric=code_smells)](https://sonarcloud.io/dashboard?id=colombo-labs_movicol-frontend)
+
 # MoviCol Frontend
 
 React + Vite frontend for Bogotá's public transport visualization and trip planning.
