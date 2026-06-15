@@ -24,19 +24,17 @@ import {
 } from "./map-components/helpers";
 
 interface MapViewProps {
-  readonly showRouteFilters?: boolean;
-  readonly routeFilter?: "all" | "tm" | "sitp";
-  onMapClick?: (lat: number, lng: number) => void;
-  predictionMode?: boolean;
-  prediction?: RoutePrediction | null;
-  tripPoints?: TripPoint[];
-  onMovePoint?: (index: number, lat: number, lng: number) => void;
-  showCongestion?: boolean;
-  showSitpOnMap?: boolean;
-  selectedTroncal?: string | null;
-  showTroncalesOnMap?: boolean;
-  showEstacionesOnMap?: boolean;
-  sitpRouteCoords?: {
+  readonly onMapClick?: (lat: number, lng: number) => void;
+  readonly predictionMode?: boolean;
+  readonly prediction?: RoutePrediction | null;
+  readonly tripPoints?: TripPoint[];
+  readonly onMovePoint?: (index: number, lat: number, lng: number) => void;
+  readonly showCongestion?: boolean;
+  readonly showSitpOnMap?: boolean;
+  readonly selectedTroncal?: string | null;
+  readonly showTroncalesOnMap?: boolean;
+  readonly showEstacionesOnMap?: boolean;
+  readonly sitpRouteCoords?: {
     coords: [number, number][];
     stops: { lat: number; lon: number; nombre: string }[];
   } | null;
@@ -52,6 +50,18 @@ const RISK_COLORS: Record<string, string> = {
 const originIcon = makeIcon("#22c55e", 36, "A");
 const destIcon = makeIcon("#ef4444", 36, "B");
 const waypointIcon = makeIcon("#3b82f6", 28);
+
+function getStopFillColor(i: number, total: number) {
+  if (i === 0) return "#22c55e";
+  if (i === total - 1) return "#ef4444";
+  return "#fff";
+}
+
+function getPointIcon(i: number, total: number) {
+  if (i === 0) return originIcon;
+  if (i === total - 1) return destIcon;
+  return waypointIcon;
+}
 
 export function MapView({
   onMapClick,
@@ -100,12 +110,10 @@ export function MapView({
         />
 
         {/* Troncales & Estaciones */}
-        {true && (
-          <TroncalesLayer
-            showTroncales={showTroncales}
-            showEstaciones={showEstaciones}
-          />
-        )}
+        <TroncalesLayer
+          showTroncales={showTroncales}
+          showEstaciones={showEstaciones}
+        />
 
         {/* SITP paraderos */}
         {(showSitp || showSitpOnMap) && <SitpLayer />}
@@ -120,17 +128,12 @@ export function MapView({
             />
             {sitpRouteCoords.stops.map((s, i) => (
               <CircleMarker
-                key={`sr-${i}`}
+                key={`sr-${s.lat}-${s.lon}`}
                 center={[s.lat, s.lon]}
                 radius={4}
                 pathOptions={{
                   color: "#3b82f6",
-                  fillColor:
-                    i === 0
-                      ? "#22c55e"
-                      : i === sitpRouteCoords.stops.length - 1
-                        ? "#ef4444"
-                        : "#fff",
+                  fillColor: getStopFillColor(i, sitpRouteCoords.stops.length),
                   fillOpacity: 1,
                   weight: 2,
                 }}
@@ -148,15 +151,10 @@ export function MapView({
 
         {/* Trip point markers */}
         {tripPoints.map((pt, i) => {
-          const icon =
-            i === 0
-              ? originIcon
-              : i === tripPoints.length - 1
-                ? destIcon
-                : waypointIcon;
+          const icon = getPointIcon(i, tripPoints.length);
           return (
             <DraggableMarker
-              key={`tp-${i}`}
+              key={`tp-${pt.lat}-${pt.lng}`}
               position={[pt.lat, pt.lng]}
               icon={icon}
               onDragEnd={(lat, lng) => onMovePoint?.(i, lat, lng)}
@@ -206,13 +204,7 @@ export function MapView({
                 <span
                   style={{
                     fontWeight: 600,
-                    color:
-                      segment.risk_label === "high" ||
-                      segment.risk_label === "critical"
-                        ? "#ef4444"
-                        : segment.risk_label === "medium"
-                          ? "#eab308"
-                          : "#22c55e",
+                    color: RISK_COLORS[segment.risk_label] ?? "#22c55e",
                   }}
                 >
                   {Math.round(segment.congestion_level * 100)}% congestión
