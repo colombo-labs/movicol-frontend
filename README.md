@@ -1,60 +1,37 @@
 # MoviCol Frontend
 
-Frontend React + Vite para visualización y planificación de transporte público en Bogotá.
+React + Vite frontend for Bogotá's public transport visualization and trip planning.
 
 ## Stack
-- **React 18** + TypeScript
-- **Vite** — bundler
-- **HeroUI** (NextUI v2.4+) — componentes UI
-- **Tailwind CSS** — estilos
-- **Leaflet** — mapas interactivos
-- **Lucide React** — iconos
+- React 18 + TypeScript + Vite
+- HeroUI (NextUI v2.4+) + Tailwind CSS
+- Leaflet (interactive maps)
+- Lucide React (icons)
 
-## Estructura
+## Features (v0.2.0)
+- ✅ Interactive map with TM/SITP layers
+- ✅ 20 real TransMilenio trunk routes (GeoJSON)
+- ✅ 332 real TM stations
+- ✅ 689 real SITP routes (42,601 stops)
+- ✅ Trip planner with real route matching (origin↔destination)
+- ✅ Accessibility metrics from real data
+- ✅ Config/Profile modals (fixed z-index over map)
+- ✅ Real fare: COP $3,550
+- ✅ Zero mock data
 
-```
-src/
-├── modules/
-│   ├── rutas/          → Tab TM (20 troncales) + Tab SITP (689 rutas)
-│   ├── planificar/     → Planificador de viaje con búsqueda de rutas reales
-│   ├── accesibilidad/  → Panel de métricas de infraestructura
-│   └── ...
-├── shared/
-│   ├── ui/             → AppModal, Header, componentes reutilizables
-│   └── hooks/          → useTheme, etc.
-└── public/
-    └── data/           → GeoJSON reales (troncales, estaciones)
-```
-
-## Datos Reales
-- `public/data/tm_troncales.geojson` — 20 troncales con geometría
-- `public/data/tm_estaciones.geojson` — 332 estaciones TM
-
-## Funcionalidades Implementadas
-- ✅ Mapa interactivo con capas TM/SITP
-- ✅ Planificador origen→destino con selección en mapa
-- ✅ Búsqueda de rutas reales que conectan origen↔destino
-- ✅ Cálculo local de distancia/tiempo cuando el backend no responde
-- ✅ Modales de configuración y perfil
-- ✅ Tarifa real $3,550 COP
-- ✅ Sin datos mock/fake
-
-## Desarrollo
-
+## Run
 ```bash
-npm install
-npm run dev         # Dev server :3000
-npm run build       # Build producción
-npm run lint        # ESLint
-npm run format      # Prettier
+npm install && npm run dev     # Dev :3000
+npm run build                  # Production build
+npm run lint                   # ESLint
+npm run format                 # Prettier
 ```
 
 ## Docker
-
 ```bash
 docker build -t colombolabs/movicol-frontend:latest .
-docker run -d --name movicol-frontend -p 3000:3000 colombolabs/movicol-frontend:latest
+docker run -d -p 3000:3000 colombolabs/movicol-frontend:latest
 ```
 
-## Variables de entorno
-- `VITE_API_URL` — URL del backend (default: `http://localhost:3001`)
+## Env
+- `VITE_API_URL` — Backend URL (default: `http://localhost:3001`)

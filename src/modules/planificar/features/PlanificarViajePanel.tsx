@@ -124,14 +124,13 @@ export function PlanificarViajePanel({
   const [mode, setMode] = useState<TransportMode>("transmilenio");
   const [departureType, setDepartureType] = useState<DepartureType>("ahora");
   const [departureTime, setDepartureTime] = useState("");
+  const [rutasDisponibles, setRutasDisponibles] = useState<
+    { ruta: string; cenefa: string; distanciaMinima: number }[]
+  >([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<GeoResult[]>([]);
   const [searching, setSearching] = useState(false);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [rutasDisponibles, setRutasDisponibles] = useState<
-    { ruta: string; cenefa: string; distanciaMinima: number }[]
-  >([]);
-  const [, setBuscandoRutas] = useState(false);
 
   const origin = tripPoints.length > 0 ? tripPoints[0] : null;
   const destination =
@@ -157,6 +156,39 @@ export function PlanificarViajePanel({
     }
   };
 
+  // Fetch real routes when origin+destination are set
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!origin || !destination || mode === "vehiculo") {
+      setRutasDisponibles([]);
+      return;
+    }
+    const fetchRutas = async () => {
+      try {
+        const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
+        const radius = 600;
+        const [resO, resD] = await Promise.all([
+          fetch(
+            `${API}/graph/rutas-cercanas?lat=${origin.lat}&lng=${origin.lng}&radius=${radius}`,
+          ).then((r) => r.json()),
+          fetch(
+            `${API}/graph/rutas-cercanas?lat=${destination.lat}&lng=${destination.lng}&radius=${radius}`,
+          ).then((r) => r.json()),
+        ]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rutasOrigen = new Set((resO.rutas || []).map((r: any) => r.ruta));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const comunes = (resD.rutas || []).filter((r: any) =>
+          rutasOrigen.has(r.ruta),
+        );
+        setRutasDisponibles(comunes.slice(0, 5));
+      } catch {
+        setRutasDisponibles([]);
+      }
+    };
+    fetchRutas();
+  }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, mode]);
+
   // Fetch available routes when origin+destination are set and mode is transit
   useEffect(() => {
     if (!origin || !destination || mode === "vehiculo") {
@@ -164,7 +196,6 @@ export function PlanificarViajePanel({
       return;
     }
     const fetchRutas = async () => {
-      setBuscandoRutas(true);
       try {
         const API = import.meta.env.VITE_API_URL || "http://localhost:3001";
         const radius = 600;
@@ -184,7 +215,6 @@ export function PlanificarViajePanel({
       } catch {
         setRutasDisponibles([]);
       }
-      setBuscandoRutas(false);
     };
     fetchRutas();
   }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, mode]);
