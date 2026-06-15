@@ -255,7 +255,7 @@ function FitRouteBounds({
     } catch {
       // Silently ignore bounds errors
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prediction, tripPoints.length]);
   return null;
 }
@@ -266,7 +266,7 @@ function InvalidateSize() {
   useEffect(() => {
     const t = setTimeout(() => map.invalidateSize(), 200);
     return () => clearTimeout(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return null;
 }

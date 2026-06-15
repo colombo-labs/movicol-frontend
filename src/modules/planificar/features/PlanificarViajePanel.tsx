@@ -188,7 +188,7 @@ export function PlanificarViajePanel({
       }
     };
     fetchRutas();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, mode]);
 
   // Swap first and last points
@@ -227,7 +227,7 @@ export function PlanificarViajePanel({
       const timer = setTimeout(() => handleSearch(), 500);
       return () => clearTimeout(timer);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tripPoints]);
   const formatCoord = (pt: TripPoint) =>
     pt.label || `${pt.lat.toFixed(4)}, ${pt.lng.toFixed(4)}`;
