@@ -34,7 +34,6 @@ interface MapViewProps {
   selectedTroncal?: string | null;
   showTroncalesOnMap?: boolean;
   showEstacionesOnMap?: boolean;
-  routeFilter?: "all" | "tm" | "sitp";
   sitpRouteCoords?: {
     coords: [number, number][];
     stops: { lat: number; lon: number; nombre: string }[];

@@ -24,11 +24,11 @@ export function DraggableMarker({
   position,
   icon,
   onDragEnd,
-}: {
+}: Readonly<{
   position: [number, number];
   icon: L.DivIcon;
   onDragEnd: (lat: number, lng: number) => void;
-}) {
+}>) {
   const markerRef = useRef<L.Marker>(null);
   const eventHandlers = useMemo(
     () => ({

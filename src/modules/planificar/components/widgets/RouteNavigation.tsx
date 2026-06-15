@@ -100,17 +100,17 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
   );
 }
 
+function getListDot(i: number, total: number) {
+  if (i === 0) return "border-primary bg-primary";
+  if (i === total - 1) return "border-danger bg-danger";
+  return "border-default-300 bg-default-300";
+}
+
 export function StationsList({
   prediction,
 }: {
   readonly prediction: RoutePrediction;
 }) {
-  function getListDot(i: number, total: number) {
-    if (i === 0) return "border-primary bg-primary";
-    if (i === total - 1) return "border-danger bg-danger";
-    return "border-default-300 bg-default-300";
-  }
-
   return (
     <GlassCard>
       <span className="text-[10px] font-semibold mb-1.5 block">

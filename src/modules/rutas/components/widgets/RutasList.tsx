@@ -187,10 +187,11 @@ export function RutasList(props: Props) {
           filteredSitp
             .slice(sitpPage * SITP_PAGE_SIZE, (sitpPage + 1) * SITP_PAGE_SIZE)
             .map((r) => (
-              <div
+              <button
+                type="button"
                 key={r.ruta}
                 onClick={() => onSelectRuta(r)}
-                className="cursor-pointer"
+                className="cursor-pointer w-full text-left"
               >
                 <GlassCard className="!p-3 hover:ring-1 hover:ring-primary/30 transition-all border-l-2 border-l-blue-400">
                   <div className="flex items-center justify-between mb-1">
@@ -209,7 +210,7 @@ export function RutasList(props: Props) {
                     </p>
                   )}
                 </GlassCard>
-              </div>
+              </button>
             ))}
         {tab === "sitp" &&
           (() => {
@@ -239,10 +240,11 @@ export function RutasList(props: Props) {
           })()}
         {tab === "tm" &&
           filteredTm.map((r) => (
-            <div
+            <button
+              type="button"
               key={r.id}
               onClick={() => onSelectTm(r)}
-              className="cursor-pointer"
+              className="cursor-pointer w-full text-left"
             >
               <GlassCard className="!p-3 hover:ring-1 hover:ring-primary/30 transition-all border-l-2 border-l-red-500">
                 <div className="flex items-center justify-between mb-1">
@@ -260,7 +262,7 @@ export function RutasList(props: Props) {
                   Troncal: {r.troncal}
                 </p>
               </GlassCard>
-            </div>
+            </button>
           ))}
         {tab === "tm" && tmTroncales.length === 0 && (
           <p className="text-xs text-default-400 text-center py-4">
