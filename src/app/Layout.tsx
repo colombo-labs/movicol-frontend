@@ -58,8 +58,8 @@ export function Layout() {
     stops: { lat: number; lon: number; nombre: string }[];
   } | null>(null);
   const [tripPoints, setTripPoints] = useState<TripPoint[]>([]);
-  const [, setShowRoutesOnMap] = useState(false); // value used in future route filtering
-  const [, setRouteFilter] = useState<"all" | "tm" | "sitp">("all"); // value used in future route filtering
+  const [_showRoutesOnMap, setShowRoutesOnMap] = useState(false); // value used in future route filtering
+  const [_routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all"); // value used in future route filtering
   const [showCongestion] = useState(false);
   const { predict, prediction, isLoading, error, clear } = useRoutePredict();
 
