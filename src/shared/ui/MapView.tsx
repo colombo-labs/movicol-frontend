@@ -30,6 +30,7 @@ interface MapViewProps {
   readonly tripPoints?: TripPoint[];
   readonly onMovePoint?: (index: number, lat: number, lng: number) => void;
   readonly showCongestion?: boolean;
+  readonly showRoutesOnMap?: boolean;
   readonly showSitpOnMap?: boolean;
   readonly selectedTroncal?: string | null;
   readonly showTroncalesOnMap?: boolean;
