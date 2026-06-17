@@ -76,6 +76,7 @@ export function MapView({
   showTroncalesOnMap,
   showEstacionesOnMap,
   sitpRouteCoords,
+  showRoutesOnMap,
 }: MapViewProps) {
   const center: [number, number] = [4.65, -74.1];
   const [showTroncalesLocal] = useState(false);
@@ -87,7 +88,7 @@ export function MapView({
   const [showSitp] = useState(false);
 
   return (
-    <div className="h-full w-full relative">
+    <div className="h-full w-full relative" data-routes-visible={showRoutesOnMap}>
       <MapContainer
         center={center}
         zoom={12}
