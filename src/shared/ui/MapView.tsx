@@ -88,7 +88,10 @@ export function MapView({
   const [showSitp] = useState(false);
 
   return (
-    <div className="h-full w-full relative" data-routes-visible={showRoutesOnMap}>
+    <div
+      className="h-full w-full relative"
+      data-routes-visible={showRoutesOnMap}
+    >
       <MapContainer
         center={center}
         zoom={12}
