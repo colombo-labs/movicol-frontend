@@ -58,8 +58,10 @@ export function Layout() {
     stops: { lat: number; lon: number; nombre: string }[];
   } | null>(null);
   const [tripPoints, setTripPoints] = useState<TripPoint[]>([]);
-  const [_showRoutesOnMap, setShowRoutesOnMap] = useState(false); // value used in future route filtering
-  const [_routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all"); // value used in future route filtering
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [showRoutesOnMap, setShowRoutesOnMap] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
   const [showCongestion] = useState(false);
   const { predict, prediction, isLoading, error, clear } = useRoutePredict();
 
