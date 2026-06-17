@@ -60,7 +60,6 @@ export function Layout() {
   const [tripPoints, setTripPoints] = useState<TripPoint[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showRoutesOnMap, setShowRoutesOnMap] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
   const [showCongestion] = useState(false);
   const { predict, prediction, isLoading, error, clear } = useRoutePredict();
@@ -190,6 +189,7 @@ export function Layout() {
             title="Rutas del sistema"
           >
             <RutasPanel
+              activeFilter={routeFilter}
               onFilterChange={(f) => setRouteFilter(f)}
               showTroncales={showTroncales}
               onToggleTroncales={() => setShowTroncales((v) => !v)}

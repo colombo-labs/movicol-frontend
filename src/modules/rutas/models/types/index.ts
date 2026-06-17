@@ -16,6 +16,7 @@ export interface TmTroncal {
 }
 
 export interface RutasPanelProps {
+  readonly activeFilter?: "all" | "tm" | "sitp";
   readonly onFilterChange?: (filter: "all" | "tm" | "sitp") => void;
   readonly onToggleSitp?: () => void;
   readonly showSitpOnMap?: boolean;
