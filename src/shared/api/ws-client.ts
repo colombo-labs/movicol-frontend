@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+import { API_URL } from "@/shared/config";
 
 /**
  * Create a namespaced WebSocket connection.

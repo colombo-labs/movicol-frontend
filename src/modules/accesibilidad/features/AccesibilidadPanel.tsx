@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import { Accessibility, MapPin, Bus, Train } from "lucide-react";
 
-const API = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
+import { API_URL as API } from "@/shared/config";
 
 interface AccData {
   totalParaderos: number;

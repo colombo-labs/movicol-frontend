@@ -2,27 +2,8 @@ import { GeoJSON, CircleMarker, Popup } from "react-leaflet";
 import { useEffect, useState, useMemo } from "react";
 import type { FeatureCollection } from "geojson";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
-
-export const TRONCAL_COLORS: Record<string, string> = {
-  "AUTOPISTA NORTE": "#ef4444",
-  CARACAS: "#f97316",
-  "CARACAS SUR": "#f97316",
-  "CALLE 80": "#eab308",
-  AMERICAS: "#22c55e",
-  "NQS CENTRAL": "#3b82f6",
-  "NQS SUR": "#8b5cf6",
-  SUBA: "#ec4899",
-  "CALLE 26": "#06b6d4",
-  "EJE AMBIENTAL": "#14b8a6",
-  "CARRERA 7": "#6366f1",
-  "CARRERA 10": "#a855f7",
-};
-
-export function getTroncalColor(troncal: string): string {
-  const key = troncal?.toUpperCase().trim() || "";
-  return TRONCAL_COLORS[key] || "#6b7280";
-}
+import { API_URL } from "@/shared/config";
+import { getTroncalColor } from "./troncal-colors";
 
 // Prefix for station properties from GeoJSON
 const P = "transmisig2.tecnica.estacion_troncal.";

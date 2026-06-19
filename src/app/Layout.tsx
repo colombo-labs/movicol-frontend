@@ -16,6 +16,37 @@ import { reverseGeocode } from "@shared/utils/reverseGeocode";
 
 export type TripPoint = { lat: number; lng: number; label?: string };
 
+function updateLabel(
+  setter: React.Dispatch<React.SetStateAction<TripPoint[]>>,
+  index: number,
+  lat: number,
+  lng: number,
+) {
+  reverseGeocode(lat, lng).then((address) => {
+    setter((prev) =>
+      prev.map((p, i) => (i === index ? { ...p, label: address } : p)),
+    );
+  });
+}
+
+function handleGeoSuccess(
+  pos: GeolocationPosition,
+  index: number | undefined,
+  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
+) {
+  const lat = pos.coords.latitude;
+  const lng = pos.coords.longitude;
+  const pt: TripPoint = { lat, lng, label: "Obteniendo dirección..." };
+  setTripPoints((prev) => {
+    if (index !== undefined && index < prev.length) {
+      return prev.map((p, i) => (i === index ? pt : p));
+    }
+    return [pt, ...prev];
+  });
+  const targetIdx = index ?? 0;
+  updateLabel(setTripPoints, targetIdx, lat, lng);
+}
+
 export function Layout() {
   const [activePanel, setActivePanel] = useState<PanelId>(null);
   const [showTroncales, setShowTroncales] = useState(false);
@@ -27,8 +58,8 @@ export function Layout() {
     stops: { lat: number; lon: number; nombre: string }[];
   } | null>(null);
   const [tripPoints, setTripPoints] = useState<TripPoint[]>([]);
-  const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
   const [showRoutesOnMap, setShowRoutesOnMap] = useState(false);
+  const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
   const [showCongestion] = useState(false);
   const { predict, prediction, isLoading, error, clear } = useRoutePredict();
 
@@ -42,11 +73,7 @@ export function Layout() {
       if (activePanel !== "planificar") return;
       const newIndex = tripPoints.length;
       setTripPoints((prev) => [...prev, { lat, lng, label: "Buscando..." }]);
-      reverseGeocode(lat, lng).then((address) => {
-        setTripPoints((prev) =>
-          prev.map((p, i) => (i === newIndex ? { ...p, label: address } : p)),
-        );
-      });
+      updateLabel(setTripPoints, newIndex, lat, lng);
     },
     [activePanel, tripPoints.length],
   );
@@ -59,11 +86,7 @@ export function Layout() {
           i === index ? { ...p, lat, lng, label: "Buscando..." } : p,
         ),
       );
-      reverseGeocode(lat, lng).then((address) => {
-        setTripPoints((prev) =>
-          prev.map((p, i) => (i === index ? { ...p, label: address } : p)),
-        );
-      });
+      updateLabel(setTripPoints, index, lat, lng);
     },
     [],
   );
@@ -80,26 +103,7 @@ export function Layout() {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const pt: TripPoint = { lat, lng, label: "Obteniendo dirección..." };
-        setTripPoints((prev) => {
-          if (index !== undefined && index < prev.length) {
-            return prev.map((p, i) => (i === index ? pt : p));
-          }
-          return [pt, ...prev];
-        });
-        reverseGeocode(lat, lng).then((address) => {
-          setTripPoints((prev) => {
-            const targetIdx =
-              index !== undefined && index < prev.length ? index : 0;
-            return prev.map((p, i) =>
-              i === targetIdx ? { ...p, label: address } : p,
-            );
-          });
-        });
-      },
+      (pos) => handleGeoSuccess(pos, index, setTripPoints),
       (err) => {
         if (err.code === 1)
           alert("Permiso de ubicación denegado. Actívalo en tu navegador.");
@@ -184,6 +188,7 @@ export function Layout() {
             title="Rutas del sistema"
           >
             <RutasPanel
+              activeFilter={routeFilter}
               onFilterChange={(f) => setRouteFilter(f)}
               showTroncales={showTroncales}
               onToggleTroncales={() => setShowTroncales((v) => !v)}
@@ -218,12 +223,11 @@ export function Layout() {
             sitpRouteCoords={sitpRouteCoords || undefined}
             onMapClick={handleMapClick}
             predictionMode={activePanel === "planificar"}
-            showRouteFilters={showRoutesOnMap}
-            routeFilter={routeFilter}
             prediction={prediction}
             tripPoints={tripPoints}
             onMovePoint={handleMovePoint}
             showCongestion={showCongestion}
+            showRoutesOnMap={showRoutesOnMap}
           />
         </main>
 

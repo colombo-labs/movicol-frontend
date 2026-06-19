@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TRONCAL_COLORS } from "./TroncalesLayer";
+import { TRONCAL_COLORS } from "./troncal-colors";
 
 const DISPLAY_NAMES: Record<string, string> = {
   "AUTOPISTA NORTE": "Autopista Norte",
