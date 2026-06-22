@@ -107,7 +107,13 @@ export function QuickActions() {
   );
 }
 
-function mapOverpassElement(el: any, destLat: number, destLng: number) {
+interface OverpassElement {
+  lat: number;
+  lon: number;
+  tags?: Record<string, string>;
+}
+
+function mapOverpassElement(el: OverpassElement, destLat: number, destLng: number) {
   const d = Math.round(
     Math.hypot(el.lat - destLat, el.lon - destLng) * 111000
   );
@@ -160,7 +166,7 @@ async function fetchNearbyPois(destLat: number, destLng: number) {
     clearTimeout(timeout);
     if (!r.ok) return [];
     const data = await r.json();
-    return (data.elements || []).map((el: any) => mapOverpassElement(el, destLat, destLng)).slice(0, 6);
+    return (data.elements || []).map((el: OverpassElement) => mapOverpassElement(el, destLat, destLng)).slice(0, 6);
   } catch {
     clearTimeout(timeout);
     return [];
@@ -169,12 +175,12 @@ async function fetchNearbyPois(destLat: number, destLng: number) {
 
 export function NearDestination({ destLat, destLng }: { readonly destLat?: number; readonly destLng?: number }) {
   const [places, setPlaces] = useState<{ name: string; dist: string; type: string }[]>([]);
-  const cacheRef = useRef<Map<string, any>>(new Map());
+  const cacheRef = useRef<Map<string, { name: string; dist: string; type: string }[]>>(new Map());
 
   useEffect(() => {
     if (!destLat || !destLng) return;
     const key = `${destLat.toFixed(3)},${destLng.toFixed(3)}`;
-    if (cacheRef.current.has(key)) { setPlaces(cacheRef.current.get(key)); return; }
+    if (cacheRef.current.has(key)) { setPlaces(cacheRef.current.get(key)!); return; }
 
     const timer = setTimeout(() => {
       fetchNearbyPois(destLat, destLng).then(results => {

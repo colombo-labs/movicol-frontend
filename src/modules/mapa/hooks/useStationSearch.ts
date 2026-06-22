@@ -4,10 +4,19 @@ import type { Station } from "../models";
 
 let cachedStations: Station[] | null = null;
 
-function parseTmStations(data: any): Station[] {
+interface GeoFeature {
+  properties?: Record<string, string>;
+  geometry?: { coordinates?: [number, number] };
+}
+
+interface GeoResponse {
+  features?: GeoFeature[];
+}
+
+function parseTmStations(data: GeoResponse): Station[] {
   const features = data?.features || [];
   return features
-    .map((f: any) => {
+    .map((f) => {
       const name = f.properties?.["transmisig2.tecnica.estacion_troncal.nom_est"] || "";
       const coords = f.geometry?.coordinates;
       return name && coords ? { id: `tm-${name}`, name: `TM ${name}`, lat: coords[1], lon: coords[0] } : null;
@@ -15,11 +24,11 @@ function parseTmStations(data: any): Station[] {
     .filter(Boolean) as Station[];
 }
 
-function parseSitpStations(data: any): Station[] {
-  const features = data?.features || data || [];
+function parseSitpStations(data: GeoResponse & { features?: GeoFeature[] }): Station[] {
+  const features = data?.features || [];
   const list = Array.isArray(features) ? features : [];
   return list
-    .map((f: any) => {
+    .map((f) => {
       const name = f.properties?.nombre || f.properties?.name || "";
       const coords = f.geometry?.coordinates;
       return name && coords ? { id: `sitp-${name}`, name, lat: coords[1], lon: coords[0] } : null;

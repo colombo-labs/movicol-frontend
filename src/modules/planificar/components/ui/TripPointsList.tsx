@@ -63,7 +63,7 @@ export function TripPointsList({
         );
         const data = await res.json();
         setResults(
-          data.map((r: any) => ({
+          data.map((r: { lat: string; lon: string; display_name: string }) => ({
             lat: Number.parseFloat(r.lat),
             lng: Number.parseFloat(r.lon),
             label: r.display_name.split(",").slice(0, 3).join(","),
