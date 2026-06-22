@@ -114,11 +114,13 @@ export function StationsList({
               <div className="flex flex-col items-center w-3 shrink-0">
                 {isFirst ? (
                   <div className="w-2.5 h-2.5 rounded-full bg-primary border-2 border-primary/30 shrink-0 mt-1" />
-                ) : isLast ? (
+                ) : null}
+                {isLast && !isFirst ? (
                   <div className="w-2.5 h-2.5 rounded-full bg-danger border-2 border-danger/30 shrink-0 mt-1" />
-                ) : (
+                ) : null}
+                {!isFirst && !isLast ? (
                   <div className="w-1.5 h-1.5 rounded-full bg-default-300 shrink-0 mt-1.5" />
-                )}
+                ) : null}
                 {!isLast && (
                   <div className="w-0.5 flex-1 bg-default-200 min-h-[10px]" />
                 )}

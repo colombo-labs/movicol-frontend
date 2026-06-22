@@ -13,6 +13,45 @@ import type {
 
 const SITP_PAGE_SIZE = 20;
 
+async function loadNearbyRutas(
+  coords: GeolocationCoordinates,
+  tmRutas?: TmRuta[],
+): Promise<{ rutas: string[]; tmCodigos: string[]; info: Map<string, { distancia: number; paradero: string }> }> {
+  const { latitude, longitude } = coords;
+  const res = await fetch(`${API_URL}/graph/rutas-cercanas?lat=${latitude}&lng=${longitude}&radius=600`);
+  const data = await res.json();
+  const rutas = (data.rutas || []) as any[];
+  const info = new Map<string, { distancia: number; paradero: string }>();
+
+  for (const r of rutas) {
+    info.set(r.ruta, { distancia: r.distanciaMinima, paradero: r.paraderosCercanos?.[0]?.nombre || "" });
+  }
+
+  const tmCodigos: string[] = [];
+  if (tmRutas) {
+    for (const ruta of tmRutas) {
+      const closest = findClosestStation(ruta.estaciones || [], latitude, longitude);
+      if (closest.dist < 800) {
+        info.set(ruta.codigo, { distancia: Math.round(closest.dist), paradero: closest.name });
+        tmCodigos.push(ruta.codigo);
+      }
+    }
+  }
+
+  return { rutas: rutas.map((r: any) => r.ruta), tmCodigos, info };
+}
+
+function findClosestStation(estaciones: any[], lat: number, lng: number): { dist: number; name: string } {
+  let minDist = Infinity;
+  let closestName = "";
+  for (const e of estaciones) {
+    if (!e.lat || !e.lon) continue;
+    const d = Math.sqrt((e.lat - lat) ** 2 + (e.lon - lng) ** 2) * 111000;
+    if (d < minDist) { minDist = d; closestName = e.nombre || ""; }
+  }
+  return { dist: minDist, name: closestName };
+}
+
 interface Props extends RutasPanelProps {
   readonly tab: Tab;
   readonly tmTroncales: TmTroncal[];
@@ -45,7 +84,6 @@ export function RutasList(props: Props) {
     sitpPage,
     setSitpPage,
     onSelectRuta,
-    // onSelectTm unused — troncales replaced by tmRutas
     handleTab,
     onFilterChange,
     showTroncales,
@@ -80,47 +118,13 @@ export function RutasList(props: Props) {
     if (filter !== "cercanas") return;
     setNearbyLoading(true);
     navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const { latitude, longitude } = pos.coords;
-          // SITP cercanas
-          const res = await fetch(
-            `${API_URL}/graph/rutas-cercanas?lat=${latitude}&lng=${longitude}&radius=600`,
-          );
-          const data = await res.json();
-          const rutas = data.rutas || [];
-          setNearbyRutas(rutas.map((r: any) => r.ruta));
-
-          // Mapa de info por ruta (distancia + paradero)
-          const info = new Map<string, { distancia: number; paradero: string }>();
-          for (const r of rutas) {
-            info.set(r.ruta, {
-              distancia: r.distanciaMinima,
-              paradero: r.paraderosCercanos?.[0]?.nombre || "",
-            });
-          }
-
-          // TM cercanas
-          if (props.tmRutas) {
-            for (const ruta of props.tmRutas) {
-              let minDist = Infinity;
-              let closestName = "";
-              for (const e of (ruta.estaciones || []) as any[]) {
-                if (!e.lat || !e.lon) continue;
-                const d = Math.sqrt((e.lat - latitude) ** 2 + (e.lon - longitude) ** 2) * 111000;
-                if (d < minDist) { minDist = d; closestName = e.nombre || ""; }
-              }
-              if (minDist < 800) {
-                info.set(ruta.codigo, { distancia: Math.round(minDist), paradero: closestName });
-              }
-            }
-            setNearbyTmCodigos(
-              props.tmRutas.filter(r => info.has(r.codigo)).map(r => r.codigo)
-            );
-          }
+      (pos) => {
+        loadNearbyRutas(pos.coords, props.tmRutas).then(({ rutas, tmCodigos, info }) => {
+          setNearbyRutas(rutas);
+          setNearbyTmCodigos(tmCodigos);
           setNearbyInfo(info);
-        } catch { setNearbyRutas([]); setNearbyTmCodigos([]); }
-        finally { setNearbyLoading(false); }
+        }).catch(() => { setNearbyRutas([]); setNearbyTmCodigos([]); })
+          .finally(() => setNearbyLoading(false));
       },
       () => { setNearbyRutas([]); setNearbyTmCodigos([]); setNearbyLoading(false); },
       { timeout: 5000 },
@@ -402,7 +406,7 @@ export function RutasList(props: Props) {
                     onClick={() => { setFilter(t); setSitpPage(() => 0); }}
                     className={`flex-1 py-1.5 rounded-lg text-[9px] font-semibold transition-all capitalize ${filter === t ? "bg-emerald-500/20 text-emerald-500" : "text-default-400 hover:text-foreground"}`}
                   >
-                    {t} {t !== "todas" ? `(${props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === t).length})` : `(${props.tmRutas!.length})`}
+                    {t} {t === "todas" ? `(${props.tmRutas!.length})` : `(${props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === t).length})`}
                   </button>
                 ))}
               </div>
@@ -421,7 +425,7 @@ export function RutasList(props: Props) {
                   onClick={() => {
                     if (r.coords.length > 0) {
                       props.onSelectSitpRoute?.({
-                        coords: r.coords as [number, number][],
+                        coords: r.coords,
                         stops: r.estaciones || [],
                       });
                     }

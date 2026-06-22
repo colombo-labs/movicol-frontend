@@ -9,7 +9,7 @@ import { ChatMessage } from "../ui/ChatMessage";
 type ModuleId = "planificar" | "rutas" | "accesibilidad" | "metricas" | null;
 
 interface ChatWidgetProps {
-  activeModule?: ModuleId;
+  readonly activeModule?: ModuleId;
 }
 
 const SUGGESTIONS: Record<string, string[]> = {
@@ -85,7 +85,10 @@ export function ChatWidget({ activeModule }: ChatWidgetProps) {
     const lastMsg = messages.filter((m) => m.role === "assistant").pop();
     return (
       <div
+        role="button"
+        tabIndex={0}
         onClick={() => setState("open")}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setState("open"); }}
         className="fixed bottom-28 md:bottom-6 right-4 md:right-[10px] z-[600] flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-divider shadow-xl cursor-pointer hover:border-primary/50 transition-all max-w-[240px]"
       >
         <Bot size={16} className="text-primary shrink-0" />

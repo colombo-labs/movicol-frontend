@@ -27,11 +27,11 @@ export function SiniestroLayer() {
 
   return (
     <>
-      {points.map((p, i) => {
+      {points.map((p) => {
         const norm = p.intensity / maxIntensity;
         return (
           <CircleMarker
-            key={i}
+            key={`${p.lat}-${p.lon}`}
             center={[p.lat, p.lon]}
             radius={4 + norm * 8}
             pathOptions={{

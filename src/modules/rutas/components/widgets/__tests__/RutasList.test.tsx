@@ -32,7 +32,7 @@ const baseProps = {
 describe("RutasList", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ operating: 120, delayed: 3, suspended: 1, alerts: [] }) });
+    globalThis.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ operating: 120, delayed: 3, suspended: 1, alerts: [] }) });
     Object.defineProperty(navigator, "geolocation", {
       value: { getCurrentPosition: vi.fn() },
       writable: true,

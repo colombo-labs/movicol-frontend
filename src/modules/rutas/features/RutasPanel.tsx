@@ -109,7 +109,7 @@ export function RutasPanel(props: RutasPanelProps) {
       onSelectTmRuta={(r: TmRuta) => {
         setSelectedTmRuta(r);
         props.onSelectSitpRoute?.({
-          coords: r.coords as [number, number][],
+          coords: r.coords,
           stops: r.estaciones || [],
         });
       }}

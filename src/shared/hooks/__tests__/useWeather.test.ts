@@ -8,7 +8,7 @@ describe("useWeather", () => {
   });
 
   it("should return temperature from API", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       json: () => Promise.resolve({ current_weather: { temperature: 18.5 } }),
     });
 

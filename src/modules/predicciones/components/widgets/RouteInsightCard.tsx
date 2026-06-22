@@ -46,9 +46,9 @@ export function RouteInsightCard({ prediction }: RouteInsightCardProps) {
           <p className="text-[10px] font-semibold text-warning">
             Tramos críticos:
           </p>
-          {criticalSegments.map((s, i) => (
+          {criticalSegments.map((s) => (
             <div
-              key={`rs-${i}`}
+              key={`rs-${s.from_station}-${s.to_station}`}
               className="flex items-center justify-between text-[11px] bg-white/5 rounded px-2 py-1"
             >
               <span>

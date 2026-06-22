@@ -64,8 +64,8 @@ export function TripPointsList({
         const data = await res.json();
         setResults(
           data.map((r: any) => ({
-            lat: parseFloat(r.lat),
-            lng: parseFloat(r.lon),
+            lat: Number.parseFloat(r.lat),
+            lng: Number.parseFloat(r.lon),
             label: r.display_name.split(",").slice(0, 3).join(","),
           })),
         );
@@ -111,8 +111,8 @@ export function TripPointsList({
         <div className="flex items-stretch gap-2">
           {/* Dots column */}
           <div className="flex flex-col items-center py-2 w-5 shrink-0">
-            {slots.map((_, i) => (
-              <div key={`dot-${i}`} className="flex flex-col items-center">
+            {slots.map((pt, i) => (
+              <div key={`dot-${pt?.lat ?? "empty"}-${pt?.lng ?? i}`} className="flex flex-col items-center">
                 <div
                   className={`w-3 h-3 rounded-full border-2 ${getDotStyle(
                     i === 0,
@@ -129,7 +129,7 @@ export function TripPointsList({
           {/* Inputs column */}
           <div className="flex-1 space-y-1.5">
             {slots.map((pt, i) => (
-              <div key={`input-${i}`} className="relative">
+              <div key={`input-${pt?.lat ?? "empty"}-${pt?.lng ?? i}`} className="relative">
                 <div className="flex items-center gap-1">
                   <div className="flex-1 min-w-0 relative">
                     <input

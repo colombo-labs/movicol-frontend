@@ -107,7 +107,26 @@ export function QuickActions() {
   );
 }
 
-function PoiIcon({ type }: { type: string }) {
+function mapOverpassElement(el: any, destLat: number, destLng: number) {
+  const d = Math.round(
+    Math.hypot(el.lat - destLat, el.lon - destLng) * 111000
+  );
+  const tags = el.tags || {};
+  const type = tags.amenity || tags.shop || "lugar";
+  const typeLabel: Record<string, string> = {
+    cafe: "cafe", atm: "atm", bank: "bank",
+    pharmacy: "pharmacy", restaurant: "restaurant",
+    bicycle_rental: "bike", supermarket: "supermarket",
+    convenience: "store",
+  };
+  return {
+    name: tags.name || type,
+    dist: `${d}m`,
+    type: typeLabel[type] || "pin",
+  };
+}
+
+function PoiIcon({ type }: { readonly type: string }) {
   const cls = "text-primary";
   const s = 13;
   if (type === "cafe") return <Coffee size={s} className={cls} />;
@@ -117,6 +136,35 @@ function PoiIcon({ type }: { type: string }) {
   if (type === "bike") return <Bike size={s} className={cls} />;
   if (type === "supermarket" || type === "store") return <Store size={s} className={cls} />;
   return <MapPin size={s} className={cls} />;
+}
+
+async function fetchNearbyPois(destLat: number, destLng: number) {
+  const radius = 200;
+  const query = `[out:json][timeout:5];(
+    node["amenity"="cafe"](around:${radius},${destLat},${destLng});
+    node["amenity"="atm"](around:${radius},${destLat},${destLng});
+    node["shop"](around:${radius},${destLat},${destLng});
+    node["amenity"="pharmacy"](around:${radius},${destLat},${destLng});
+    node["amenity"="restaurant"](around:${radius},${destLat},${destLng});
+  );out body 6;`;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const r = await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      body: `data=${encodeURIComponent(query)}`,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!r.ok) return [];
+    const data = await r.json();
+    return (data.elements || []).map((el: any) => mapOverpassElement(el, destLat, destLng)).slice(0, 6);
+  } catch {
+    clearTimeout(timeout);
+    return [];
+  }
 }
 
 export function NearDestination({ destLat, destLng }: { readonly destLat?: number; readonly destLng?: number }) {
@@ -129,50 +177,10 @@ export function NearDestination({ destLat, destLng }: { readonly destLat?: numbe
     if (cacheRef.current.has(key)) { setPlaces(cacheRef.current.get(key)); return; }
 
     const timer = setTimeout(() => {
-      const radius = 200;
-      const query = `[out:json][timeout:5];(
-        node["amenity"="cafe"](around:${radius},${destLat},${destLng});
-        node["amenity"="atm"](around:${radius},${destLat},${destLng});
-        node["shop"](around:${radius},${destLat},${destLng});
-        node["amenity"="pharmacy"](around:${radius},${destLat},${destLng});
-        node["amenity"="restaurant"](around:${radius},${destLat},${destLng});
-      );out body 6;`;
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-
-      fetch("https://overpass-api.de/api/interpreter", {
-        method: "POST",
-        body: `data=${encodeURIComponent(query)}`,
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        signal: controller.signal,
-      })
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-          clearTimeout(timeout);
-          if (!data) return;
-          const results = (data.elements || []).map((el: any) => {
-          const d = Math.round(
-            Math.sqrt((el.lat - destLat) ** 2 + (el.lon - destLng) ** 2) * 111000
-          );
-          const tags = el.tags || {};
-          const type = tags.amenity || tags.shop || "lugar";
-          const typeLabel: Record<string, string> = {
-            cafe: "cafe", atm: "atm", bank: "bank",
-            pharmacy: "pharmacy", restaurant: "restaurant",
-            bicycle_rental: "bike", supermarket: "supermarket",
-            convenience: "store",
-          };
-          return {
-            name: tags.name || type,
-            dist: `${d}m`,
-            type: typeLabel[type] || "pin",
-          };
-        }).slice(0, 6);
+      fetchNearbyPois(destLat, destLng).then(results => {
         setPlaces(results);
         cacheRef.current.set(key, results);
-      })
-      .catch(() => { clearTimeout(timeout); });
+      }).catch(() => {});
     }, 1000);
     return () => clearTimeout(timer);
   }, [destLat, destLng]);

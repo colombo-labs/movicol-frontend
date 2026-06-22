@@ -84,7 +84,7 @@ export function EmptyState({ tripPoints, onUseMyLocation, onAddPoint }: Props) {
   );
 }
 
-function RecentRoutes({ onAddPoint }: { onAddPoint?: (lat: number, lng: number, label: string) => void }) {
+function RecentRoutes({ onAddPoint }: { readonly onAddPoint?: (lat: number, lng: number, label: string) => void }) {
   const saved = JSON.parse(
     localStorage.getItem("movicol_saved_routes") || "[]",
   );

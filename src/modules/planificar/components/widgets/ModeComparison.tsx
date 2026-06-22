@@ -46,7 +46,7 @@ const TAG_LABELS: Record<string, { label: string; color: string }> = {
   less_walking: { label: "Menos caminata", color: "bg-blue-500 text-white" },
 };
 
-function LegIcon({ type, size = 12 }: { type: RouteLeg["type"]; size?: number }) {
+function LegIcon({ type, size = 12 }: { readonly type: RouteLeg["type"]; readonly size?: number }) {
   if (type === "walk") return <Footprints size={size} className="text-default-500" />;
   if (type === "transmilenio") return <img src="/icons/tm-logo.svg" alt="TM" style={{ width: size + 2, height: size + 2 }} className="inline-block" />;
   if (type === "drive") return <Car size={size} className="text-emerald-400" />;
@@ -58,6 +58,19 @@ function getLegBg(type: RouteLeg["type"]) {
   if (type === "transmilenio") return "bg-red-500/15";
   if (type === "drive") return "bg-emerald-500/15";
   return "bg-blue-500/15";
+}
+
+function getDotColor(type: RouteLeg["type"]): string {
+  if (type === "walk") return "bg-default-300";
+  if (type === "transmilenio") return "bg-danger";
+  if (type === "drive") return "bg-emerald-500";
+  return "bg-blue-500";
+}
+
+function getLegLabel(type: RouteLeg["type"], line?: string): string {
+  const labels: Record<string, string> = { walk: "Caminar", transmilenio: "TransMilenio", drive: "Vehículo", sitp: "SITP" };
+  const base = labels[type] || type;
+  return line ? `${base} — ${line}` : base;
 }
 
 export function RouteOptionsList({ options, selectedId, onSelect }: RouteOptionsListProps) {
@@ -112,7 +125,7 @@ export function RouteOptionsList({ options, selectedId, onSelect }: RouteOptions
                   {opt.transfers} transbordo{opt.transfers > 1 ? "s" : ""}
                 </span>
               )}
-              {opt.legs.filter(l => l.type === "walk").length > 0 && (
+              {opt.legs.some(l => l.type === "walk") && (
                 <span className="flex items-center gap-0.5">
                   <Footprints size={8} />
                   {opt.legs.filter(l => l.type === "walk").reduce((a, l) => a + l.duration_minutes, 0)}' caminando
@@ -137,13 +150,13 @@ export function SelectedRouteDetail({ option }: { readonly option: RouteOption }
       <div className="space-y-0 border-l-2 border-primary/20 ml-2 pl-3">
         {option.legs.map((leg, i) => (
           <div key={`detail-${i}`} className="flex items-center gap-2 py-1.5 relative">
-            <div className={`absolute -left-[13px] w-2 h-2 rounded-full ${leg.type === "walk" ? "bg-default-300" : leg.type === "transmilenio" ? "bg-danger" : leg.type === "drive" ? "bg-emerald-500" : "bg-blue-500"}`} />
+            <div className={`absolute -left-[13px] w-2 h-2 rounded-full ${getDotColor(leg.type)}`} />
             <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full shrink-0 ${getLegBg(leg.type)}`}>
               <LegIcon type={leg.type} size={11} />
             </span>
             <div className="flex-1 min-w-0">
               <p className="text-[10px] text-foreground font-medium truncate">
-                {leg.type === "walk" ? "Caminar" : leg.type === "transmilenio" ? "TransMilenio" : leg.type === "drive" ? "Vehículo" : "SITP"}{leg.line ? ` — ${leg.line}` : ""}
+                {getLegLabel(leg.type, leg.line)}
               </p>
               <p className="text-[9px] text-default-400 truncate">
                 {leg.from} → {leg.to}
