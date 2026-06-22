@@ -86,7 +86,7 @@ export function RutaDetail({
                   )}
                 </div>
                 {/* Content */}
-                <div className={`flex-1 pb-2 ${isFirst || isLast ? "pt-1" : "pt-1"}`}>
+                <div className={`flex-1 pb-2 pt-1`}>
                   <p className={`text-[11px] leading-tight ${isFirst || isLast ? "font-semibold text-foreground" : "text-default-500"}`}>
                     {p.nombre || `Parada ${i + 1}`}
                   </p>

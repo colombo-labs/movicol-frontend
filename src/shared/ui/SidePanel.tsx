@@ -54,12 +54,11 @@ export function SidePanel({
     <>
       {/* Backdrop — solo cuando está en full */}
       {isOpen && snap === "full" && (
-        <div
-          className="md:hidden absolute inset-0 z-[499] bg-black/20 transition-opacity duration-300"
-          role="button"
-          tabIndex={0}
+        <button
+          type="button"
+          className="md:hidden absolute inset-0 z-[499] bg-black/20 transition-opacity duration-300 border-none cursor-default"
           onClick={() => setSnap("half")}
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSnap("half"); }}
+          aria-label="Close panel"
         />
       )}
 

@@ -5,7 +5,7 @@ import { useStationSearch } from "../hooks/useStationSearch";
 describe("useStationSearch", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       json: () => Promise.resolve({ features: [] }),
     });
   });

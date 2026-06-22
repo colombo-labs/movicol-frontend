@@ -18,7 +18,7 @@ describe("useWeather", () => {
   });
 
   it("should return 14 as fallback on error", async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
     const { result } = renderHook(() => useWeather());
 

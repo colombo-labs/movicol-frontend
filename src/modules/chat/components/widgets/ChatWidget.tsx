@@ -82,13 +82,11 @@ export function ChatWidget({ activeModule }: ChatWidgetProps) {
 
   // Minimized: barra compacta con último mensaje
   if (state === "minimized") {
-    const lastMsg = messages.filter((m) => m.role === "assistant").pop();
+    const lastMsg = [...messages].reverse().find((m) => m.role === "assistant");
     return (
-      <div
-        role="button"
-        tabIndex={0}
+      <button
+        type="button"
         onClick={() => setState("open")}
-        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setState("open"); }}
         className="fixed bottom-28 md:bottom-6 right-4 md:right-[10px] z-[600] flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-divider shadow-xl cursor-pointer hover:border-primary/50 transition-all max-w-[240px]"
       >
         <Bot size={16} className="text-primary shrink-0" />
@@ -102,7 +100,7 @@ export function ChatWidget({ activeModule }: ChatWidgetProps) {
         >
           <X size={12} />
         </button>
-      </div>
+      </button>
     );
   }
 

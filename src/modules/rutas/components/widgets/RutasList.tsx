@@ -46,7 +46,7 @@ function findClosestStation(estaciones: any[], lat: number, lng: number): { dist
   let closestName = "";
   for (const e of estaciones) {
     if (!e.lat || !e.lon) continue;
-    const d = Math.sqrt((e.lat - lat) ** 2 + (e.lon - lng) ** 2) * 111000;
+    const d = Math.hypot(e.lat - lat, e.lon - lng) * 111000;
     if (d < minDist) { minDist = d; closestName = e.nombre || ""; }
   }
   return { dist: minDist, name: closestName };
@@ -64,7 +64,6 @@ interface Props extends RutasPanelProps {
   readonly sitpPage: number;
   readonly setSitpPage: (fn: (p: number) => number) => void;
   readonly onSelectRuta: (ruta: SitpRuta) => void;
-  readonly onSelectTm: (troncal: TmTroncal) => void;
   readonly onSelectTmRuta?: (ruta: TmRuta) => void;
   readonly handleTab: (
     t: Tab,
@@ -396,10 +395,10 @@ export function RutasList(props: Props) {
           const totalPages = Math.ceil(filtered.length / pageSize);
           const paged = filtered.slice(sitpPage * pageSize, (sitpPage + 1) * pageSize);
           const typeCounts: Record<string, number> = {
-            todas: props.tmRutas!.length,
-            articulado: props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === "articulado").length,
-            biarticulado: props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === "biarticulado").length,
-            dual: props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === "dual").length,
+            todas: props.tmRutas.length,
+            articulado: props.tmRutas.filter(r => r.tipo_bus.toLowerCase() === "articulado").length,
+            biarticulado: props.tmRutas.filter(r => r.tipo_bus.toLowerCase() === "biarticulado").length,
+            dual: props.tmRutas.filter(r => r.tipo_bus.toLowerCase() === "dual").length,
           };
           return (
             <>

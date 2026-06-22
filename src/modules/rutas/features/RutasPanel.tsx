@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { RutasPanelProps, SitpRuta, TmTroncal, TmRuta } from "../models/types";
+import type { RutasPanelProps, SitpRuta, TmRuta } from "../models/types";
 import { useRutasData } from "../hooks/useRutasData";
 import { SitpDetail } from "../components/widgets/SitpDetail";
 import { TmDetail } from "../components/widgets/TmDetail";
@@ -13,7 +13,6 @@ export function RutasPanel(props: RutasPanelProps) {
     tmTroncales,
     tmRutas,
     tmStations,
-    setTmStations,
     selectedSitpRuta,
     setSelectedSitpRuta,
     selectedTmRuta,
@@ -93,18 +92,6 @@ export function RutasPanel(props: RutasPanelProps) {
           coords: r.paraderos.map((p) => [p.lat, p.lon] as [number, number]),
           stops: r.paraderos,
         });
-      }}
-      onSelectTm={(r: TmTroncal) => {
-        props.onSelectTmRoute?.(r.troncal);
-        setTmStations(r.estaciones);
-        setSelected({
-          id: r.id,
-          origen: r.origen,
-          destino: r.destino,
-          estado: "Operando",
-          estaciones: r.estaciones.length,
-          troncal: r.troncal,
-        } as any);
       }}
       onSelectTmRuta={(r: TmRuta) => {
         setSelectedTmRuta(r);

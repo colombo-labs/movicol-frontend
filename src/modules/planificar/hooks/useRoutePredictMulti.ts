@@ -107,7 +107,7 @@ function buildCombinedOption(
 
   return {
     id: "tm-sitp-transfer",
-    label: `TM${tmC ? ` ${tmC}` : ""} + SITP${sitpC ? ` ${sitpC}` : ""}`,
+    label: "TM" + (tmC ? " " + tmC : "") + " + SITP" + (sitpC ? " " + sitpC : ""),
     total_time_minutes: combinedTime,
     total_distance_km: combinedDist,
     cost: "$3,550",
