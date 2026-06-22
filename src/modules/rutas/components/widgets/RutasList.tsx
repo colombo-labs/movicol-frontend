@@ -395,6 +395,12 @@ export function RutasList(props: Props) {
           const pageSize = 15;
           const totalPages = Math.ceil(filtered.length / pageSize);
           const paged = filtered.slice(sitpPage * pageSize, (sitpPage + 1) * pageSize);
+          const typeCounts: Record<string, number> = {
+            todas: props.tmRutas!.length,
+            articulado: props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === "articulado").length,
+            biarticulado: props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === "biarticulado").length,
+            dual: props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === "dual").length,
+          };
           return (
             <>
               {/* Sub-tabs tipo bus */}
@@ -406,7 +412,7 @@ export function RutasList(props: Props) {
                     onClick={() => { setFilter(t); setSitpPage(() => 0); }}
                     className={`flex-1 py-1.5 rounded-lg text-[9px] font-semibold transition-all capitalize ${filter === t ? "bg-emerald-500/20 text-emerald-500" : "text-default-400 hover:text-foreground"}`}
                   >
-                    {t} {t === "todas" ? `(${props.tmRutas!.length})` : `(${props.tmRutas!.filter(r => r.tipo_bus.toLowerCase() === t).length})`}
+                    {t} ({typeCounts[t]})
                   </button>
                 ))}
               </div>
