@@ -30,6 +30,10 @@
 }
 
 /* Leaflet zoom controls */
+.leaflet-control-attribution {
+  display: none !important;
+}
+
 .leaflet-control-zoom {
   border: 1px solid var(--glass-border) !important;
   border-radius: 0.5rem !important;
@@ -77,6 +81,9 @@
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 8px);
 }
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 
 /* Hide scrollbar on mobile for cleaner look */
 @media (max-width: 768px) {
@@ -93,4 +100,19 @@ html, body {
 /* Smooth scroll */
 * {
   -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but allow scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dark mode tiles filter */
+.dark-tiles {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
