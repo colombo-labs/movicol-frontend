@@ -48,7 +48,7 @@ export function RouteInsightCard({ prediction }: RouteInsightCardProps) {
           </p>
           {criticalSegments.map((s) => (
             <div
-              key={`${s.from_station}-${s.to_station}`}
+              key={`rs-${s.from_station}-${s.to_station}`}
               className="flex items-center justify-between text-[11px] bg-white/5 rounded px-2 py-1"
             >
               <span>

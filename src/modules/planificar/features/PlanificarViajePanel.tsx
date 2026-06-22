@@ -1,25 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Navigation, Clock, AlertCircle } from "lucide-react";
+import { useWeather } from "@shared/hooks/useWeather";
+import { RouteSkeleton } from "@shared/ui/Skeleton";
 import type {
   PlanificarProps,
   TransportMode,
   DepartureType,
+  RouteOption,
 } from "../models/types";
-import { useRutasCercanas } from "../hooks/useRutasCercanas";
-import { useAddressSearch } from "../hooks/useAddressSearch";
-import { estimateTrip } from "../api/planificarApi";
-import { SearchBar } from "../components/ui/SearchBar";
 import { TripPointsList } from "../components/ui/TripPointsList";
-import { EmptyState } from "../components/ui/EmptyState";
 import {
-  ModeComparison,
-  RouteAlternatives,
+  ModeTabs,
+  RouteOptionsList,
+  SelectedRouteDetail,
 } from "../components/widgets/ModeComparison";
-import {
-  LiveTimeBanner,
-  RouteSummaryCard,
-  TripDetails,
-} from "../components/widgets/RouteSummary";
 import {
   EcoInfo,
   CongestionBar,
@@ -35,11 +29,12 @@ import {
 import {
   NavigationSteps,
   StationsList,
+  VehicleNavSteps,
 } from "../components/widgets/RouteNavigation";
 
 export function PlanificarViajePanel({
-  onPredict,
-  prediction,
+  onPredictMulti,
+  options,
   isLoading,
   error,
   tripPoints,
@@ -48,100 +43,98 @@ export function PlanificarViajePanel({
   onSwapPoints,
   onClear,
   onAddPoint,
+  onUpdatePoint,
+  onRequestAddPoint,
+  onSelectRoute,
+  selectedRouteIdx,
 }: PlanificarProps) {
-  const [mode, setMode] = useState<TransportMode>("transmilenio");
+  const [mode, setMode] = useState<TransportMode>("publico");
+  const temp = useWeather();
   const [departureType, setDepartureType] = useState<DepartureType>("ahora");
   const [departureTime, setDepartureTime] = useState("");
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+
+  // Sync from map selection
+  useEffect(() => {
+    if (selectedRouteIdx !== undefined && options?.[selectedRouteIdx]) {
+      setSelectedOptionId(options[selectedRouteIdx].id);
+    }
+  }, [selectedRouteIdx]);
 
   const origin = tripPoints.length > 0 ? tripPoints[0] : null;
   const destination =
     tripPoints.length > 1 ? tripPoints[tripPoints.length - 1] : null;
 
-  const rutasDisponibles = useRutasCercanas(origin, destination, mode);
-  const {
-    searchQuery,
-    searchResults,
-    searching,
-    handleSearch: onSearchAddress,
-    clearSearch,
-  } = useAddressSearch();
+  const selectedOption =
+    options?.find((o) => o.id === selectedOptionId) ?? null;
 
-  const handlePredict = () => {
+  // Auto-calcular cuando cambian los puntos (origen + destino mínimo)
+  const prevPointsRef = useRef("");
+  useEffect(() => {
+    if (!origin || !destination) return;
+    const key = `${origin.lat},${origin.lng}-${destination.lat},${destination.lng}-${mode}`;
+    if (key === prevPointsRef.current) return;
+    prevPointsRef.current = key;
+    const dt =
+      departureType === "programar" && departureTime
+        ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+        : new Date().toISOString();
+    setSelectedOptionId(null);
+    onPredictMulti?.(origin, destination, mode, dt);
+  }, [tripPoints, mode]);
+
+  const handleSearch = () => {
     if (!origin || !destination) return;
     const dt =
       departureType === "programar" && departureTime
         ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
         : new Date().toISOString();
-    onPredict?.(origin, destination, mode, dt);
+    setSelectedOptionId(null);
+    onPredictMulti?.(origin, destination, mode, dt);
   };
 
   const handleModeChange = (newMode: TransportMode) => {
     setMode(newMode);
-    if (prediction && origin && destination) {
+    setSelectedOptionId(null);
+    if (origin && destination) {
       const dt =
         departureType === "programar" && departureTime
           ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
           : new Date().toISOString();
-      onPredict?.(origin, destination, newMode, dt);
+      onPredictMulti?.(origin, destination, newMode, dt);
     }
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (tripPoints.length >= 2 && !prediction && !isLoading) {
-      const timer = setTimeout(() => handlePredict(), 500);
-      return () => clearTimeout(timer);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tripPoints]);
+  const handleSelectOption = (opt: RouteOption) => {
+    setSelectedOptionId(opt.id);
+    const idx = options?.findIndex((o) => o.id === opt.id) ?? 0;
+    onSelectRoute?.(idx);
+  };
 
   const getETA = () => {
-    if (!prediction) return null;
-    const eta = new Date(Date.now() + prediction.total_time_minutes * 60000);
+    if (!selectedOption) return null;
+    const eta = new Date(
+      Date.now() + selectedOption.total_time_minutes * 60000,
+    );
     return eta.toLocaleTimeString("es-CO", {
       hour: "2-digit",
       minute: "2-digit",
     });
   };
 
-  // Fill estimated values if backend returns 0
-  if (prediction?.total_time_minutes === 0 && origin && destination) {
-    const est = estimateTrip(origin, destination, mode);
-    prediction.total_time_minutes = est.time;
-    prediction.total_distance_km = est.distance;
-    prediction.cost = est.cost;
-  }
-
   return (
     <div className="space-y-3">
-      <SearchBar
-        query={searchQuery}
-        results={searchResults}
-        searching={searching}
-        onSearch={onSearchAddress}
-        onSelect={(r) => {
-          onAddPoint?.(r.lat, r.lng, r.label);
-          clearSearch();
-        }}
+      <TripPointsList
+        tripPoints={tripPoints}
+        mode={mode}
+        onRemovePoint={onRemovePoint}
+        onUseMyLocation={onUseMyLocation}
+        onSwapPoints={onSwapPoints}
+        onClear={onClear}
+        onAddPoint={onAddPoint}
+        onUpdatePoint={onUpdatePoint}
+        onRequestAddPoint={onRequestAddPoint}
       />
-
-      {!prediction && (
-        <EmptyState
-          tripPoints={tripPoints}
-          onUseMyLocation={onUseMyLocation}
-          onAddPoint={onAddPoint}
-        />
-      )}
-
-      {tripPoints.length > 0 && (
-        <TripPointsList
-          tripPoints={tripPoints}
-          onRemovePoint={onRemovePoint}
-          onUseMyLocation={onUseMyLocation}
-          onSwapPoints={onSwapPoints}
-          onClear={onClear}
-        />
-      )}
 
       {/* Departure time */}
       <div className="flex items-center gap-2 flex-wrap">
@@ -168,36 +161,18 @@ export function PlanificarViajePanel({
         )}
       </div>
 
-      {/* Search / Recalculate buttons */}
-      {!prediction && !isLoading && tripPoints.length >= 2 && (
+      {/* Recalculate button */}
+      {tripPoints.length >= 2 && !isLoading && (
         <button
-          onClick={handlePredict}
-          className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.98]"
-        >
-          <Navigation size={14} /> Buscar ruta
-        </button>
-      )}
-      {prediction && !isLoading && (
-        <button
-          onClick={handlePredict}
+          onClick={handleSearch}
           className="w-full py-1.5 rounded-lg border border-primary/30 text-primary text-[10px] font-medium flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-all"
         >
-          <Navigation size={10} /> Recalcular ruta
+          <Navigation size={10} /> Recalcular
         </button>
       )}
 
       {/* Loading */}
-      {isLoading && (
-        <div className="flex flex-col items-center justify-center py-5 gap-2">
-          <div className="relative">
-            <div className="w-10 h-10 rounded-full border-2 border-primary/20" />
-            <div className="absolute inset-0 w-10 h-10 rounded-full border-2 border-transparent border-t-primary animate-spin" />
-          </div>
-          <span className="text-xs text-primary font-medium">
-            Calculando mejor ruta...
-          </span>
-        </div>
-      )}
+      {isLoading && <RouteSkeleton />}
 
       {/* Error */}
       {error && (
@@ -208,7 +183,7 @@ export function PlanificarViajePanel({
       )}
 
       {/* Rush hour */}
-      {prediction &&
+      {options &&
         (() => {
           const hour = new Date().getHours();
           if (!((hour >= 6 && hour <= 9) || (hour >= 17 && hour <= 20)))
@@ -229,10 +204,10 @@ export function PlanificarViajePanel({
         })()}
 
       {/* Results */}
-      {prediction && (
+      {options && (
         <div className="space-y-2.5">
           <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-default-100/50 text-[9px] text-default-400">
-            <span>14°C Bogotá</span>
+            <span>{temp ?? "..."}°C Bogotá</span>
             <span>Datos en vivo</span>
             <span>
               {new Date().toLocaleTimeString("es-CO", {
@@ -241,48 +216,67 @@ export function PlanificarViajePanel({
               })}
             </span>
           </div>
-          <ModeComparison
-            prediction={prediction}
+
+          <ModeTabs
             mode={mode}
             onModeChange={handleModeChange}
+            optionsCount={options.length}
           />
-          <RouteAlternatives prediction={prediction} />
-          <LiveTimeBanner prediction={prediction} mode={mode} getETA={getETA} />
-          <RouteSummaryCard
-            prediction={prediction}
-            mode={mode}
-            rutasDisponibles={rutasDisponibles}
-            getETA={getETA}
+
+          <RouteOptionsList
+            options={options}
+            selectedId={selectedOptionId}
+            onSelect={handleSelectOption}
           />
-          <TripDetails prediction={prediction} mode={mode} />
-          <EcoInfo prediction={prediction} />
-          <CongestionBar prediction={prediction} />
-          {mode !== "vehiculo" && <WaitEstimation prediction={prediction} />}
-          <RouteAlerts prediction={prediction} />
-          {mode !== "vehiculo" && prediction.stations.length > 0 && (
-            <NavigationSteps
-              prediction={prediction}
-              mode={mode}
-              getETA={getETA}
-            />
+
+          {/* Detalle de la opción seleccionada */}
+          {selectedOption && (
+            <>
+              <SelectedRouteDetail option={selectedOption} />
+              <EcoInfo prediction={selectedOption.prediction} />
+              <CongestionBar prediction={selectedOption.prediction} />
+              {mode === "publico" && (
+                <WaitEstimation prediction={selectedOption.prediction} />
+              )}
+              <RouteAlerts prediction={selectedOption.prediction} />
+              {mode === "publico" &&
+                selectedOption.prediction.stations.length > 0 && (
+                  <NavigationSteps
+                    prediction={selectedOption.prediction}
+                    mode={
+                      selectedOption.prediction.mode === "sitp"
+                        ? "sitp"
+                        : "transmilenio"
+                    }
+                    getETA={getETA}
+                  />
+                )}
+              {mode === "vehiculo" &&
+                selectedOption.prediction.navigation_steps &&
+                selectedOption.prediction.navigation_steps.length > 0 && (
+                  <VehicleNavSteps
+                    steps={selectedOption.prediction.navigation_steps}
+                    getETA={getETA}
+                  />
+                )}
+              <NearDestination
+                destLat={destination?.lat}
+                destLng={destination?.lng}
+              />
+              <ActionButtons
+                prediction={selectedOption.prediction}
+                tripPoints={tripPoints}
+                onClear={onClear}
+              />
+              <QuickActions />
+              <TravelTips
+                mode={mode === "publico" ? "transmilenio" : "vehiculo"}
+              />
+              {selectedOption.prediction.stations.length > 0 && (
+                <StationsList prediction={selectedOption.prediction} />
+              )}
+            </>
           )}
-          <NearDestination />
-          <ActionButtons
-            prediction={prediction}
-            tripPoints={tripPoints}
-            onClear={onClear}
-          />
-          <QuickActions />
-          <TravelTips mode={mode} />
-          {prediction.stations.length > 0 && (
-            <StationsList prediction={prediction} />
-          )}
-          <button
-            onClick={handlePredict}
-            className="w-full py-1.5 text-[10px] text-primary hover:underline"
-          >
-            Recalcular
-          </button>
         </div>
       )}
     </div>

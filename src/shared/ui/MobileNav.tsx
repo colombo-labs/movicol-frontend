@@ -6,16 +6,20 @@ interface MobileNavProps {
   onTogglePanel: (id: PanelId) => void;
 }
 
-const items: { id: Exclude<PanelId, null>; icon: typeof Navigation }[] = [
-  { id: "planificar", icon: Navigation },
-  { id: "rutas", icon: Route },
-  { id: "accesibilidad", icon: Accessibility },
-  { id: "metricas", icon: BarChart3 },
+const items: {
+  id: Exclude<PanelId, null>;
+  icon: typeof Navigation;
+  label: string;
+}[] = [
+  { id: "planificar", icon: Navigation, label: "Viaje" },
+  { id: "rutas", icon: Route, label: "Rutas" },
+  { id: "accesibilidad", icon: Accessibility, label: "Acceso" },
+  { id: "metricas", icon: BarChart3, label: "Datos" },
 ];
 
 export function MobileNav({ activePanel, onTogglePanel }: MobileNavProps) {
   return (
-    <nav className="md:hidden h-12 flex items-center justify-around border-t border-divider bg-background/90 backdrop-blur-xl shrink-0">
+    <nav className="md:hidden h-14 flex items-center justify-around border-t border-divider bg-background shrink-0 px-1 safe-area-bottom">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = activePanel === item.id;
@@ -23,11 +27,18 @@ export function MobileNav({ activePanel, onTogglePanel }: MobileNavProps) {
           <button
             key={item.id}
             onClick={() => onTogglePanel(isActive ? null : item.id)}
-            className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 ${
-              isActive ? "text-primary" : "text-default-400 active:scale-90"
+            className={`relative flex flex-col items-center justify-center gap-0.5 px-4 py-1.5 rounded-xl transition-all duration-200 ${
+              isActive
+                ? "bg-primary/15 text-primary"
+                : "text-default-400 active:scale-95 active:bg-default-100"
             }`}
           >
-            <Icon size={18} />
+            <Icon size={18} strokeWidth={isActive ? 2.5 : 1.8} />
+            <span
+              className={`text-[9px] leading-tight ${isActive ? "font-bold" : "font-medium"}`}
+            >
+              {item.label}
+            </span>
           </button>
         );
       })}

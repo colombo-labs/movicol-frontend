@@ -26,7 +26,16 @@ export interface RoutePrediction {
   mode: string;
   risk_segments: RiskSegment[];
   overall_risk: "low" | "medium" | "high" | "critical";
+  safety_score: number;
   explanation: string;
   stations: string[];
   departure_time: string;
+  route_code?: string;
+  navigation_steps?: {
+    instruction: string;
+    street: string;
+    distance_m: number;
+    duration_s: number;
+    maneuver: string;
+  }[];
 }

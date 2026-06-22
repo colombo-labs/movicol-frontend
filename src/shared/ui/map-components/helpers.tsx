@@ -34,6 +34,8 @@ export function DraggableMarker({
       icon={icon}
       eventHandlers={eventHandlers}
       ref={markerRef}
+      title="Punto de ruta"
+      alt="Marcador de ruta"
     />
   );
 }

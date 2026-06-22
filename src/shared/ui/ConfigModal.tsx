@@ -1,3 +1,4 @@
+import { Moon, Sun, Globe, Bell, Info } from "lucide-react";
 import { AppModal } from "@shared/ui/AppModal";
 import { useTheme } from "@shared/hooks/useTheme";
 
@@ -11,41 +12,62 @@ export function ConfigModal({ isOpen, onClose }: Props) {
 
   return (
     <AppModal isOpen={isOpen} onClose={onClose} title="Configuración" size="md">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Tema</p>
-            <p className="text-xs text-default-400">
-              Apariencia de la aplicación
-            </p>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">
+          <div className="flex items-center gap-3">
+            {theme === "dark" ? (
+              <Moon size={16} className="text-warning" />
+            ) : (
+              <Sun size={16} className="text-warning" />
+            )}
+            <div>
+              <p className="text-sm font-medium">Tema</p>
+              <p className="text-[10px] text-default-400">
+                Apariencia de la app
+              </p>
+            </div>
           </div>
           <button
             onClick={toggle}
             className="px-3 py-1.5 rounded-lg bg-default-100 text-xs font-semibold hover:bg-default-200 transition-colors"
           >
-            {theme === "dark" ? "🌙 Oscuro" : "☀️ Claro"}
+            {theme === "dark" ? "Oscuro" : "Claro"}
           </button>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Idioma</p>
-            <p className="text-xs text-default-400">Idioma de la interfaz</p>
+
+        <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">
+          <div className="flex items-center gap-3">
+            <Globe size={16} className="text-primary" />
+            <div>
+              <p className="text-sm font-medium">Idioma</p>
+              <p className="text-[10px] text-default-400">
+                Idioma de la interfaz
+              </p>
+            </div>
           </div>
           <span className="text-xs text-default-500">Español</span>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Notificaciones</p>
-            <p className="text-xs text-default-400">
-              Alertas de rutas y tráfico
-            </p>
+
+        <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">
+          <div className="flex items-center gap-3">
+            <Bell size={16} className="text-success" />
+            <div>
+              <p className="text-sm font-medium">Notificaciones</p>
+              <p className="text-[10px] text-default-400">
+                Alertas de rutas y tráfico
+              </p>
+            </div>
           </div>
-          <span className="text-xs text-success">Activadas</span>
+          <span className="text-xs text-success font-medium">Activadas</span>
         </div>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Versión</p>
-            <p className="text-xs text-default-400">MoviCol</p>
+
+        <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">
+          <div className="flex items-center gap-3">
+            <Info size={16} className="text-default-400" />
+            <div>
+              <p className="text-sm font-medium">Versión</p>
+              <p className="text-[10px] text-default-400">MoviCol</p>
+            </div>
           </div>
           <span className="text-xs text-default-500">0.1.0</span>
         </div>

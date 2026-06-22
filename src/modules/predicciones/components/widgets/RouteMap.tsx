@@ -106,7 +106,7 @@ export function RouteMap({
       {/* Route polylines colored by risk */}
       {prediction?.risk_segments.map((segment) => (
         <Polyline
-          key={`${segment.from_station}-${segment.to_station}`}
+          key={`seg-${segment.from_station}-${segment.to_station}`}
           positions={segment.coordinates.map(
             (c) => [c[0], c[1]] as [number, number],
           )}

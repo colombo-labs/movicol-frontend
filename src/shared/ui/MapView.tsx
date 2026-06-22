@@ -15,6 +15,7 @@ import {
 import { TroncalesLayer } from "./TroncalesLayer";
 import { SitpLayer, CongestionLayer } from "./map-components/layers";
 import { SelectedTroncalLayer } from "./map-components/troncal-layer";
+import { SiniestroLayer } from "./map-components/siniestro-layer";
 import { makeIcon } from "./map-components/make-icon";
 import {
   DraggableMarker,
@@ -27,6 +28,8 @@ interface MapViewProps {
   readonly onMapClick?: (lat: number, lng: number) => void;
   readonly predictionMode?: boolean;
   readonly prediction?: RoutePrediction | null;
+  readonly altPredictions?: RoutePrediction[];
+  readonly onSelectAltRoute?: (index: number) => void;
   readonly tripPoints?: TripPoint[];
   readonly onMovePoint?: (index: number, lat: number, lng: number) => void;
   readonly showCongestion?: boolean;
@@ -39,6 +42,7 @@ interface MapViewProps {
     coords: [number, number][];
     stops: { lat: number; lon: number; nombre: string }[];
   } | null;
+  readonly showSiniestros?: boolean;
 }
 
 const RISK_COLORS: Record<string, string> = {
@@ -68,6 +72,8 @@ export function MapView({
   onMapClick,
   predictionMode,
   prediction,
+  altPredictions = [],
+  onSelectAltRoute,
   tripPoints = [],
   onMovePoint,
   showCongestion,
@@ -77,6 +83,7 @@ export function MapView({
   showEstacionesOnMap,
   sitpRouteCoords,
   showRoutesOnMap,
+  showSiniestros,
 }: MapViewProps) {
   const center: [number, number] = [4.65, -74.1];
   const [showTroncalesLocal] = useState(false);
@@ -154,6 +161,9 @@ export function MapView({
         {/* Congestion overlay */}
         {showCongestion && <CongestionLayer />}
 
+        {/* Siniestralidad heatmap */}
+        {showSiniestros && <SiniestroLayer />}
+
         {/* Trip point markers */}
         {tripPoints.map((pt, i) => {
           const icon = getPointIcon(i, tripPoints.length);
@@ -185,10 +195,30 @@ export function MapView({
 
         <FitRouteBounds prediction={prediction} tripPoints={tripPoints} />
 
-        {/* Prediction route segments */}
+        {/* Alternative route polylines (light green, clickable like Google Maps) */}
+        {altPredictions.map((alt, ai) =>
+          alt.risk_segments.map((segment, si) => (
+            <Polyline
+              key={`alt-${ai}-${si}`}
+              positions={segment.coordinates.map(
+                (c) => [c[0], c[1]] as [number, number],
+              )}
+              pathOptions={{
+                color: "#86efac",
+                weight: 5,
+                opacity: 0.6,
+                lineCap: "round",
+                lineJoin: "round",
+              }}
+              eventHandlers={{ click: () => onSelectAltRoute?.(ai) }}
+            />
+          )),
+        )}
+
+        {/* Prediction route segments (selected — bold, colored) */}
         {prediction?.risk_segments.map((segment) => (
           <Polyline
-            key={`${segment.from_station}-${segment.to_station}`}
+            key={`pred-seg-${segment.from_station}-${segment.to_station}`}
             positions={segment.coordinates.map(
               (c) => [c[0], c[1]] as [number, number],
             )}
@@ -218,6 +248,51 @@ export function MapView({
             </Popup>
           </Polyline>
         ))}
+
+        {/* Walking lines — dashed from origin to first segment and last segment to destination */}
+        {prediction &&
+          prediction.risk_segments.length > 0 &&
+          tripPoints.length >= 2 &&
+          (() => {
+            const firstSeg = prediction.risk_segments[0];
+            const lastSeg =
+              prediction.risk_segments[prediction.risk_segments.length - 1];
+            const firstCoord = firstSeg.coordinates[0];
+            const lastCoord =
+              lastSeg.coordinates[lastSeg.coordinates.length - 1];
+            const origin = tripPoints[0];
+            const dest = tripPoints[tripPoints.length - 1];
+            return (
+              <>
+                <Polyline
+                  positions={[
+                    [origin.lat, origin.lng],
+                    [firstCoord[0], firstCoord[1]],
+                  ]}
+                  pathOptions={{
+                    color: "#a855f7",
+                    weight: 3,
+                    dashArray: "6 10",
+                    opacity: 0.7,
+                    lineCap: "round",
+                  }}
+                />
+                <Polyline
+                  positions={[
+                    [lastCoord[0], lastCoord[1]],
+                    [dest.lat, dest.lng],
+                  ]}
+                  pathOptions={{
+                    color: "#a855f7",
+                    weight: 3,
+                    dashArray: "6 10",
+                    opacity: 0.7,
+                    lineCap: "round",
+                  }}
+                />
+              </>
+            );
+          })()}
       </MapContainer>
 
       {/* Tap hint when prediction mode */}
@@ -228,7 +303,7 @@ export function MapView({
         </div>
       )}
 
-      {/* Map info bar */}
+      {/* Map info bar — desktop only */}
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-[400] hidden md:flex items-center gap-3 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-md border border-divider/50 text-[9px] text-default-400">
         <span>Bogotá D.C.</span>
         <span className="w-px h-3 bg-divider" />

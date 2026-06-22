@@ -1,4 +1,4 @@
-import { Train, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 
 interface Props {
@@ -28,7 +28,7 @@ export function TmDetail({ selected, tmStations, onBack }: Props) {
       <GlassCard>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <Train size={16} className="text-primary" />
+            <img src="/icons/tm-logo.svg" alt="TM" className="w-5 h-5" />
             <span className="text-lg font-bold">{selected.id}</span>
           </div>
           <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">
@@ -63,7 +63,10 @@ export function TmDetail({ selected, tmStations, onBack }: Props) {
         </span>
         <div className="space-y-0 max-h-[calc(100vh-350px)] overflow-y-auto">
           {tmStations.map((name, i) => (
-            <div key={`st-${name}`} className="flex items-center gap-2 py-1">
+            <div
+              key={`st-${i}-${name}`}
+              className="flex items-center gap-2 py-1"
+            >
               <div className="flex flex-col items-center">
                 <div
                   className={`w-2.5 h-2.5 rounded-full border-2 ${getStationDot(i, tmStations.length)}`}

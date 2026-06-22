@@ -1,42 +1,35 @@
-![CI](https://github.com/colombo-labs/movicol-frontend/actions/workflows/ci.yml/badge.svg)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=colombo-labs_movicol-frontend&metric=alert_status)](https://sonarcloud.io/dashboard?id=colombo-labs_movicol-frontend)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=colombo-labs_movicol-frontend&metric=bugs)](https://sonarcloud.io/dashboard?id=colombo-labs_movicol-frontend)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=colombo-labs_movicol-frontend&metric=code_smells)](https://sonarcloud.io/dashboard?id=colombo-labs_movicol-frontend)
-
 # MoviCol Frontend
 
-React + Vite frontend for Bogotá's public transport visualization and trip planning.
+Aplicación de movilidad urbana inteligente para Bogotá — React + Vite + TypeScript + Leaflet.
 
 ## Stack
-- React 18 + TypeScript + Vite
-- HeroUI (NextUI v2.4+) + Tailwind CSS
-- Leaflet (interactive maps)
-- Lucide React (icons)
 
-## Features (v0.2.0)
-- ✅ Interactive map with TM/SITP layers
-- ✅ 20 real TransMilenio trunk routes (GeoJSON)
-- ✅ 332 real TM stations
-- ✅ 689 real SITP routes (42,601 stops)
-- ✅ Trip planner with real route matching (origin↔destination)
-- ✅ Accessibility metrics from real data
-- ✅ Config/Profile modals (fixed z-index over map)
-- ✅ Real fare: COP $3,550
-- ✅ Zero mock data
+- React 18 + Vite 5 + TypeScript
+- TailwindCSS + Leaflet (mapa)
+- Lucide React (iconos)
 
-## Run
+## Setup
+
 ```bash
-npm install && npm run dev     # Dev :3000
-npm run build                  # Production build
-npm run lint                   # ESLint
-npm run format                 # Prettier
+npm install
+npm run dev        # http://localhost:3000
+npm test           # Vitest (49 tests)
+npm run build      # Production build
 ```
 
-## Docker
-```bash
-docker build -t colombolabs/movicol-frontend:latest .
-docker run -d -p 3000:3000 colombolabs/movicol-frontend:latest
-```
+## Módulos
+
+| Módulo | Descripción |
+|--------|-------------|
+| `planificar/` | Planificador de viaje multi-modal (TM, SITP, Vehículo) |
+| `rutas/` | Explorer de rutas con filtros, cercanas (GPS), alertas |
+| `accesibilidad/` | Panel de estadísticas de accesibilidad |
+| `metricas/` | Métricas del sistema y congestión |
+| `mapa/` | Componentes del mapa (layers, markers, search) |
+| `predicciones/` | API client + hooks de predicción |
 
 ## Env
-- `VITE_API_URL` — Backend URL (default: `http://localhost:3001`)
+
+```env
+VITE_API_URL=http://localhost:3001
+```
