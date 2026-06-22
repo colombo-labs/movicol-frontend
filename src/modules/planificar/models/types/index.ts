@@ -16,15 +16,15 @@ export interface RouteLeg {
 }
 
 /** Una opción de ruta completa con posibles transbordos */
-export interface RouteOption {
+export interface RouteOption extends Pick<
+  RoutePrediction,
+  "total_time_minutes" | "total_distance_km" | "cost"
+> {
   id: string;
   label: string;
-  total_time_minutes: number;
-  total_distance_km: number;
-  cost: string;
   transfers: number;
   legs: RouteLeg[];
-  prediction: RoutePrediction; // datos crudos del backend
+  prediction: RoutePrediction;
   tag?: "fastest" | "cheapest" | "less_walking";
 }
 
