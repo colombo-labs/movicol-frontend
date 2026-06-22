@@ -1,29 +1,44 @@
-import { GlassCard } from '@shared/ui/GlassCard';
+import { Activity } from "lucide-react";
+import { useMetricsData } from "../hooks/useMetricsData";
+import { SystemStatus } from "../components/widgets/SystemStatus";
+import {
+  AlertsCard,
+  LiveCounter,
+  PassengersCard,
+  NetworkEfficiency,
+} from "../components/widgets/MetricCards";
+import {
+  GridStats,
+  TopCongested,
+  PeakHours,
+  Recommendations,
+} from "../components/widgets/MetricStats";
 
 export function MetricasPanel() {
+  const { stats, loading, avgCongestion, critical, high, topCongested } =
+    useMetricsData();
+
+  if (loading)
+    return (
+      <div className="flex items-center justify-center py-8 text-primary">
+        <Activity size={20} className="animate-pulse" />
+        <span className="ml-2 text-sm">
+          Cargando métricas en tiempo real...
+        </span>
+      </div>
+    );
+
   return (
-    <div className="space-y-4">
-      <GlassCard>
-        <p className="text-sm text-default-500">Estaciones</p>
-        <p className="text-3xl font-bold">7,444</p>
-      </GlassCard>
-      <GlassCard>
-        <p className="text-sm text-default-500">Conexiones</p>
-        <p className="text-3xl font-bold">41,990</p>
-      </GlassCard>
-      <GlassCard>
-        <p className="text-sm text-default-500">Componente Principal</p>
-        <p className="text-3xl font-bold">97.9%</p>
-      </GlassCard>
-      <GlassCard>
-        <p className="text-sm text-default-500">Grado Promedio</p>
-        <p className="text-2xl font-bold">11.28</p>
-      </GlassCard>
-      <GlassCard>
-        <p className="text-sm text-default-500">Modelo GNN</p>
-        <p className="text-2xl font-bold">GAT</p>
-        <p className="text-xs text-default-400">RMSE: 0.42 | MSE: 0.18</p>
-      </GlassCard>
+    <div className="space-y-3">
+      <SystemStatus avgCongestion={avgCongestion} />
+      <AlertsCard critical={critical} high={high} />
+      <LiveCounter />
+      <PassengersCard avgCongestion={avgCongestion} />
+      <NetworkEfficiency />
+      <GridStats stats={stats} />
+      <TopCongested items={topCongested} />
+      <PeakHours />
+      <Recommendations avgCongestion={avgCongestion} />
     </div>
   );
 }

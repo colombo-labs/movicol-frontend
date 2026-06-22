@@ -12,13 +12,13 @@ export interface Prediction {
   stationId: string;
   stationName: string;
   congestionLevel: number;
-  riskLabel: 'low' | 'medium' | 'high' | 'critical';
+  riskLabel: "low" | "medium" | "high" | "critical";
   horizonMinutes: number;
   confidence: number;
 }
 
 export interface ChatMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   sources?: string[];
 }

@@ -1,5 +1,11 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
-import { type ReactNode } from 'react';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/react";
+import { type ReactNode } from "react";
 
 interface AppModalProps {
   isOpen: boolean;
@@ -7,24 +13,29 @@ interface AppModalProps {
   title: string;
   children: ReactNode;
   footer?: ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  size?: "sm" | "md" | "lg" | "xl" | "full";
 }
 
-/**
- * Reusable modal component for quick actions within a module.
- * Used for: station details, prediction results, filters, settings.
- */
-export function AppModal({ isOpen, onClose, title, children, footer, size = 'lg' }: AppModalProps) {
+export function AppModal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  footer,
+  size = "lg",
+}: AppModalProps) {
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       size={size}
-      backdrop="blur"
+      backdrop="opaque"
       classNames={{
-        base: 'bg-background/90 backdrop-blur-xl border border-white/10',
-        header: 'border-b border-white/10',
-        footer: 'border-t border-white/10',
+        wrapper: "z-[9999]",
+        backdrop: "z-[9998] bg-black/80",
+        base: "bg-background border border-divider shadow-2xl",
+        header: "border-b border-divider",
+        footer: "border-t border-divider",
       }}
     >
       <ModalContent>

@@ -1,261 +1,288 @@
-import { useState } from 'react';
-import { Navigation, Train, Bus, Car, Plus, X, Clock, ArrowRightLeft, Zap, Leaf, DollarSign, MapPin } from 'lucide-react';
-import { GlassCard } from '@shared/ui/GlassCard';
+import { useState, useEffect } from "react";
+import { Navigation, Clock, AlertCircle } from "lucide-react";
+import type {
+  PlanificarProps,
+  TransportMode,
+  DepartureType,
+} from "../models/types";
+import { useRutasCercanas } from "../hooks/useRutasCercanas";
+import { useAddressSearch } from "../hooks/useAddressSearch";
+import { estimateTrip } from "../api/planificarApi";
+import { SearchBar } from "../components/ui/SearchBar";
+import { TripPointsList } from "../components/ui/TripPointsList";
+import { EmptyState } from "../components/ui/EmptyState";
+import {
+  ModeComparison,
+  RouteAlternatives,
+} from "../components/widgets/ModeComparison";
+import {
+  LiveTimeBanner,
+  RouteSummaryCard,
+  TripDetails,
+} from "../components/widgets/RouteSummary";
+import {
+  EcoInfo,
+  CongestionBar,
+  WaitEstimation,
+  RouteAlerts,
+} from "../components/widgets/RouteStats";
+import {
+  ActionButtons,
+  QuickActions,
+  NearDestination,
+  TravelTips,
+} from "../components/widgets/RouteActions";
+import {
+  NavigationSteps,
+  StationsList,
+} from "../components/widgets/RouteNavigation";
 
-type TransportMode = 'transmilenio' | 'sitp' | 'vehiculo';
-type Preference = 'rapido' | 'economico' | 'ecologico';
-type DepartureType = 'ahora' | 'programar';
+export function PlanificarViajePanel({
+  onPredict,
+  prediction,
+  isLoading,
+  error,
+  tripPoints,
+  onRemovePoint,
+  onUseMyLocation,
+  onSwapPoints,
+  onClear,
+  onAddPoint,
+}: PlanificarProps) {
+  const [mode, setMode] = useState<TransportMode>("transmilenio");
+  const [departureType, setDepartureType] = useState<DepartureType>("ahora");
+  const [departureTime, setDepartureTime] = useState("");
 
-const modes = [
-  { id: 'transmilenio' as TransportMode, icon: Train, label: 'TM' },
-  { id: 'sitp' as TransportMode, icon: Bus, label: 'SITP' },
-  { id: 'vehiculo' as TransportMode, icon: Car, label: 'Carro' },
-];
+  const origin = tripPoints.length > 0 ? tripPoints[0] : null;
+  const destination =
+    tripPoints.length > 1 ? tripPoints[tripPoints.length - 1] : null;
 
-const preferences = [
-  { id: 'rapido' as Preference, icon: Zap, label: 'Más rápido' },
-  { id: 'economico' as Preference, icon: DollarSign, label: 'Más barato' },
-  { id: 'ecologico' as Preference, icon: Leaf, label: 'Ecológico' },
-];
+  const rutasDisponibles = useRutasCercanas(origin, destination, mode);
+  const {
+    searchQuery,
+    searchResults,
+    searching,
+    handleSearch: onSearchAddress,
+    clearSearch,
+  } = useAddressSearch();
 
-export function PlanificarViajePanel() {
-  const [mode, setMode] = useState<TransportMode>('transmilenio');
-  const [preference, setPreference] = useState<Preference>('rapido');
-  const [departureType, setDepartureType] = useState<DepartureType>('ahora');
-  const [departureTime, setDepartureTime] = useState('');
-  const [stops, setStops] = useState<string[]>(['', '']);
-  const [searched, setSearched] = useState(false);
-
-  const addStop = () => {
-    const newStops = [...stops];
-    newStops.splice(stops.length - 1, 0, '');
-    setStops(newStops);
-    setSearched(false);
+  const handlePredict = () => {
+    if (!origin || !destination) return;
+    const dt =
+      departureType === "programar" && departureTime
+        ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+        : new Date().toISOString();
+    onPredict?.(origin, destination, mode, dt);
   };
 
-  const removeStop = (index: number) => {
-    if (stops.length <= 2) return;
-    setStops(stops.filter((_, i) => i !== index));
-    setSearched(false);
+  const handleModeChange = (newMode: TransportMode) => {
+    setMode(newMode);
+    if (prediction && origin && destination) {
+      const dt =
+        departureType === "programar" && departureTime
+          ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+          : new Date().toISOString();
+      onPredict?.(origin, destination, newMode, dt);
+    }
   };
 
-  const updateStop = (index: number, value: string) => {
-    const newStops = [...stops];
-    newStops[index] = value;
-    setStops(newStops);
-    setSearched(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (tripPoints.length >= 2 && !prediction && !isLoading) {
+      const timer = setTimeout(() => handlePredict(), 500);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tripPoints]);
+
+  const getETA = () => {
+    if (!prediction) return null;
+    const eta = new Date(Date.now() + prediction.total_time_minutes * 60000);
+    return eta.toLocaleTimeString("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
-  const swapStops = () => {
-    setStops([...stops].reverse());
-    setSearched(false);
-  };
-
-  const canSearch = stops.every((s) => s.trim().length > 0);
+  // Fill estimated values if backend returns 0
+  if (prediction?.total_time_minutes === 0 && origin && destination) {
+    const est = estimateTrip(origin, destination, mode);
+    prediction.total_time_minutes = est.time;
+    prediction.total_distance_km = est.distance;
+    prediction.cost = est.cost;
+  }
 
   return (
-    <div className="space-y-4">
-      {/* Modo de transporte */}
-      <div>
-        <span className="text-[10px] uppercase tracking-wider text-default-400 mb-1.5 block">Modo de transporte</span>
-        <div className="flex gap-1 bg-default-100 rounded-xl p-1">
-          {modes.map((m) => {
-            const Icon = m.icon;
-            return (
-              <button
-                key={m.id}
-                onClick={() => { setMode(m.id); setSearched(false); }}
-                className={`flex-1 flex flex-col items-center gap-0.5 py-2 rounded-lg text-[10px] font-semibold transition-all ${
-                  mode === m.id ? 'bg-primary text-primary-foreground shadow-sm' : 'text-default-500 hover:text-foreground'
-                }`}
-              >
-                <Icon size={16} />
-                {m.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+    <div className="space-y-3">
+      <SearchBar
+        query={searchQuery}
+        results={searchResults}
+        searching={searching}
+        onSearch={onSearchAddress}
+        onSelect={(r) => {
+          onAddPoint?.(r.lat, r.lng, r.label);
+          clearSearch();
+        }}
+      />
 
-      {/* Paradas */}
-      <div>
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[10px] uppercase tracking-wider text-default-400">Ruta</span>
-          {stops.length === 2 && (
-            <button onClick={swapStops} className="text-default-400 hover:text-primary transition-colors" title="Invertir ruta">
-              <ArrowRightLeft size={14} />
-            </button>
-          )}
-        </div>
-        <div className="flex items-stretch gap-3">
-          <div className="flex flex-col items-center py-2">
-            {stops.map((_, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <div className={`w-3 h-3 rounded-full border-2 ${
-                  i === 0 ? 'border-primary bg-primary/20' : i === stops.length - 1 ? 'border-danger bg-danger/20' : 'border-warning bg-warning/20'
-                }`} />
-                {i < stops.length - 1 && <div className="w-0.5 h-6 bg-default-200" />}
-              </div>
-            ))}
-          </div>
-          <div className="flex-1 space-y-2">
-            {stops.map((stop, i) => (
-              <div key={i} className="flex items-center gap-1">
-                <input
-                  type="text"
-                  placeholder={i === 0 ? 'Origen (ej. Portal Norte)' : i === stops.length - 1 ? 'Destino (ej. Universidades)' : `Parada ${i}`}
-                  value={stop}
-                  onChange={(e) => updateStop(i, e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-xl bg-default-100 border border-divider text-sm outline-none text-foreground placeholder:text-default-400 focus:border-primary/50 transition-colors"
-                />
-                {stops.length > 2 && i > 0 && i < stops.length - 1 && (
-                  <button onClick={() => removeStop(i)} className="w-7 h-7 rounded-lg flex items-center justify-center text-default-400 hover:text-danger hover:bg-danger/10 transition-colors">
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+      {!prediction && (
+        <EmptyState
+          tripPoints={tripPoints}
+          onUseMyLocation={onUseMyLocation}
+          onAddPoint={onAddPoint}
+        />
+      )}
+
+      {tripPoints.length > 0 && (
+        <TripPointsList
+          tripPoints={tripPoints}
+          onRemovePoint={onRemovePoint}
+          onUseMyLocation={onUseMyLocation}
+          onSwapPoints={onSwapPoints}
+          onClear={onClear}
+        />
+      )}
+
+      {/* Departure time */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <Clock size={13} className="text-default-400 shrink-0" />
         <button
-          onClick={addStop}
-          className="w-full mt-2 py-1.5 rounded-xl border border-dashed border-divider text-[11px] text-default-400 hover:text-foreground hover:border-primary/50 flex items-center justify-center gap-1 transition-colors"
+          onClick={() => setDepartureType("ahora")}
+          className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "ahora" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
         >
-          <Plus size={11} /> Agregar parada
+          Salir ahora
         </button>
-      </div>
-
-      {/* Hora de salida */}
-      <div>
-        <span className="text-[10px] uppercase tracking-wider text-default-400 mb-1.5 block">Salida</span>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setDepartureType('ahora')}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
-              departureType === 'ahora' ? 'bg-primary/20 text-primary ring-1 ring-primary/50' : 'bg-default-100 text-default-500 hover:text-foreground'
-            }`}
-          >
-            <Clock size={12} /> Ahora
-          </button>
-          <button
-            onClick={() => setDepartureType('programar')}
-            className={`flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
-              departureType === 'programar' ? 'bg-primary/20 text-primary ring-1 ring-primary/50' : 'bg-default-100 text-default-500 hover:text-foreground'
-            }`}
-          >
-            <Clock size={12} /> Programar
-          </button>
-        </div>
-        {departureType === 'programar' && (
+        <button
+          onClick={() => setDepartureType("programar")}
+          className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "programar" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
+        >
+          Programar
+        </button>
+        {departureType === "programar" && (
           <input
-            type="datetime-local"
+            type="time"
             value={departureTime}
             onChange={(e) => setDepartureTime(e.target.value)}
-            className="w-full mt-2 px-3 py-2 rounded-xl bg-default-100 border border-divider text-sm outline-none text-foreground focus:border-primary/50 transition-colors"
+            className="px-2 py-0.5 rounded-lg bg-default-100 border border-divider text-[10px] outline-none text-foreground"
           />
         )}
       </div>
 
-      {/* Preferencia */}
-      <div>
-        <span className="text-[10px] uppercase tracking-wider text-default-400 mb-1.5 block">Preferencia</span>
-        <div className="flex gap-1">
-          {preferences.map((p) => {
-            const Icon = p.icon;
-            return (
-              <button
-                key={p.id}
-                onClick={() => setPreference(p.id)}
-                className={`flex-1 py-2 rounded-xl text-[10px] font-semibold flex items-center justify-center gap-1 transition-all ${
-                  preference === p.id ? 'bg-primary/20 text-primary ring-1 ring-primary/50' : 'bg-default-100 text-default-500 hover:text-foreground'
-                }`}
-              >
-                <Icon size={12} /> {p.label}
-              </button>
-            );
-          })}
+      {/* Search / Recalculate buttons */}
+      {!prediction && !isLoading && tripPoints.length >= 2 && (
+        <button
+          onClick={handlePredict}
+          className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.98]"
+        >
+          <Navigation size={14} /> Buscar ruta
+        </button>
+      )}
+      {prediction && !isLoading && (
+        <button
+          onClick={handlePredict}
+          className="w-full py-1.5 rounded-lg border border-primary/30 text-primary text-[10px] font-medium flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-all"
+        >
+          <Navigation size={10} /> Recalcular ruta
+        </button>
+      )}
+
+      {/* Loading */}
+      {isLoading && (
+        <div className="flex flex-col items-center justify-center py-5 gap-2">
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full border-2 border-primary/20" />
+            <div className="absolute inset-0 w-10 h-10 rounded-full border-2 border-transparent border-t-primary animate-spin" />
+          </div>
+          <span className="text-xs text-primary font-medium">
+            Calculando mejor ruta...
+          </span>
         </div>
-      </div>
+      )}
 
-      {/* Buscar */}
-      <button
-        onClick={() => { if (canSearch) setSearched(true); }}
-        disabled={!canSearch}
-        className="w-full py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-all active:scale-[0.98]"
-      >
-        <Navigation size={14} />
-        Buscar ruta
-      </button>
+      {/* Error */}
+      {error && (
+        <div className="flex items-start gap-2 p-2.5 rounded-xl bg-danger/10 border border-danger/20">
+          <AlertCircle size={12} className="text-danger mt-0.5 shrink-0" />
+          <p className="text-[10px] text-danger">{error}</p>
+        </div>
+      )}
 
-      {/* Resultado */}
-      {searched && (
-        <div className="space-y-3">
-          <span className="text-[10px] uppercase tracking-wider text-default-400">Resultado — Predicción IA (GNN)</span>
-
-          {/* Ruta principal */}
-          <GlassCard>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold">Ruta recomendada</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-success/20 text-success font-medium">87% confianza</span>
-            </div>
-            <div className="flex items-center gap-1 text-xs text-default-500 mb-3">
-              <MapPin size={10} className="text-primary" />
-              <span>{stops.filter(Boolean).join(' → ')}</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="text-center">
-                <p className="text-[10px] text-default-400">Tiempo</p>
-                <p className="text-lg font-bold">{stops.length * 14} min</p>
-              </div>
-              <div className="text-center">
-                <p className="text-[10px] text-default-400">Distancia</p>
-                <p className="text-lg font-bold">{(stops.length * 3.2).toFixed(1)} km</p>
-              </div>
-              <div className="text-center">
-                <p className="text-[10px] text-default-400">Costo</p>
-                <p className="text-lg font-bold">${mode === 'transmilenio' || mode === 'sitp' ? '2,950' : '0'}</p>
-              </div>
-            </div>
-          </GlassCard>
-
-          {/* Detalles del trayecto */}
-          <GlassCard>
-            <span className="text-xs font-semibold mb-2 block">Detalle del trayecto</span>
-            <div className="space-y-2">
-              {stops.filter(Boolean).map((stop, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-primary' : i === stops.length - 1 ? 'bg-danger' : 'bg-warning'}`} />
-                  <span className="text-xs text-foreground">{stop}</span>
-                  {i < stops.filter(Boolean).length - 1 && (
-                    <span className="text-[10px] text-default-400 ml-auto">{Math.round(Math.random() * 10 + 5)} min</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-
-          {/* Congestión predicha */}
-          <GlassCard>
-            <span className="text-xs font-semibold mb-2 block">Congestión predicha (GNN)</span>
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-2 rounded-full bg-default-100 overflow-hidden">
-                <div className="h-full w-[62%] bg-gradient-to-r from-success via-warning to-danger rounded-full" />
-              </div>
-              <span className="text-xs font-bold text-warning">62%</span>
-            </div>
-            <p className="text-[10px] text-default-400 mt-1">Nivel medio — se recomienda salir 10 min antes</p>
-          </GlassCard>
-
-          {/* Alternativa */}
-          <GlassCard className="opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
-            <div className="flex items-center justify-between">
+      {/* Rush hour */}
+      {prediction &&
+        (() => {
+          const hour = new Date().getHours();
+          if (!((hour >= 6 && hour <= 9) || (hour >= 17 && hour <= 20)))
+            return null;
+          return (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-warning/10 border border-warning/20">
+              <Clock size={12} className="text-warning shrink-0" />
               <div>
-                <span className="text-xs font-semibold">Ruta alternativa</span>
-                <p className="text-[10px] text-default-400">{stops.length * 18} min — Menos congestión</p>
+                <p className="text-[10px] text-warning font-semibold">
+                  Hora pico activa
+                </p>
+                <p className="text-[9px] text-warning/70">
+                  El tiempo puede ser mayor al estimado
+                </p>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/20 text-primary font-medium">Ver</span>
             </div>
-          </GlassCard>
+          );
+        })()}
+
+      {/* Results */}
+      {prediction && (
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-default-100/50 text-[9px] text-default-400">
+            <span>14°C Bogotá</span>
+            <span>Datos en vivo</span>
+            <span>
+              {new Date().toLocaleTimeString("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </div>
+          <ModeComparison
+            prediction={prediction}
+            mode={mode}
+            onModeChange={handleModeChange}
+          />
+          <RouteAlternatives prediction={prediction} />
+          <LiveTimeBanner prediction={prediction} mode={mode} getETA={getETA} />
+          <RouteSummaryCard
+            prediction={prediction}
+            mode={mode}
+            rutasDisponibles={rutasDisponibles}
+            getETA={getETA}
+          />
+          <TripDetails prediction={prediction} mode={mode} />
+          <EcoInfo prediction={prediction} />
+          <CongestionBar prediction={prediction} />
+          {mode !== "vehiculo" && <WaitEstimation prediction={prediction} />}
+          <RouteAlerts prediction={prediction} />
+          {mode !== "vehiculo" && prediction.stations.length > 0 && (
+            <NavigationSteps
+              prediction={prediction}
+              mode={mode}
+              getETA={getETA}
+            />
+          )}
+          <NearDestination />
+          <ActionButtons
+            prediction={prediction}
+            tripPoints={tripPoints}
+            onClear={onClear}
+          />
+          <QuickActions />
+          <TravelTips mode={mode} />
+          {prediction.stations.length > 0 && (
+            <StationsList prediction={prediction} />
+          )}
+          <button
+            onClick={handlePredict}
+            className="w-full py-1.5 text-[10px] text-primary hover:underline"
+          >
+            Recalcular
+          </button>
         </div>
       )}
     </div>

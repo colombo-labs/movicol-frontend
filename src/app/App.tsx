@@ -1,4 +1,4 @@
-import { Layout } from './Layout';
+import { Layout } from "./Layout";
 
 export function App() {
   return <Layout />;
