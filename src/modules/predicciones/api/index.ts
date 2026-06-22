@@ -23,4 +23,11 @@ export const routePredictionApi = {
       destination: toApiCoordinates(params.destination),
       mode: params.mode ?? "transmilenio",
     }),
+  predictAlternatives: (params: PredictRouteParams) =>
+    api.post<RoutePrediction[]>("/route-prediction/alternatives", {
+      ...params,
+      origin: toApiCoordinates(params.origin),
+      destination: toApiCoordinates(params.destination),
+      mode: "vehiculo",
+    }),
 };

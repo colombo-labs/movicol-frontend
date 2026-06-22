@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { Coordinates, RoutePrediction } from "../models";
 import { routePredictionApi } from "../api";
 
@@ -13,8 +13,10 @@ export function useRoutePredict() {
   const [prediction, setPrediction] = useState<RoutePrediction | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const cancelledRef = useRef(false);
 
   const predict = useCallback(async (params: PredictParams) => {
+    cancelledRef.current = false;
     setIsLoading(true);
     setError(null);
     try {
@@ -24,18 +26,24 @@ export function useRoutePredict() {
         departure_time: params.departureTime ?? new Date().toISOString(),
         mode: params.mode ?? "transmilenio",
       });
-      setPrediction(result);
+      if (!cancelledRef.current) {
+        setPrediction(result);
+        setIsLoading(false);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al predecir ruta");
-      setPrediction(null);
-    } finally {
-      setIsLoading(false);
+      if (!cancelledRef.current) {
+        setError(err instanceof Error ? err.message : "Error al predecir ruta");
+        setPrediction(null);
+        setIsLoading(false);
+      }
     }
   }, []);
 
   const clear = useCallback(() => {
+    cancelledRef.current = true;
     setPrediction(null);
     setError(null);
+    setIsLoading(false);
   }, []);
 
   return { predict, prediction, isLoading, error, clear };
