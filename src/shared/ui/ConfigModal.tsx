@@ -15,10 +15,16 @@ export function ConfigModal({ isOpen, onClose }: Props) {
       <div className="space-y-3">
         <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">
           <div className="flex items-center gap-3">
-            {theme === "dark" ? <Moon size={16} className="text-warning" /> : <Sun size={16} className="text-warning" />}
+            {theme === "dark" ? (
+              <Moon size={16} className="text-warning" />
+            ) : (
+              <Sun size={16} className="text-warning" />
+            )}
             <div>
               <p className="text-sm font-medium">Tema</p>
-              <p className="text-[10px] text-default-400">Apariencia de la app</p>
+              <p className="text-[10px] text-default-400">
+                Apariencia de la app
+              </p>
             </div>
           </div>
           <button
@@ -34,7 +40,9 @@ export function ConfigModal({ isOpen, onClose }: Props) {
             <Globe size={16} className="text-primary" />
             <div>
               <p className="text-sm font-medium">Idioma</p>
-              <p className="text-[10px] text-default-400">Idioma de la interfaz</p>
+              <p className="text-[10px] text-default-400">
+                Idioma de la interfaz
+              </p>
             </div>
           </div>
           <span className="text-xs text-default-500">Español</span>
@@ -45,7 +53,9 @@ export function ConfigModal({ isOpen, onClose }: Props) {
             <Bell size={16} className="text-success" />
             <div>
               <p className="text-sm font-medium">Notificaciones</p>
-              <p className="text-[10px] text-default-400">Alertas de rutas y tráfico</p>
+              <p className="text-[10px] text-default-400">
+                Alertas de rutas y tráfico
+              </p>
             </div>
           </div>
           <span className="text-xs text-success font-medium">Activadas</span>

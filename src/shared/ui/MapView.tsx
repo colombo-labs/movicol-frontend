@@ -212,7 +212,7 @@ export function MapView({
               }}
               eventHandlers={{ click: () => onSelectAltRoute?.(ai) }}
             />
-          ))
+          )),
         )}
 
         {/* Prediction route segments (selected — bold, colored) */}
@@ -250,26 +250,49 @@ export function MapView({
         ))}
 
         {/* Walking lines — dashed from origin to first segment and last segment to destination */}
-        {prediction && prediction.risk_segments.length > 0 && tripPoints.length >= 2 && (() => {
-          const firstSeg = prediction.risk_segments[0];
-          const lastSeg = prediction.risk_segments[prediction.risk_segments.length - 1];
-          const firstCoord = firstSeg.coordinates[0];
-          const lastCoord = lastSeg.coordinates[lastSeg.coordinates.length - 1];
-          const origin = tripPoints[0];
-          const dest = tripPoints[tripPoints.length - 1];
-          return (
-            <>
-              <Polyline
-                positions={[[origin.lat, origin.lng], [firstCoord[0], firstCoord[1]]]}
-                pathOptions={{ color: "#a855f7", weight: 3, dashArray: "6 10", opacity: 0.7, lineCap: "round" }}
-              />
-              <Polyline
-                positions={[[lastCoord[0], lastCoord[1]], [dest.lat, dest.lng]]}
-                pathOptions={{ color: "#a855f7", weight: 3, dashArray: "6 10", opacity: 0.7, lineCap: "round" }}
-              />
-            </>
-          );
-        })()}
+        {prediction &&
+          prediction.risk_segments.length > 0 &&
+          tripPoints.length >= 2 &&
+          (() => {
+            const firstSeg = prediction.risk_segments[0];
+            const lastSeg =
+              prediction.risk_segments[prediction.risk_segments.length - 1];
+            const firstCoord = firstSeg.coordinates[0];
+            const lastCoord =
+              lastSeg.coordinates[lastSeg.coordinates.length - 1];
+            const origin = tripPoints[0];
+            const dest = tripPoints[tripPoints.length - 1];
+            return (
+              <>
+                <Polyline
+                  positions={[
+                    [origin.lat, origin.lng],
+                    [firstCoord[0], firstCoord[1]],
+                  ]}
+                  pathOptions={{
+                    color: "#a855f7",
+                    weight: 3,
+                    dashArray: "6 10",
+                    opacity: 0.7,
+                    lineCap: "round",
+                  }}
+                />
+                <Polyline
+                  positions={[
+                    [lastCoord[0], lastCoord[1]],
+                    [dest.lat, dest.lng],
+                  ]}
+                  pathOptions={{
+                    color: "#a855f7",
+                    weight: 3,
+                    dashArray: "6 10",
+                    opacity: 0.7,
+                    lineCap: "round",
+                  }}
+                />
+              </>
+            );
+          })()}
       </MapContainer>
 
       {/* Tap hint when prediction mode */}

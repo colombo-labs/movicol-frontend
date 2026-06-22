@@ -25,12 +25,16 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
     <div className="text-xs text-left">
       <span className="inline-block px-3 py-2 rounded-xl rounded-bl-sm max-w-[90%] bg-white/5 text-foreground space-y-1">
         {lines.map((line, i) => {
-          const isBullet = line.trim().startsWith("•") || line.trim().startsWith("-");
+          const isBullet =
+            line.trim().startsWith("•") || line.trim().startsWith("-");
           const isLabel = line.includes(":") && !isBullet && lines.length > 1;
 
           if (isBullet) {
             return (
-              <p key={i} className="pl-2 text-default-300">
+              <p
+                key={`bullet-${line.slice(0, 20)}`}
+                className="pl-2 text-default-300"
+              >
                 {line.trim()}
               </p>
             );
@@ -39,14 +43,21 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
           if (isLabel) {
             const [label, ...rest] = line.split(":");
             return (
-              <p key={i}>
+              <p key={`label-${label}`}>
                 <span className="text-primary/80 font-medium">{label}:</span>
                 <span className="text-default-300">{rest.join(":")}</span>
               </p>
             );
           }
 
-          return <p key={i} className="text-default-300">{line}</p>;
+          return (
+            <p
+              key={`line-${line.slice(0, 20)}-${i}`}
+              className="text-default-300"
+            >
+              {line}
+            </p>
+          );
         })}
       </span>
     </div>

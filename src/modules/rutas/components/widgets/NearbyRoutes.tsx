@@ -23,11 +23,17 @@ function groupByStop(routes: NearbyRoute[]): StopGroup[] {
     if (!stop) continue;
     const key = stop.nombre;
     if (!map.has(key)) {
-      map.set(key, { nombre: stop.nombre, distancia: stop.distancia, rutas: [] });
+      map.set(key, {
+        nombre: stop.nombre,
+        distancia: stop.distancia,
+        rutas: [],
+      });
     }
     map.get(key)!.rutas.push(r);
   }
-  return Array.from(map.values()).sort((a, b) => a.distancia - b.distancia).slice(0, 3);
+  return Array.from(map.values())
+    .sort((a, b) => a.distancia - b.distancia)
+    .slice(0, 3);
 }
 
 function estimateArrival(): string {
@@ -61,7 +67,10 @@ export function NearbyRoutes() {
           setLoading(false);
         }
       },
-      () => { setLoading(false); setError(true); },
+      () => {
+        setLoading(false);
+        setError(true);
+      },
       { timeout: 5000 },
     );
   }, []);
@@ -70,7 +79,9 @@ export function NearbyRoutes() {
     return (
       <div className="flex items-center gap-2 px-3 py-3 rounded-xl bg-primary/5 border border-primary/10 animate-pulse">
         <MapPin size={14} className="text-primary" />
-        <span className="text-[11px] text-primary font-medium">Buscando paradas cercanas...</span>
+        <span className="text-[11px] text-primary font-medium">
+          Buscando paradas cercanas...
+        </span>
       </div>
     );
   }
@@ -81,7 +92,9 @@ export function NearbyRoutes() {
     <div className="space-y-2">
       <div className="flex items-center gap-1.5 px-1">
         <MapPin size={11} className="text-primary" />
-        <span className="text-[10px] font-semibold text-foreground">Paradas cercanas</span>
+        <span className="text-[10px] font-semibold text-foreground">
+          Paradas cercanas
+        </span>
         <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse ml-1" />
       </div>
 
@@ -93,29 +106,45 @@ export function NearbyRoutes() {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <img src="/icons/sitp-logo.svg" alt="" className="w-3 h-3 bg-white rounded-full p-px" />
+                  <img
+                    src="/icons/sitp-logo.svg"
+                    alt=""
+                    className="w-3 h-3 bg-white rounded-full p-px"
+                  />
                 </div>
-                <p className="text-[11px] font-medium text-foreground truncate">{g.nombre}</p>
+                <p className="text-[11px] font-medium text-foreground truncate">
+                  {g.nombre}
+                </p>
               </div>
               <div className="flex items-center gap-1 shrink-0 text-[9px] text-default-400">
                 <Footprints size={9} />
-                <span>{walkMin} min · {g.distancia}m</span>
+                <span>
+                  {walkMin} min · {g.distancia}m
+                </span>
               </div>
             </div>
 
             {/* Routes at this stop */}
             <div className="space-y-1">
               {g.rutas.slice(0, 4).map((r) => (
-                <div key={r.ruta} className="flex items-center justify-between py-1 px-1.5 rounded-md hover:bg-default-100/50 transition-colors">
+                <div
+                  key={r.ruta}
+                  className="flex items-center justify-between py-1 px-1.5 rounded-md hover:bg-default-100/50 transition-colors"
+                >
                   <div className="flex items-center gap-2">
                     <span
                       className="text-[10px] font-bold px-1.5 py-0.5 rounded min-w-[36px] text-center"
-                      style={{ backgroundColor: `#${r.cenefa}20`, color: `#${r.cenefa}`, border: `1px solid #${r.cenefa}40` }}
+                      style={{
+                        backgroundColor: `#${r.cenefa}20`,
+                        color: `#${r.cenefa}`,
+                        border: `1px solid #${r.cenefa}40`,
+                      }}
                     >
                       {r.ruta}
                     </span>
                     <span className="text-[9px] text-default-500 truncate max-w-[120px]">
-                      {r.paraderosCercanos[r.paraderosCercanos.length - 1]?.nombre || ""}
+                      {r.paraderosCercanos[r.paraderosCercanos.length - 1]
+                        ?.nombre || ""}
                     </span>
                   </div>
                   <div className="flex items-center gap-1 text-[9px] font-medium text-success">

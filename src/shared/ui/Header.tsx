@@ -18,8 +18,12 @@ export function Header() {
             <Bus size={16} className="dark:text-black text-white" />
           </span>
           <span className="flex flex-col leading-tight">
-            <span className="text-sm font-bold text-foreground">Movi<span className="text-[#2d8a5e]">Col</span></span>
-            <span className="text-[9px] text-default-400">Transporte inteligente</span>
+            <span className="text-sm font-bold text-foreground">
+              Movi<span className="text-[#2d8a5e]">Col</span>
+            </span>
+            <span className="text-[9px] text-default-400">
+              Transporte inteligente
+            </span>
           </span>
         </span>
         <div className="flex items-center gap-1.5 md:gap-2 md:ml-auto">

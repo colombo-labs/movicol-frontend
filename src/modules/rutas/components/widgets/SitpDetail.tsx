@@ -17,7 +17,6 @@ export function SitpDetail({ ruta, onBack }: Props) {
       paradas={ruta.paraderos}
       badgeLabel={`${ruta.paraderos.length} paradas`}
       badgeColor="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-      accentColor="blue"
       onBack={onBack}
     />
   );

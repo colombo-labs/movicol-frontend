@@ -18,7 +18,6 @@ interface RutaDetailProps {
   readonly paradas: Stop[];
   readonly badgeLabel: string;
   readonly badgeColor: string;
-  readonly accentColor: string;
   readonly onBack: () => void;
 }
 
@@ -44,19 +43,22 @@ export function RutaDetail({
       <GlassCard>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            {iconSrc ? (
-              <img src={iconSrc} alt="" className="w-5 h-5" />
-            ) : Icon ? (
-              <Icon size={16} className="text-primary" />
-            ) : null}
+            {iconSrc && <img src={iconSrc} alt="" className="w-5 h-5" />}
+            {!iconSrc && Icon && <Icon size={16} className="text-primary" />}
             <span className="text-lg font-bold">{codigo}</span>
           </div>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${badgeColor}`}>
+          <span
+            className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${badgeColor}`}
+          >
             {badgeLabel}
           </span>
         </div>
-        {subtitulo && <p className="text-xs text-default-500 mb-1">{subtitulo}</p>}
-        <p className="text-[11px] text-default-600">{origen} → {destino}</p>
+        {subtitulo && (
+          <p className="text-xs text-default-500 mb-1">{subtitulo}</p>
+        )}
+        <p className="text-[11px] text-default-600">
+          {origen} → {destino}
+        </p>
         {extra && <p className="text-[10px] text-default-400 mt-1">{extra}</p>}
       </GlassCard>
 
@@ -73,11 +75,13 @@ export function RutaDetail({
                 {/* Timeline column */}
                 <div className="flex flex-col items-center w-4 shrink-0">
                   {/* Dot */}
-                  {isFirst ? (
+                  {isFirst && (
                     <div className="w-3.5 h-3.5 rounded-full bg-success border-2 border-success/30 shrink-0 mt-2" />
-                  ) : isLast ? (
+                  )}
+                  {!isFirst && isLast && (
                     <div className="w-3.5 h-3.5 rounded-full bg-danger border-2 border-danger/30 shrink-0 mt-2" />
-                  ) : (
+                  )}
+                  {!isFirst && !isLast && (
                     <div className="w-2 h-2 rounded-full bg-default-400 shrink-0 mt-2.5" />
                   )}
                   {/* Connector line */}
@@ -87,7 +91,9 @@ export function RutaDetail({
                 </div>
                 {/* Content */}
                 <div className={`flex-1 pb-2 pt-1`}>
-                  <p className={`text-[11px] leading-tight ${isFirst || isLast ? "font-semibold text-foreground" : "text-default-500"}`}>
+                  <p
+                    className={`text-[11px] leading-tight ${isFirst || isLast ? "font-semibold text-foreground" : "text-default-500"}`}
+                  >
                     {p.nombre || `Parada ${i + 1}`}
                   </p>
                 </div>

@@ -1,5 +1,12 @@
 import { useState, useRef } from "react";
-import { X, LocateFixed, ArrowUpDown, Plus, Trash2, Search } from "lucide-react";
+import {
+  X,
+  LocateFixed,
+  ArrowUpDown,
+  Plus,
+  Trash2,
+  Search,
+} from "lucide-react";
 import type { TripPoint } from "@/app/Layout";
 
 interface Props {
@@ -10,7 +17,12 @@ interface Props {
   readonly onSwapPoints: (i: number, j: number) => void;
   readonly onClear: () => void;
   readonly onAddPoint?: (lat: number, lng: number, label: string) => void;
-  readonly onUpdatePoint?: (index: number, lat: number, lng: number, label: string) => void;
+  readonly onUpdatePoint?: (
+    index: number,
+    lat: number,
+    lng: number,
+    label: string,
+  ) => void;
   readonly onRequestAddPoint?: () => void;
 }
 
@@ -54,7 +66,10 @@ export function TripPointsList({
     setQuery(value);
     setEditingIdx(idx);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (value.length < 3) { setResults([]); return; }
+    if (value.length < 3) {
+      setResults([]);
+      return;
+    }
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       try {
@@ -69,8 +84,11 @@ export function TripPointsList({
             label: r.display_name.split(",").slice(0, 3).join(","),
           })),
         );
-      } catch { setResults([]); }
-      finally { setSearching(false); }
+      } catch {
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
     }, 300);
   };
 
@@ -102,7 +120,9 @@ export function TripPointsList({
   prevLenRef.current = tripPoints.length;
 
   // Empty slot: only when less than 2 points (need origin+dest), or user explicitly wants to add
-  const needsSlot = tripPoints.length < 2 || (mode === "vehiculo" && showExtraSlot && tripPoints.length < maxPoints);
+  const needsSlot =
+    tripPoints.length < 2 ||
+    (mode === "vehiculo" && showExtraSlot && tripPoints.length < maxPoints);
   const slots = needsSlot ? [...tripPoints, null] : tripPoints;
 
   return (
@@ -112,7 +132,10 @@ export function TripPointsList({
           {/* Dots column */}
           <div className="flex flex-col items-center py-2 w-5 shrink-0">
             {slots.map((pt, i) => (
-              <div key={`dot-${pt?.lat ?? "empty"}-${pt?.lng ?? i}`} className="flex flex-col items-center">
+              <div
+                key={`dot-${pt?.lat ?? "empty"}-${pt?.lng ?? i}`}
+                className="flex flex-col items-center"
+              >
                 <div
                   className={`w-3 h-3 rounded-full border-2 ${getDotStyle(
                     i === 0,
@@ -129,14 +152,17 @@ export function TripPointsList({
           {/* Inputs column */}
           <div className="flex-1 space-y-1.5">
             {slots.map((pt, i) => (
-              <div key={`input-${pt?.lat ?? "empty"}-${pt?.lng ?? i}`} className="relative">
+              <div
+                key={`input-${pt?.lat ?? "empty"}-${pt?.lng ?? i}`}
+                className="relative"
+              >
                 <div className="flex items-center gap-1">
                   <div className="flex-1 min-w-0 relative">
                     <input
                       type="text"
                       id={`trip-point-${i}`}
                       name={`trip-point-${i}`}
-                      value={editingIdx === i ? query : (pt?.label || "")}
+                      value={editingIdx === i ? query : pt?.label || ""}
                       placeholder={getPlaceholder(i, slots.length)}
                       onFocus={() => {
                         setEditingIdx(i);
@@ -146,7 +172,10 @@ export function TripPointsList({
                       className="w-full px-2.5 py-2 rounded-lg bg-default-100 border border-divider text-[11px] text-foreground placeholder:text-default-400 outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
                     />
                     {editingIdx === i && searching && (
-                      <Search size={10} className="absolute right-2 top-2.5 text-primary animate-pulse" />
+                      <Search
+                        size={10}
+                        className="absolute right-2 top-2.5 text-primary animate-pulse"
+                      />
                     )}
                   </div>
                   {pt && (
@@ -159,7 +188,10 @@ export function TripPointsList({
                         <LocateFixed size={12} />
                       </button>
                       <button
-                        onClick={() => { onRemovePoint(i); closeSearch(); }}
+                        onClick={() => {
+                          onRemovePoint(i);
+                          closeSearch();
+                        }}
                         className="text-default-400 hover:text-danger p-1"
                         title="Quitar"
                       >
@@ -200,14 +232,20 @@ export function TripPointsList({
         </div>
 
         {/* Add destination (vehículo only, more than 2) */}
-        {mode === "vehiculo" && tripPoints.length >= 2 && !showExtraSlot && tripPoints.length < maxPoints && (
-          <button
-            onClick={() => { setShowExtraSlot(true); onRequestAddPoint?.(); }}
-            className="flex items-center gap-2 pt-2 pl-7 text-[10px] text-primary hover:underline"
-          >
-            <Plus size={11} /> Agregar un destino
-          </button>
-        )}
+        {mode === "vehiculo" &&
+          tripPoints.length >= 2 &&
+          !showExtraSlot &&
+          tripPoints.length < maxPoints && (
+            <button
+              onClick={() => {
+                setShowExtraSlot(true);
+                onRequestAddPoint?.();
+              }}
+              className="flex items-center gap-2 pt-2 pl-7 text-[10px] text-primary hover:underline"
+            >
+              <Plus size={11} /> Agregar un destino
+            </button>
+          )}
       </div>
 
       {/* Use my location - prominent when no points */}
@@ -218,15 +256,22 @@ export function TripPointsList({
         >
           <LocateFixed size={16} className="text-primary animate-pulse" />
           <div className="text-left">
-            <span className="block text-[11px] text-primary font-semibold">Usar mi ubicación</span>
-            <span className="block text-[9px] text-primary/60">Iniciar desde donde estás</span>
+            <span className="block text-[11px] text-primary font-semibold">
+              Usar mi ubicación
+            </span>
+            <span className="block text-[9px] text-primary/60">
+              Iniciar desde donde estás
+            </span>
           </div>
         </button>
       )}
 
       {tripPoints.length > 0 && (
         <button
-          onClick={() => { onClear(); closeSearch(); }}
+          onClick={() => {
+            onClear();
+            closeSearch();
+          }}
           className="flex items-center gap-1 text-[10px] text-danger hover:underline"
         >
           <Trash2 size={10} /> Limpiar

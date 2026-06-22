@@ -63,7 +63,10 @@ export function TmDetail({ selected, tmStations, onBack }: Props) {
         </span>
         <div className="space-y-0 max-h-[calc(100vh-350px)] overflow-y-auto">
           {tmStations.map((name, i) => (
-            <div key={`st-${i}-${name}`} className="flex items-center gap-2 py-1">
+            <div
+              key={`st-${i}-${name}`}
+              className="flex items-center gap-2 py-1"
+            >
               <div className="flex flex-col items-center">
                 <div
                   className={`w-2.5 h-2.5 rounded-full border-2 ${getStationDot(i, tmStations.length)}`}

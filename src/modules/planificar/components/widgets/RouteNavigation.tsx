@@ -35,7 +35,8 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
             Camina {mode === "transmilenio" ? "a la estación" : "al paradero"}
           </p>
           <p className="text-[9px] text-default-400">
-            ~{Math.round(prediction.total_distance_km * 0.15 * 12)} min · {Math.round(prediction.total_distance_km * 150)} m
+            ~{Math.round(prediction.total_distance_km * 0.15 * 12)} min ·{" "}
+            {Math.round(prediction.total_distance_km * 150)} m
           </p>
         </div>
       </div>
@@ -45,7 +46,8 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
         {prediction.stations.map((s, i) => {
           const isFirst = i === 0;
           const isLast = i === prediction.stations.length - 1;
-          const timePerStation = prediction.total_time_minutes / prediction.stations.length;
+          const timePerStation =
+            prediction.total_time_minutes / prediction.stations.length;
           const arriveAt = new Date(Date.now() + i * timePerStation * 60000);
           return (
             <div key={`nav-${i}-${s}`} className="flex items-stretch gap-3">
@@ -62,11 +64,16 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
                 )}
               </div>
               <div className="flex-1 flex items-center justify-between pb-1.5 min-w-0">
-                <p className={`text-[10px] truncate ${isFirst || isLast ? "font-semibold text-foreground" : "text-default-500"}`}>
+                <p
+                  className={`text-[10px] truncate ${isFirst || isLast ? "font-semibold text-foreground" : "text-default-500"}`}
+                >
                   {s}
                 </p>
                 <span className="text-[9px] text-default-400 tabular-nums shrink-0 ml-2">
-                  {arriveAt.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+                  {arriveAt.toLocaleTimeString("es-CO", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </span>
               </div>
             </div>
@@ -110,7 +117,10 @@ export function StationsList({
           const isFirst = i === 0;
           const isLast = i === prediction.stations.length - 1;
           return (
-            <div key={`st-${i}-${station}`} className="flex items-stretch gap-2.5">
+            <div
+              key={`st-${i}-${station}`}
+              className="flex items-stretch gap-2.5"
+            >
               <div className="flex flex-col items-center w-3 shrink-0">
                 {isFirst ? (
                   <div className="w-2.5 h-2.5 rounded-full bg-primary border-2 border-primary/30 shrink-0 mt-1" />
@@ -125,7 +135,9 @@ export function StationsList({
                   <div className="w-0.5 flex-1 bg-default-200 min-h-[10px]" />
                 )}
               </div>
-              <span className={`text-[10px] pb-1 ${isFirst || isLast ? "font-medium text-foreground" : "text-default-500"}`}>
+              <span
+                className={`text-[10px] pb-1 ${isFirst || isLast ? "font-medium text-foreground" : "text-default-500"}`}
+              >
                 {station}
               </span>
             </div>
@@ -136,8 +148,17 @@ export function StationsList({
   );
 }
 
-export function VehicleNavSteps({ steps, getETA }: {
-  readonly steps: { instruction: string; street: string; distance_m: number; duration_s: number; maneuver: string }[];
+export function VehicleNavSteps({
+  steps,
+  getETA,
+}: {
+  readonly steps: {
+    instruction: string;
+    street: string;
+    distance_m: number;
+    duration_s: number;
+    maneuver: string;
+  }[];
   readonly getETA: () => string | null;
 }) {
   const maneuverIcon = (m: string) => {
@@ -157,28 +178,42 @@ export function VehicleNavSteps({ steps, getETA }: {
         </span>
       </div>
       <div className="max-h-48 overflow-y-auto pl-1 space-y-0">
-        {steps.filter(s => s.distance_m > 0 || s.maneuver === "arrive").map((s, i) => (
-          <div key={`nav-v-${i}`} className="flex items-stretch gap-2.5 py-1.5">
-            <div className="flex flex-col items-center w-5 shrink-0">
-              <span className="text-[11px]">{maneuverIcon(s.maneuver)}</span>
-              {i < steps.length - 1 && <div className="w-0.5 flex-1 bg-primary/20 min-h-[8px]" />}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-foreground font-medium leading-tight">{s.instruction}</p>
-              {s.distance_m > 0 && (
-                <p className="text-[9px] text-default-400">
-                  {s.distance_m >= 1000 ? `${(s.distance_m / 1000).toFixed(1)} km` : `${s.distance_m} m`}
-                  {" · "}{Math.ceil(s.duration_s / 60)} min
+        {steps
+          .filter((s) => s.distance_m > 0 || s.maneuver === "arrive")
+          .map((s, i) => (
+            <div
+              key={`nav-v-${i}`}
+              className="flex items-stretch gap-2.5 py-1.5"
+            >
+              <div className="flex flex-col items-center w-5 shrink-0">
+                <span className="text-[11px]">{maneuverIcon(s.maneuver)}</span>
+                {i < steps.length - 1 && (
+                  <div className="w-0.5 flex-1 bg-primary/20 min-h-[8px]" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] text-foreground font-medium leading-tight">
+                  {s.instruction}
                 </p>
-              )}
+                {s.distance_m > 0 && (
+                  <p className="text-[9px] text-default-400">
+                    {s.distance_m >= 1000
+                      ? `${(s.distance_m / 1000).toFixed(1)} km`
+                      : `${s.distance_m} m`}
+                    {" · "}
+                    {Math.ceil(s.duration_s / 60)} min
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
       <div className="flex items-center gap-2 mt-2 pt-2 border-t border-divider/30">
         <span className="text-[10px]">📍</span>
         <div>
-          <p className="text-[10px] text-foreground font-medium">Llegada estimada</p>
+          <p className="text-[10px] text-foreground font-medium">
+            Llegada estimada
+          </p>
           <p className="text-[9px] text-success font-medium">{getETA()}</p>
         </div>
       </div>

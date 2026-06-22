@@ -1,5 +1,9 @@
-export function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse rounded-lg bg-default-200/50 ${className}`} />;
+export function Skeleton({ className = "" }: { readonly className?: string }) {
+  return (
+    <div
+      className={`animate-pulse rounded-lg bg-default-200/50 ${className}`}
+    />
+  );
 }
 
 export function RouteSkeleton() {

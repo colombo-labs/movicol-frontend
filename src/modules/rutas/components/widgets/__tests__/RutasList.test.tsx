@@ -7,8 +7,19 @@ const baseProps = {
   tmTroncales: [],
   tmRutas: [],
   sitpRutas: [
-    { ruta: "674", cenefa: "297A13", paraderos: [{ nombre: "A", lat: 4.6, lon: -74.1, orden: "1" }] },
-    { ruta: "112B", cenefa: "122B04", paraderos: [{ nombre: "B", lat: 4.65, lon: -74.08, orden: "1" }, { nombre: "C", lat: 4.7, lon: -74.05, orden: "2" }] },
+    {
+      ruta: "674",
+      cenefa: "297A13",
+      paraderos: [{ nombre: "A", lat: 4.6, lon: -74.1, orden: "1" }],
+    },
+    {
+      ruta: "112B",
+      cenefa: "122B04",
+      paraderos: [
+        { nombre: "B", lat: 4.65, lon: -74.08, orden: "1" },
+        { nombre: "C", lat: 4.7, lon: -74.05, orden: "2" },
+      ],
+    },
   ],
   search: "",
   setSearch: vi.fn(),
@@ -32,7 +43,16 @@ const baseProps = {
 describe("RutasList", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    globalThis.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ operating: 120, delayed: 3, suspended: 1, alerts: [] }) });
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          operating: 120,
+          delayed: 3,
+          suspended: 1,
+          alerts: [],
+        }),
+    });
     Object.defineProperty(navigator, "geolocation", {
       value: { getCurrentPosition: vi.fn() },
       writable: true,

@@ -64,29 +64,33 @@ export function Layout() {
   const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
   const [showCongestion] = useState(false);
   const [showSiniestros, setShowSiniestros] = useState(false);
-  const { predictMulti, options, isLoading, error, clear } = useRoutePredictMulti();
+  const { predictMulti, options, isLoading, error, clear } =
+    useRoutePredictMulti();
   const [selectedRouteIdx, setSelectedRouteIdx] = useState(0);
   const [addingPoint, setAddingPoint] = useState(false);
 
-  const togglePanel = useCallback((id: PanelId) => {
-    setActivePanel(id);
-    // Reset contexto de rutas al salir del módulo rutas
-    if (id !== "rutas") {
-      setShowTroncales(false);
-      setShowEstaciones(false);
-      setShowSitpOnMap(false);
-      setShowRoutesOnMap(false);
-      setSitpRouteCoords(null);
-      setSelectedTroncal(null);
-    }
-    // Reset contexto de planificar al salir del módulo planificar
-    if (id !== "planificar") {
-      setTripPoints([]);
-      clear();
-      setSelectedRouteIdx(0);
-      setAddingPoint(false);
-    }
-  }, [clear]);
+  const togglePanel = useCallback(
+    (id: PanelId) => {
+      setActivePanel(id);
+      // Reset contexto de rutas al salir del módulo rutas
+      if (id !== "rutas") {
+        setShowTroncales(false);
+        setShowEstaciones(false);
+        setShowSitpOnMap(false);
+        setShowRoutesOnMap(false);
+        setSitpRouteCoords(null);
+        setSelectedTroncal(null);
+      }
+      // Reset contexto de planificar al salir del módulo planificar
+      if (id !== "planificar") {
+        setTripPoints([]);
+        clear();
+        setSelectedRouteIdx(0);
+        setAddingPoint(false);
+      }
+    },
+    [clear],
+  );
 
   // Click on map => add point with reverse geocoding
   const handleMapClick = useCallback(
@@ -115,10 +119,13 @@ export function Layout() {
   );
 
   // Remove a point
-  const handleRemovePoint = useCallback((index: number) => {
-    setTripPoints((prev) => prev.filter((_, i) => i !== index));
-    clear();
-  }, [clear]);
+  const handleRemovePoint = useCallback(
+    (index: number) => {
+      setTripPoints((prev) => prev.filter((_, i) => i !== index));
+      clear();
+    },
+    [clear],
+  );
 
   // Use my location for a specific index (or append)
   const handleUseMyLocation = useCallback((index?: number) => {
@@ -177,131 +184,160 @@ export function Layout() {
       mode: TransportMode,
       departureTime: string,
     ) => {
-      const waypoints = tripPoints.length > 2
-        ? tripPoints.slice(1, -1).map(p => ({ lat: p.lat, lng: p.lng }))
-        : undefined;
-      predictMulti({ origin: orig, destination: dest, waypoints, departureTime, mode });
+      const waypoints =
+        tripPoints.length > 2
+          ? tripPoints.slice(1, -1).map((p) => ({ lat: p.lat, lng: p.lng }))
+          : undefined;
+      predictMulti({
+        origin: orig,
+        destination: dest,
+        waypoints,
+        departureTime,
+        mode,
+      });
     },
     [predictMulti, tripPoints],
   );
 
   return (
-  <>
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
-      <div className="hidden md:block">
-        <Sidebar activePanel={activePanel} onTogglePanel={togglePanel} />
-      </div>
+    <>
+      <div className="flex h-screen w-screen overflow-hidden bg-background">
+        <div className="hidden md:block">
+          <Sidebar activePanel={activePanel} onTogglePanel={togglePanel} />
+        </div>
 
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-hidden relative">
-          <SidePanel
-            isOpen={activePanel === "planificar"}
-            onClose={() => {
-              setActivePanel(null);
-              handleClearPrediction();
-            }}
-            title="Planificar viaje"
-          >
-            <PlanificarViajePanel
-              onPredictMulti={handlePredict}
-              options={options}
-              isLoading={isLoading}
-              error={error}
-              tripPoints={tripPoints}
-              onRemovePoint={handleRemovePoint}
-              onUseMyLocation={handleUseMyLocation}
-              onSwapPoints={handleSwapPoints}
-              onClear={handleClearPrediction}
-              onAddPoint={handleAddPoint}
-              onUpdatePoint={handleUpdatePoint}
-              onRequestAddPoint={() => setAddingPoint(true)}
-              onSelectRoute={(idx: number) => setSelectedRouteIdx(idx)}
-              selectedRouteIdx={selectedRouteIdx}
-            />
-          </SidePanel>
-          <SidePanel
-            isOpen={activePanel === "rutas"}
-            onClose={() => {
-              setActivePanel(null);
-              setShowRoutesOnMap(false);
-            }}
-            title="Rutas del sistema"
-          >
-            <RutasPanel
-              activeFilter={routeFilter}
-              onFilterChange={(f) => setRouteFilter(f)}
-              showTroncales={showTroncales}
-              onToggleTroncales={() => setShowTroncales((v) => !v)}
-              showEstaciones={showEstaciones}
-              onToggleEstaciones={() => setShowEstaciones((v) => !v)}
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+          <Header />
+          <main className="flex-1 overflow-hidden relative">
+            <SidePanel
+              isOpen={activePanel === "planificar"}
+              onClose={() => {
+                setActivePanel(null);
+                handleClearPrediction();
+              }}
+              title="Planificar viaje"
+            >
+              <PlanificarViajePanel
+                onPredictMulti={handlePredict}
+                options={options}
+                isLoading={isLoading}
+                error={error}
+                tripPoints={tripPoints}
+                onRemovePoint={handleRemovePoint}
+                onUseMyLocation={handleUseMyLocation}
+                onSwapPoints={handleSwapPoints}
+                onClear={handleClearPrediction}
+                onAddPoint={handleAddPoint}
+                onUpdatePoint={handleUpdatePoint}
+                onRequestAddPoint={() => setAddingPoint(true)}
+                onSelectRoute={(idx: number) => setSelectedRouteIdx(idx)}
+                selectedRouteIdx={selectedRouteIdx}
+              />
+            </SidePanel>
+            <SidePanel
+              isOpen={activePanel === "rutas"}
+              onClose={() => {
+                setActivePanel(null);
+                setShowRoutesOnMap(false);
+              }}
+              title="Rutas del sistema"
+            >
+              <RutasPanel
+                activeFilter={routeFilter}
+                onFilterChange={(f) => setRouteFilter(f)}
+                showTroncales={showTroncales}
+                onToggleTroncales={() => setShowTroncales((v) => !v)}
+                showEstaciones={showEstaciones}
+                onToggleEstaciones={() => setShowEstaciones((v) => !v)}
+                showSitpOnMap={showSitpOnMap}
+                onToggleSitp={() => setShowSitpOnMap((v) => !v)}
+                onSelectSitpRoute={(coords) => setSitpRouteCoords(coords)}
+                onSelectTmRoute={(t) => setSelectedTroncal(t)}
+              />
+            </SidePanel>
+            <SidePanel
+              isOpen={activePanel === "accesibilidad"}
+              onClose={() => setActivePanel(null)}
+              title="Accesibilidad"
+            >
+              <AccesibilidadPanel />
+            </SidePanel>
+            <SidePanel
+              isOpen={activePanel === "metricas"}
+              onClose={() => setActivePanel(null)}
+              title="Métricas del Grafo"
+            >
+              <MetricasPanel />
+            </SidePanel>
+
+            <MapView
+              selectedTroncal={selectedTroncal}
+              showTroncalesOnMap={showTroncales}
+              showEstacionesOnMap={showEstaciones}
               showSitpOnMap={showSitpOnMap}
-              onToggleSitp={() => setShowSitpOnMap((v) => !v)}
-              onSelectSitpRoute={(coords) => setSitpRouteCoords(coords)}
-              onSelectTmRoute={(t) => setSelectedTroncal(t)}
-            />
-          </SidePanel>
-          <SidePanel
-            isOpen={activePanel === "accesibilidad"}
-            onClose={() => setActivePanel(null)}
-            title="Accesibilidad"
-          >
-            <AccesibilidadPanel />
-          </SidePanel>
-          <SidePanel
-            isOpen={activePanel === "metricas"}
-            onClose={() => setActivePanel(null)}
-            title="Métricas del Grafo"
-          >
-            <MetricasPanel />
-          </SidePanel>
-
-          <MapView
-            selectedTroncal={selectedTroncal}
-            showTroncalesOnMap={showTroncales}
-            showEstacionesOnMap={showEstaciones}
-            showSitpOnMap={showSitpOnMap}
-            sitpRouteCoords={activePanel === "rutas" ? (sitpRouteCoords || undefined) : undefined}
-            onMapClick={handleMapClick}
-            predictionMode={activePanel === "planificar" && (tripPoints.length < 2 || addingPoint)}
-            prediction={activePanel === "planificar" ? (options?.[selectedRouteIdx]?.prediction ?? options?.[0]?.prediction ?? null) : null}
-            altPredictions={activePanel === "planificar" ? (options?.filter((_, i) => i !== selectedRouteIdx).map(o => o.prediction) ?? []) : []}
-            onSelectAltRoute={(ai) => {
-              // ai = index in altPredictions (which skips selectedRouteIdx)
-              let realIdx = 0;
-              let count = 0;
-              for (let i = 0; i < (options?.length ?? 0); i++) {
-                if (i === selectedRouteIdx) continue;
-                if (count === ai) { realIdx = i; break; }
-                count++;
+              sitpRouteCoords={
+                activePanel === "rutas"
+                  ? sitpRouteCoords || undefined
+                  : undefined
               }
-              setSelectedRouteIdx(realIdx);
-            }}
-            tripPoints={activePanel === "planificar" ? tripPoints : []}
-            onMovePoint={handleMovePoint}
-            showCongestion={showCongestion}
-            showSiniestros={showSiniestros}
-            showRoutesOnMap={showRoutesOnMap}
-          />
+              onMapClick={handleMapClick}
+              predictionMode={
+                activePanel === "planificar" &&
+                (tripPoints.length < 2 || addingPoint)
+              }
+              prediction={
+                activePanel === "planificar"
+                  ? (options?.[selectedRouteIdx]?.prediction ??
+                    options?.[0]?.prediction ??
+                    null)
+                  : null
+              }
+              altPredictions={
+                activePanel === "planificar"
+                  ? (options
+                      ?.filter((_, i) => i !== selectedRouteIdx)
+                      .map((o) => o.prediction) ?? [])
+                  : []
+              }
+              onSelectAltRoute={(ai) => {
+                // ai = index in altPredictions (which skips selectedRouteIdx)
+                let realIdx = 0;
+                let count = 0;
+                for (let i = 0; i < (options?.length ?? 0); i++) {
+                  if (i === selectedRouteIdx) continue;
+                  if (count === ai) {
+                    realIdx = i;
+                    break;
+                  }
+                  count++;
+                }
+                setSelectedRouteIdx(realIdx);
+              }}
+              tripPoints={activePanel === "planificar" ? tripPoints : []}
+              onMovePoint={handleMovePoint}
+              showCongestion={showCongestion}
+              showSiniestros={showSiniestros}
+              showRoutesOnMap={showRoutesOnMap}
+            />
 
-          {/* Toggle siniestralidad */}
-          <button
-            onClick={() => setShowSiniestros((v) => !v)}
-            className={`absolute top-[90px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg transition-all duration-200 ${
-              showSiniestros
-                ? "bg-danger text-white shadow-danger/30"
-                : "bg-background/90 text-default-500 border border-divider hover:text-danger"
-            }`}
-            title="Zonas de riesgo vial"
-          >
-            <AlertTriangle size={18} />
-          </button>
-        </main>
+            {/* Toggle siniestralidad */}
+            <button
+              onClick={() => setShowSiniestros((v) => !v)}
+              className={`absolute top-[90px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg transition-all duration-200 ${
+                showSiniestros
+                  ? "bg-danger text-white shadow-danger/30"
+                  : "bg-background/90 text-default-500 border border-divider hover:text-danger"
+              }`}
+              title="Zonas de riesgo vial"
+            >
+              <AlertTriangle size={18} />
+            </button>
+          </main>
 
-        <MobileNav activePanel={activePanel} onTogglePanel={togglePanel} />
+          <MobileNav activePanel={activePanel} onTogglePanel={togglePanel} />
+        </div>
       </div>
-    </div>
-    <ChatWidget activeModule={activePanel} />
-  </>
+      <ChatWidget activeModule={activePanel} />
+    </>
   );
 }

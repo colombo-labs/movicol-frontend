@@ -30,21 +30,25 @@ describe("useRoutePredictMulti", () => {
   });
 
   it("should call predictAlternatives for vehiculo mode", async () => {
-    const mockResult = [{
-      route_id: "v1",
-      total_time_minutes: 15,
-      total_distance_km: 10,
-      cost: "$20.000",
-      mode: "vehiculo",
-      risk_segments: [],
-      overall_risk: "low",
-      safety_score: 80,
-      explanation: "",
-      stations: ["Calle 72"],
-      departure_time: "2026-06-21T15:00:00",
-      navigation_steps: [],
-    }];
-    (routePredictionApi.predictAlternatives as any).mockResolvedValue(mockResult);
+    const mockResult = [
+      {
+        route_id: "v1",
+        total_time_minutes: 15,
+        total_distance_km: 10,
+        cost: "$20.000",
+        mode: "vehiculo",
+        risk_segments: [],
+        overall_risk: "low",
+        safety_score: 80,
+        explanation: "",
+        stations: ["Calle 72"],
+        departure_time: "2026-06-21T15:00:00",
+        navigation_steps: [],
+      },
+    ];
+    (routePredictionApi.predictAlternatives as any).mockResolvedValue(
+      mockResult,
+    );
 
     const { result } = renderHook(() => useRoutePredictMulti());
 

@@ -1,5 +1,11 @@
 import { X, ChevronUp, ChevronDown, Minus } from "lucide-react";
-import { type ReactNode, useRef, useCallback, useState, useEffect } from "react";
+import {
+  type ReactNode,
+  useRef,
+  useCallback,
+  useState,
+  useEffect,
+} from "react";
 
 interface SidePanelProps {
   isOpen: boolean;
@@ -69,7 +75,7 @@ export function SidePanel({
           top-auto bottom-0 left-0 right-0 ${SNAP_HEIGHTS[snap]} rounded-t-2xl border-t shadow-[0_-4px_20px_rgba(0,0,0,0.3)]
           ${isOpen ? "translate-y-0" : "translate-y-full"}
         `}
-        inert={!isOpen ? true : undefined}
+        inert={isOpen ? undefined : true}
       >
         {/* Mobile drag handle + status */}
         <div
@@ -87,7 +93,10 @@ export function SidePanel({
             </span>
             <span className="w-px h-2.5 bg-divider" />
             <span>
-              {new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}
+              {new Date().toLocaleTimeString("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </span>
           </div>
         </div>

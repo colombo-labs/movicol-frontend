@@ -44,7 +44,12 @@ export interface PlanificarProps {
   readonly onSwapPoints: (i: number, j: number) => void;
   readonly onClear: () => void;
   readonly onAddPoint?: (lat: number, lng: number, label: string) => void;
-  readonly onUpdatePoint?: (index: number, lat: number, lng: number, label: string) => void;
+  readonly onUpdatePoint?: (
+    index: number,
+    lat: number,
+    lng: number,
+    label: string,
+  ) => void;
   readonly onRequestAddPoint?: () => void;
   readonly onSelectRoute?: (index: number) => void;
   readonly selectedRouteIdx?: number;

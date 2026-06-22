@@ -84,7 +84,11 @@ export function EmptyState({ tripPoints, onUseMyLocation, onAddPoint }: Props) {
   );
 }
 
-function RecentRoutes({ onAddPoint }: { readonly onAddPoint?: (lat: number, lng: number, label: string) => void }) {
+function RecentRoutes({
+  onAddPoint,
+}: {
+  readonly onAddPoint?: (lat: number, lng: number, label: string) => void;
+}) {
   const saved = JSON.parse(
     localStorage.getItem("movicol_saved_routes") || "[]",
   );
@@ -97,13 +101,31 @@ function RecentRoutes({ onAddPoint }: { readonly onAddPoint?: (lat: number, lng:
       {saved
         .slice(0, 3)
         .map(
-          (r: { origin: string; dest: string; originLat?: number; originLng?: number; destLat?: number; destLng?: number; time: number; date: string }) => (
+          (r: {
+            origin: string;
+            dest: string;
+            originLat?: number;
+            originLng?: number;
+            destLat?: number;
+            destLng?: number;
+            time: number;
+            date: string;
+          }) => (
             <button
               key={`${r.origin}-${r.dest}`}
               onClick={() => {
-                if (r.originLat && r.originLng && r.destLat && r.destLng && onAddPoint) {
+                if (
+                  r.originLat &&
+                  r.originLng &&
+                  r.destLat &&
+                  r.destLng &&
+                  onAddPoint
+                ) {
                   onAddPoint(r.originLat, r.originLng, r.origin);
-                  setTimeout(() => onAddPoint(r.destLat!, r.destLng!, r.dest), 100);
+                  setTimeout(
+                    () => onAddPoint(r.destLat!, r.destLng!, r.dest),
+                    100,
+                  );
                 }
               }}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-left hover:bg-default-200 transition-all"

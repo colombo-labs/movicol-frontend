@@ -65,7 +65,8 @@ export function PlanificarViajePanel({
   const destination =
     tripPoints.length > 1 ? tripPoints[tripPoints.length - 1] : null;
 
-  const selectedOption = options?.find((o) => o.id === selectedOptionId) ?? null;
+  const selectedOption =
+    options?.find((o) => o.id === selectedOptionId) ?? null;
 
   // Auto-calcular cuando cambian los puntos (origen + destino mínimo)
   const prevPointsRef = useRef("");
@@ -74,9 +75,10 @@ export function PlanificarViajePanel({
     const key = `${origin.lat},${origin.lng}-${destination.lat},${destination.lng}-${mode}`;
     if (key === prevPointsRef.current) return;
     prevPointsRef.current = key;
-    const dt = departureType === "programar" && departureTime
-      ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
-      : new Date().toISOString();
+    const dt =
+      departureType === "programar" && departureTime
+        ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+        : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
   }, [tripPoints, mode]);
@@ -105,14 +107,19 @@ export function PlanificarViajePanel({
 
   const handleSelectOption = (opt: RouteOption) => {
     setSelectedOptionId(opt.id);
-    const idx = options?.findIndex(o => o.id === opt.id) ?? 0;
+    const idx = options?.findIndex((o) => o.id === opt.id) ?? 0;
     onSelectRoute?.(idx);
   };
 
   const getETA = () => {
     if (!selectedOption) return null;
-    const eta = new Date(Date.now() + selectedOption.total_time_minutes * 60000);
-    return eta.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+    const eta = new Date(
+      Date.now() + selectedOption.total_time_minutes * 60000,
+    );
+    return eta.toLocaleTimeString("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -176,19 +183,25 @@ export function PlanificarViajePanel({
       )}
 
       {/* Rush hour */}
-      {options && (() => {
-        const hour = new Date().getHours();
-        if (!((hour >= 6 && hour <= 9) || (hour >= 17 && hour <= 20))) return null;
-        return (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-warning/10 border border-warning/20">
-            <Clock size={12} className="text-warning shrink-0" />
-            <div>
-              <p className="text-[10px] text-warning font-semibold">Hora pico activa</p>
-              <p className="text-[9px] text-warning/70">El tiempo puede ser mayor al estimado</p>
+      {options &&
+        (() => {
+          const hour = new Date().getHours();
+          if (!((hour >= 6 && hour <= 9) || (hour >= 17 && hour <= 20)))
+            return null;
+          return (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-warning/10 border border-warning/20">
+              <Clock size={12} className="text-warning shrink-0" />
+              <div>
+                <p className="text-[10px] text-warning font-semibold">
+                  Hora pico activa
+                </p>
+                <p className="text-[9px] text-warning/70">
+                  El tiempo puede ser mayor al estimado
+                </p>
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       {/* Results */}
       {options && (
@@ -196,10 +209,19 @@ export function PlanificarViajePanel({
           <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-default-100/50 text-[9px] text-default-400">
             <span>{temp ?? "..."}°C Bogotá</span>
             <span>Datos en vivo</span>
-            <span>{new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" })}</span>
+            <span>
+              {new Date().toLocaleTimeString("es-CO", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
           </div>
 
-          <ModeTabs mode={mode} onModeChange={handleModeChange} optionsCount={options.length} />
+          <ModeTabs
+            mode={mode}
+            onModeChange={handleModeChange}
+            optionsCount={options.length}
+          />
 
           <RouteOptionsList
             options={options}
@@ -213,26 +235,43 @@ export function PlanificarViajePanel({
               <SelectedRouteDetail option={selectedOption} />
               <EcoInfo prediction={selectedOption.prediction} />
               <CongestionBar prediction={selectedOption.prediction} />
-              {mode === "publico" && <WaitEstimation prediction={selectedOption.prediction} />}
+              {mode === "publico" && (
+                <WaitEstimation prediction={selectedOption.prediction} />
+              )}
               <RouteAlerts prediction={selectedOption.prediction} />
-              {mode === "publico" && selectedOption.prediction.stations.length > 0 && (
-                <NavigationSteps
-                  prediction={selectedOption.prediction}
-                  mode={selectedOption.prediction.mode === "sitp" ? "sitp" : "transmilenio"}
-                  getETA={getETA}
-                />
-              )}
-              {mode === "vehiculo" && selectedOption.prediction.navigation_steps && selectedOption.prediction.navigation_steps.length > 0 && (
-                <VehicleNavSteps steps={selectedOption.prediction.navigation_steps} getETA={getETA} />
-              )}
-              <NearDestination destLat={destination?.lat} destLng={destination?.lng} />
+              {mode === "publico" &&
+                selectedOption.prediction.stations.length > 0 && (
+                  <NavigationSteps
+                    prediction={selectedOption.prediction}
+                    mode={
+                      selectedOption.prediction.mode === "sitp"
+                        ? "sitp"
+                        : "transmilenio"
+                    }
+                    getETA={getETA}
+                  />
+                )}
+              {mode === "vehiculo" &&
+                selectedOption.prediction.navigation_steps &&
+                selectedOption.prediction.navigation_steps.length > 0 && (
+                  <VehicleNavSteps
+                    steps={selectedOption.prediction.navigation_steps}
+                    getETA={getETA}
+                  />
+                )}
+              <NearDestination
+                destLat={destination?.lat}
+                destLng={destination?.lng}
+              />
               <ActionButtons
                 prediction={selectedOption.prediction}
                 tripPoints={tripPoints}
                 onClear={onClear}
               />
               <QuickActions />
-              <TravelTips mode={mode === "publico" ? "transmilenio" : "vehiculo"} />
+              <TravelTips
+                mode={mode === "publico" ? "transmilenio" : "vehiculo"}
+              />
               {selectedOption.prediction.stations.length > 0 && (
                 <StationsList prediction={selectedOption.prediction} />
               )}

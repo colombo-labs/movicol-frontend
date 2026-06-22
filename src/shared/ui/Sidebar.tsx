@@ -1,10 +1,4 @@
-import {
-  Bus,
-  Navigation,
-  Route,
-  Accessibility,
-  BarChart3,
-} from "lucide-react";
+import { Bus, Navigation, Route, Accessibility, BarChart3 } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { LucideIcon } from "lucide-react";
 

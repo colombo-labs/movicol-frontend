@@ -32,7 +32,15 @@ describe("RouteOptionsList", () => {
       total_distance_km: 12,
       cost: "$3,550",
       transfers: 0,
-      legs: [{ type: "walk" as const, from: "A", to: "B", duration_minutes: 5, distance_km: 0.4 }],
+      legs: [
+        {
+          type: "walk" as const,
+          from: "A",
+          to: "B",
+          duration_minutes: 5,
+          distance_km: 0.4,
+        },
+      ],
       prediction: {} as any,
       tag: "fastest" as const,
     },
@@ -43,37 +51,75 @@ describe("RouteOptionsList", () => {
       total_distance_km: 13,
       cost: "$3,550",
       transfers: 0,
-      legs: [{ type: "sitp" as const, from: "C", to: "D", duration_minutes: 30, distance_km: 12 }],
+      legs: [
+        {
+          type: "sitp" as const,
+          from: "C",
+          to: "D",
+          duration_minutes: 30,
+          distance_km: 12,
+        },
+      ],
       prediction: {} as any,
     },
   ];
 
   it("should render all options", () => {
-    render(<RouteOptionsList options={mockOptions} selectedId={null} onSelect={vi.fn()} />);
+    render(
+      <RouteOptionsList
+        options={mockOptions}
+        selectedId={null}
+        onSelect={vi.fn()}
+      />,
+    );
     expect(screen.getByText("TM B5")).toBeDefined();
     expect(screen.getByText("SITP 112B")).toBeDefined();
   });
 
   it("should show time for each option", () => {
-    render(<RouteOptionsList options={mockOptions} selectedId={null} onSelect={vi.fn()} />);
+    render(
+      <RouteOptionsList
+        options={mockOptions}
+        selectedId={null}
+        onSelect={vi.fn()}
+      />,
+    );
     expect(screen.getByText("24 min")).toBeDefined();
     expect(screen.getByText("35 min")).toBeDefined();
   });
 
   it("should show tag label", () => {
-    render(<RouteOptionsList options={mockOptions} selectedId={null} onSelect={vi.fn()} />);
+    render(
+      <RouteOptionsList
+        options={mockOptions}
+        selectedId={null}
+        onSelect={vi.fn()}
+      />,
+    );
     expect(screen.getByText("Más rápida")).toBeDefined();
   });
 
   it("should call onSelect when option clicked", () => {
     const onSelect = vi.fn();
-    render(<RouteOptionsList options={mockOptions} selectedId={null} onSelect={onSelect} />);
+    render(
+      <RouteOptionsList
+        options={mockOptions}
+        selectedId={null}
+        onSelect={onSelect}
+      />,
+    );
     fireEvent.click(screen.getByText("SITP 112B"));
     expect(onSelect).toHaveBeenCalledWith(mockOptions[1]);
   });
 
   it("should show count text", () => {
-    render(<RouteOptionsList options={mockOptions} selectedId={null} onSelect={vi.fn()} />);
+    render(
+      <RouteOptionsList
+        options={mockOptions}
+        selectedId={null}
+        onSelect={vi.fn()}
+      />,
+    );
     expect(screen.getByText(/2 opci/)).toBeDefined();
   });
 });

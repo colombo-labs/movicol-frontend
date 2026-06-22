@@ -1,9 +1,9 @@
 import { type CSSProperties, type ReactNode } from "react";
 
 interface GlassCardProps {
-  children: ReactNode;
-  className?: string;
-  style?: CSSProperties;
+  readonly children: ReactNode;
+  readonly className?: string;
+  readonly style?: CSSProperties;
 }
 
 /**

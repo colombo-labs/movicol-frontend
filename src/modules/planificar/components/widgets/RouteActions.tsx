@@ -37,11 +37,13 @@ export function ActionButtons({
         <button
           onClick={() => {
             if (navigator.share)
-              navigator.share({
-                title: "Mi ruta MoviCol",
-                text: `Ruta de ${Math.round(prediction.total_time_minutes)} min`,
-                url: globalThis.location.href,
-              }).catch(() => {});
+              navigator
+                .share({
+                  title: "Mi ruta MoviCol",
+                  text: `Ruta de ${Math.round(prediction.total_time_minutes)} min`,
+                  url: globalThis.location.href,
+                })
+                .catch(() => {});
           }}
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
@@ -56,10 +58,13 @@ export function ActionButtons({
               localStorage.getItem("movicol_saved_routes") || "[]",
             );
             saved.unshift({
-              origin: origin.label || `${origin.lat.toFixed(4)}, ${origin.lng.toFixed(4)}`,
+              origin:
+                origin.label ||
+                `${origin.lat.toFixed(4)}, ${origin.lng.toFixed(4)}`,
               originLat: origin.lat,
               originLng: origin.lng,
-              dest: dest.label || `${dest.lat.toFixed(4)}, ${dest.lng.toFixed(4)}`,
+              dest:
+                dest.label || `${dest.lat.toFixed(4)}, ${dest.lng.toFixed(4)}`,
               destLat: dest.lat,
               destLng: dest.lng,
               time: Math.round(prediction.total_time_minutes),
@@ -71,7 +76,12 @@ export function ActionButtons({
             );
             // Feedback visual
             const btn = document.activeElement as HTMLButtonElement;
-            if (btn) { btn.textContent = "✓ Guardado"; setTimeout(() => { btn.textContent = "Guardar"; }, 1500); }
+            if (btn) {
+              btn.textContent = "✓ Guardado";
+              setTimeout(() => {
+                btn.textContent = "Guardar";
+              }, 1500);
+            }
           }}
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
@@ -113,16 +123,22 @@ interface OverpassElement {
   tags?: Record<string, string>;
 }
 
-function mapOverpassElement(el: OverpassElement, destLat: number, destLng: number) {
-  const d = Math.round(
-    Math.hypot(el.lat - destLat, el.lon - destLng) * 111000
-  );
+function mapOverpassElement(
+  el: OverpassElement,
+  destLat: number,
+  destLng: number,
+) {
+  const d = Math.round(Math.hypot(el.lat - destLat, el.lon - destLng) * 111000);
   const tags = el.tags || {};
   const type = tags.amenity || tags.shop || "lugar";
   const typeLabel: Record<string, string> = {
-    cafe: "cafe", atm: "atm", bank: "bank",
-    pharmacy: "pharmacy", restaurant: "restaurant",
-    bicycle_rental: "bike", supermarket: "supermarket",
+    cafe: "cafe",
+    atm: "atm",
+    bank: "bank",
+    pharmacy: "pharmacy",
+    restaurant: "restaurant",
+    bicycle_rental: "bike",
+    supermarket: "supermarket",
     convenience: "store",
   };
   return {
@@ -136,11 +152,14 @@ function PoiIcon({ type }: { readonly type: string }) {
   const cls = "text-primary";
   const s = 13;
   if (type === "cafe") return <Coffee size={s} className={cls} />;
-  if (type === "atm" || type === "bank") return <Landmark size={s} className={cls} />;
+  if (type === "atm" || type === "bank")
+    return <Landmark size={s} className={cls} />;
   if (type === "pharmacy") return <Pill size={s} className={cls} />;
-  if (type === "restaurant") return <UtensilsCrossed size={s} className={cls} />;
+  if (type === "restaurant")
+    return <UtensilsCrossed size={s} className={cls} />;
   if (type === "bike") return <Bike size={s} className={cls} />;
-  if (type === "supermarket" || type === "store") return <Store size={s} className={cls} />;
+  if (type === "supermarket" || type === "store")
+    return <Store size={s} className={cls} />;
   return <MapPin size={s} className={cls} />;
 }
 
@@ -166,27 +185,44 @@ async function fetchNearbyPois(destLat: number, destLng: number) {
     clearTimeout(timeout);
     if (!r.ok) return [];
     const data = await r.json();
-    return (data.elements || []).map((el: OverpassElement) => mapOverpassElement(el, destLat, destLng)).slice(0, 6);
+    return (data.elements || [])
+      .map((el: OverpassElement) => mapOverpassElement(el, destLat, destLng))
+      .slice(0, 6);
   } catch {
     clearTimeout(timeout);
     return [];
   }
 }
 
-export function NearDestination({ destLat, destLng }: { readonly destLat?: number; readonly destLng?: number }) {
-  const [places, setPlaces] = useState<{ name: string; dist: string; type: string }[]>([]);
-  const cacheRef = useRef<Map<string, { name: string; dist: string; type: string }[]>>(new Map());
+export function NearDestination({
+  destLat,
+  destLng,
+}: {
+  readonly destLat?: number;
+  readonly destLng?: number;
+}) {
+  const [places, setPlaces] = useState<
+    { name: string; dist: string; type: string }[]
+  >([]);
+  const cacheRef = useRef<
+    Map<string, { name: string; dist: string; type: string }[]>
+  >(new Map());
 
   useEffect(() => {
     if (!destLat || !destLng) return;
     const key = `${destLat.toFixed(3)},${destLng.toFixed(3)}`;
-    if (cacheRef.current.has(key)) { setPlaces(cacheRef.current.get(key)!); return; }
+    if (cacheRef.current.has(key)) {
+      setPlaces(cacheRef.current.get(key)!);
+      return;
+    }
 
     const timer = setTimeout(() => {
-      fetchNearbyPois(destLat, destLng).then(results => {
-        setPlaces(results);
-        cacheRef.current.set(key, results);
-      }).catch(() => {});
+      fetchNearbyPois(destLat, destLng)
+        .then((results) => {
+          setPlaces(results);
+          cacheRef.current.set(key, results);
+        })
+        .catch(() => {});
     }, 1000);
     return () => clearTimeout(timer);
   }, [destLat, destLng]);
@@ -250,13 +286,21 @@ export function TravelTips({ mode }: { readonly mode: string }) {
             className="p-1.5 rounded-full hover:bg-success/20 transition-colors"
             onClick={() => setVote(vote === "up" ? null : "up")}
           >
-            <ThumbsUp size={14} className={vote === "up" ? "text-success" : "text-default-400"} fill={vote === "up" ? "currentColor" : "none"} />
+            <ThumbsUp
+              size={14}
+              className={vote === "up" ? "text-success" : "text-default-400"}
+              fill={vote === "up" ? "currentColor" : "none"}
+            />
           </button>
           <button
             className="p-1.5 rounded-full hover:bg-danger/20 transition-colors"
             onClick={() => setVote(vote === "down" ? null : "down")}
           >
-            <ThumbsDown size={14} className={vote === "down" ? "text-danger" : "text-default-400"} fill={vote === "down" ? "currentColor" : "none"} />
+            <ThumbsDown
+              size={14}
+              className={vote === "down" ? "text-danger" : "text-default-400"}
+              fill={vote === "down" ? "currentColor" : "none"}
+            />
           </button>
         </div>
       </div>

@@ -2,7 +2,6 @@ import { Button, Input } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
 import { Bot, X, SendHorizontal, Wifi, WifiOff, Minus } from "lucide-react";
 
-
 import { useChatWs } from "../../hooks/useChatWs";
 import { ChatMessage } from "../ui/ChatMessage";
 
@@ -65,7 +64,8 @@ export function ChatWidget({ activeModule }: ChatWidgetProps) {
     }
   };
 
-  const suggestions = SUGGESTIONS[activeModule ?? "default"] ?? SUGGESTIONS.default;
+  const suggestions =
+    SUGGESTIONS[activeModule ?? "default"] ?? SUGGESTIONS.default;
 
   // Closed: solo botón flotante
   if (state === "closed") {
@@ -91,11 +91,16 @@ export function ChatWidget({ activeModule }: ChatWidgetProps) {
       >
         <Bot size={16} className="text-primary shrink-0" />
         <span className="text-[10px] text-default-400 truncate">
-          {isStreaming ? "Pensando..." : lastMsg?.content.slice(0, 40) || "MoviBot"}
+          {isStreaming
+            ? "Pensando..."
+            : lastMsg?.content.slice(0, 40) || "MoviBot"}
           {lastMsg && lastMsg.content.length > 40 ? "..." : ""}
         </span>
         <button
-          onClick={(e) => { e.stopPropagation(); setState("closed"); }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setState("closed");
+          }}
           className="text-default-400 hover:text-foreground shrink-0"
         >
           <X size={12} />

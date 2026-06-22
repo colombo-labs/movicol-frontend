@@ -36,7 +36,8 @@ export function SiniestroLayer() {
             radius={4 + norm * 8}
             pathOptions={{
               color: "transparent",
-              fillColor: norm > 0.7 ? "#ef4444" : norm > 0.4 ? "#f59e0b" : "#22c55e",
+              fillColor:
+                norm > 0.7 ? "#ef4444" : norm > 0.4 ? "#f59e0b" : "#22c55e",
               fillOpacity: 0.3 + norm * 0.4,
             }}
           >

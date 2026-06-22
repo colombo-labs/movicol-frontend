@@ -17,7 +17,9 @@ describe("Skeleton", () => {
 describe("RouteSkeleton", () => {
   it("should render multiple skeleton blocks", () => {
     const { container } = render(<RouteSkeleton />);
-    const pulseElements = container.querySelectorAll("[class*='animate-pulse']");
+    const pulseElements = container.querySelectorAll(
+      "[class*='animate-pulse']",
+    );
     expect(pulseElements.length).toBeGreaterThan(5);
   });
 });

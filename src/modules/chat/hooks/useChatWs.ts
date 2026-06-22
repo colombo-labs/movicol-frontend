@@ -56,5 +56,11 @@ export function useChatWs() {
 
   const clearMessages = useCallback(() => setMessages([]), []);
 
-  return { messages, sendMessage, isStreaming, isConnected: true, clearMessages };
+  return {
+    messages,
+    sendMessage,
+    isStreaming,
+    isConnected: true,
+    clearMessages,
+  };
 }

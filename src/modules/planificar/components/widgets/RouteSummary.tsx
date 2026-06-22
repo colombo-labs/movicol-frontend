@@ -94,9 +94,7 @@ export function RouteSummaryCard({
         </div>
         <div className="text-center p-1.5 rounded-lg bg-default-100">
           <p className="text-[9px] text-default-400">Costo</p>
-          <p className="text-base font-bold text-xs">
-            {prediction.cost}
-          </p>
+          <p className="text-base font-bold text-xs">{prediction.cost}</p>
         </div>
         <div className="text-center p-1.5 rounded-lg bg-primary/10">
           <p className="text-[9px] text-primary">Llegada</p>
@@ -187,8 +185,19 @@ export function TripDetails({
         <p className="text-[8px] text-default-400">Caminando</p>
       </div>
       <div className="flex flex-col items-center p-2 rounded-lg bg-default-100">
-        <Shield size={14} className={prediction.safety_score >= 70 ? "text-success" : prediction.safety_score >= 40 ? "text-warning" : "text-danger"} />
-        <p className={`text-[10px] font-bold ${prediction.safety_score >= 70 ? "text-success" : prediction.safety_score >= 40 ? "text-warning" : "text-danger"}`}>
+        <Shield
+          size={14}
+          className={
+            prediction.safety_score >= 70
+              ? "text-success"
+              : prediction.safety_score >= 40
+                ? "text-warning"
+                : "text-danger"
+          }
+        />
+        <p
+          className={`text-[10px] font-bold ${prediction.safety_score >= 70 ? "text-success" : prediction.safety_score >= 40 ? "text-warning" : "text-danger"}`}
+        >
           {prediction.safety_score ?? 75}%
         </p>
         <p className="text-[8px] text-default-400">Seguridad</p>

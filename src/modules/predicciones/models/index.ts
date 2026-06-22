@@ -31,5 +31,11 @@ export interface RoutePrediction {
   stations: string[];
   departure_time: string;
   route_code?: string;
-  navigation_steps?: { instruction: string; street: string; distance_m: number; duration_s: number; maneuver: string }[];
+  navigation_steps?: {
+    instruction: string;
+    street: string;
+    distance_m: number;
+    duration_s: number;
+    maneuver: string;
+  }[];
 }
