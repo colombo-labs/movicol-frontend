@@ -6,6 +6,21 @@ export interface SitpRuta {
   paraderos: { lat: number; lon: number; nombre: string }[];
 }
 
+export interface TmRuta {
+  codigo: string;
+  nombre: string;
+  origen: string;
+  destino: string;
+  tipo_bus: string;
+  tipo_ruta: string;
+  horario_lv: string;
+  horario_sab: string;
+  horario_dom: string;
+  estado: string;
+  coords: [number, number][];
+  estaciones: { nombre: string; lat: number; lon: number }[];
+}
+
 export interface TmTroncal {
   id: string;
   nombre: string;

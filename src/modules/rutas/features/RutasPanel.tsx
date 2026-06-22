@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { RutasPanelProps, SitpRuta, TmTroncal } from "../models/types";
+import type { RutasPanelProps, SitpRuta, TmTroncal, TmRuta } from "../models/types";
 import { useRutasData } from "../hooks/useRutasData";
 import { SitpDetail } from "../components/widgets/SitpDetail";
 import { TmDetail } from "../components/widgets/TmDetail";
+import { TmRutaDetail } from "../components/widgets/TmRutaDetail";
 import { RutasList } from "../components/widgets/RutasList";
 
 export function RutasPanel(props: RutasPanelProps) {
@@ -10,10 +11,13 @@ export function RutasPanel(props: RutasPanelProps) {
     tab,
     sitpRutas,
     tmTroncales,
+    tmRutas,
     tmStations,
     setTmStations,
     selectedSitpRuta,
     setSelectedSitpRuta,
+    selectedTmRuta,
+    setSelectedTmRuta,
     selected,
     setSelected,
     sitpPage,
@@ -41,7 +45,20 @@ export function RutasPanel(props: RutasPanelProps) {
     }
   }
 
-  // TM detail view
+  // TM ruta detail view
+  if (tab === "tm" && selectedTmRuta) {
+    return (
+      <TmRutaDetail
+        ruta={selectedTmRuta}
+        onBack={() => {
+          setSelectedTmRuta(null);
+          props.onSelectSitpRoute?.(null);
+        }}
+      />
+    );
+  }
+
+  // TM troncal detail view
   if (selected) {
     return (
       <TmDetail
@@ -61,6 +78,7 @@ export function RutasPanel(props: RutasPanelProps) {
       {...props}
       tab={tab}
       tmTroncales={tmTroncales}
+      tmRutas={tmRutas}
       sitpRutas={sitpRutas}
       search={search}
       setSearch={setSearch}
@@ -87,6 +105,13 @@ export function RutasPanel(props: RutasPanelProps) {
           estaciones: r.estaciones.length,
           troncal: r.troncal,
         } as any);
+      }}
+      onSelectTmRuta={(r: TmRuta) => {
+        setSelectedTmRuta(r);
+        props.onSelectSitpRoute?.({
+          coords: r.coords as [number, number][],
+          stops: r.estaciones || [],
+        });
       }}
     />
   );
