@@ -1,4 +1,7 @@
-import type { RoutePrediction } from "@modules/predicciones/models";
+import type {
+  Coordinates,
+  RoutePrediction,
+} from "@modules/predicciones/models";
 import type { TripPoint } from "@/app/Layout";
 
 export type TransportMode = "publico" | "vehiculo";
@@ -30,8 +33,8 @@ export interface RouteOption extends Pick<
 
 export interface PlanificarProps {
   readonly onPredictMulti?: (
-    origin: { lat: number; lng: number },
-    destination: { lat: number; lng: number },
+    origin: Coordinates,
+    destination: Coordinates,
     mode: TransportMode,
     departureTime: string,
   ) => void;

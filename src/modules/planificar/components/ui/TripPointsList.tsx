@@ -7,23 +7,20 @@ import {
   Trash2,
   Search,
 } from "lucide-react";
-import type { TripPoint } from "@/app/Layout";
+import type { PlanificarProps } from "../../models/types";
 
-interface Props {
-  readonly tripPoints: TripPoint[];
+interface Props extends Pick<
+  PlanificarProps,
+  | "tripPoints"
+  | "onRemovePoint"
+  | "onUseMyLocation"
+  | "onSwapPoints"
+  | "onClear"
+  | "onAddPoint"
+  | "onUpdatePoint"
+  | "onRequestAddPoint"
+> {
   readonly mode: "publico" | "vehiculo";
-  readonly onRemovePoint: (index: number) => void;
-  readonly onUseMyLocation: (index?: number) => void;
-  readonly onSwapPoints: (i: number, j: number) => void;
-  readonly onClear: () => void;
-  readonly onAddPoint?: (lat: number, lng: number, label: string) => void;
-  readonly onUpdatePoint?: (
-    index: number,
-    lat: number,
-    lng: number,
-    label: string,
-  ) => void;
-  readonly onRequestAddPoint?: () => void;
 }
 
 interface SearchResult {
