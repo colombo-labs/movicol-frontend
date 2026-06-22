@@ -4,6 +4,29 @@ import type { Station } from "../models";
 
 let cachedStations: Station[] | null = null;
 
+function parseTmStations(data: any): Station[] {
+  const features = data?.features || [];
+  return features
+    .map((f: any) => {
+      const name = f.properties?.["transmisig2.tecnica.estacion_troncal.nom_est"] || "";
+      const coords = f.geometry?.coordinates;
+      return name && coords ? { id: `tm-${name}`, name: `TM ${name}`, lat: coords[1], lon: coords[0] } : null;
+    })
+    .filter(Boolean) as Station[];
+}
+
+function parseSitpStations(data: any): Station[] {
+  const features = data?.features || data || [];
+  const list = Array.isArray(features) ? features : [];
+  return list
+    .map((f: any) => {
+      const name = f.properties?.nombre || f.properties?.name || "";
+      const coords = f.geometry?.coordinates;
+      return name && coords ? { id: `sitp-${name}`, name, lat: coords[1], lon: coords[0] } : null;
+    })
+    .filter(Boolean) as Station[];
+}
+
 async function loadStations(): Promise<Station[]> {
   if (cachedStations) return cachedStations;
 
@@ -12,36 +35,11 @@ async function loadStations(): Promise<Station[]> {
     fetch(`${API_URL}/graph/sitp/paraderos`).then(r => r.json()),
   ]);
 
-  const stations: Station[] = [];
+  const tmStations = tmRes.status === "fulfilled" ? parseTmStations(tmRes.value) : [];
+  const sitpStations = sitpRes.status === "fulfilled" ? parseSitpStations(sitpRes.value) : [];
 
-  // TM estaciones
-  if (tmRes.status === "fulfilled") {
-    const features = tmRes.value?.features || [];
-    for (const f of features) {
-      const props = f.properties || {};
-      const name = props["transmisig2.tecnica.estacion_troncal.nom_est"] || "";
-      const coords = f.geometry?.coordinates;
-      if (name && coords) {
-        stations.push({ id: `tm-${name}`, name: `TM ${name}`, lat: coords[1], lon: coords[0] });
-      }
-    }
-  }
-
-  // SITP paraderos
-  if (sitpRes.status === "fulfilled") {
-    const features = sitpRes.value?.features || sitpRes.value || [];
-    for (const f of Array.isArray(features) ? features : []) {
-      const props = f.properties || {};
-      const name = props.nombre || props.name || "";
-      const coords = f.geometry?.coordinates;
-      if (name && coords) {
-        stations.push({ id: `sitp-${name}`, name, lat: coords[1], lon: coords[0] });
-      }
-    }
-  }
-
-  cachedStations = stations;
-  return stations;
+  cachedStations = [...tmStations, ...sitpStations];
+  return cachedStations;
 }
 
 export function useStationSearch() {
