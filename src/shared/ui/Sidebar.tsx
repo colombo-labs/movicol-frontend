@@ -1,5 +1,5 @@
 import {
-  MapPin,
+  Bus,
   Navigation,
   Route,
   Accessibility,
@@ -69,15 +69,15 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
           <div
             className={`flex items-center gap-2 ${expanded ? "w-full" : ""}`}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 shadow-md shadow-primary/20">
-              <MapPin size={20} className="text-primary-foreground" />
+            <div className="w-11 h-11 rounded-xl bg-[#2d8a5e] flex items-center justify-center shrink-0 shadow-sm">
+              <Bus size={20} className="dark:text-black text-white" />
             </div>
             {expanded && (
-              <div>
-                <span className="text-sm font-bold text-foreground block leading-tight">
-                  MoviCol
+              <div className="flex flex-col leading-tight">
+                <span className="text-base font-bold text-foreground">
+                  Movi<span className="text-[#2d8a5e]">Col</span>
                 </span>
-                <span className="text-[9px] text-default-400">
+                <span className="text-[10px] text-default-400">
                   Transporte inteligente
                 </span>
               </div>

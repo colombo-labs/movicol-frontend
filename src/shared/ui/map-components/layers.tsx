@@ -41,9 +41,9 @@ export function SitpLayer() {
   }, []);
   return (
     <>
-      {paraderos.map((p) => (
+      {paraderos.map((p, i) => (
         <CircleMarker
-          key={`sitp-${p.lat}-${p.lon}`}
+          key={`sitp-${i}-${p.lat}-${p.lon}`}
           center={[p.lat, p.lon]}
           radius={3}
           pathOptions={{
