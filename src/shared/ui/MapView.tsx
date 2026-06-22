@@ -216,9 +216,9 @@ export function MapView({
         )}
 
         {/* Prediction route segments (selected — bold, colored) */}
-        {prediction?.risk_segments.map((segment, i) => (
+        {prediction?.risk_segments.map((segment) => (
           <Polyline
-            key={`pred-seg-${i}`}
+            key={`pred-seg-${segment.from_station}-${segment.to_station}`}
             positions={segment.coordinates.map(
               (c) => [c[0], c[1]] as [number, number],
             )}

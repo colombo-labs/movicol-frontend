@@ -71,7 +71,10 @@ export function RutaDetail({
             const isFirst = i === 0;
             const isLast = i === paradas.length - 1;
             return (
-              <div key={`stop-${i}`} className="flex items-stretch gap-3">
+              <div
+                key={`stop-${p.nombre || i}`}
+                className="flex items-stretch gap-3"
+              >
                 {/* Timeline column */}
                 <div className="flex flex-col items-center w-4 shrink-0">
                   {/* Dot */}

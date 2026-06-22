@@ -19,6 +19,12 @@ import type {
   RutasPanelProps,
 } from "../../models/types";
 
+function getTmColor(tipoBus: string): string {
+  if (tipoBus === "BIARTICULADO") return "#E3342F";
+  if (tipoBus === "ARTICULADO") return "#F6993F";
+  return "#38A169";
+}
+
 const SITP_PAGE_SIZE = 20;
 
 async function loadNearbyRutas(
@@ -356,9 +362,9 @@ export function RutasList(props: Props) {
           <p className="text-[10px] text-warning font-medium px-1">
             ⚠️ Alertas operacionales
           </p>
-          {alerts.items.map((a, i) => (
+          {alerts.items.map((a) => (
             <a
-              key={`alert-${i}`}
+              key={`alert-${a.url}`}
               href={a.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -518,6 +524,10 @@ export function RutasList(props: Props) {
                 (r) => r.tipo_bus.toLowerCase() === "dual",
               ).length,
             };
+            const handleBusFilter = (t: string) => {
+              setFilter(t);
+              setSitpPage(() => 0);
+            };
             return (
               <>
                 {/* Sub-tabs tipo bus */}
@@ -527,10 +537,7 @@ export function RutasList(props: Props) {
                       (t) => (
                         <button
                           key={t}
-                          onClick={() => {
-                            setFilter(t);
-                            setSitpPage(() => 0);
-                          }}
+                          onClick={() => handleBusFilter(t)}
                           className={`flex-1 py-1.5 rounded-lg text-[9px] font-semibold transition-all capitalize ${filter === t ? "bg-emerald-500/20 text-emerald-500" : "text-default-400 hover:text-foreground"}`}
                         >
                           {t} ({typeCounts[t]})
@@ -545,12 +552,7 @@ export function RutasList(props: Props) {
                 </p>
 
                 {paged.map((r) => {
-                  const tmColor =
-                    r.tipo_bus === "BIARTICULADO"
-                      ? "#E3342F"
-                      : r.tipo_bus === "ARTICULADO"
-                        ? "#F6993F"
-                        : "#38A169";
+                  const tmColor = getTmColor(r.tipo_bus);
                   const handleTmClick = () => {
                     if (r.coords.length > 0) {
                       props.onSelectSitpRoute?.({

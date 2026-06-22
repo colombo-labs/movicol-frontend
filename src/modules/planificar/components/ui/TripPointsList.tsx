@@ -204,9 +204,9 @@ export function TripPointsList({
                 {/* Search results dropdown */}
                 {editingIdx === i && results.length > 0 && (
                   <div className="absolute z-50 left-0 right-0 mt-1 rounded-lg bg-background border border-divider shadow-lg max-h-40 overflow-y-auto">
-                    {results.map((r, ri) => (
+                    {results.map((r) => (
                       <button
-                        key={`res-${ri}`}
+                        key={`res-${r.label}-${r.lat}`}
                         onClick={() => handleSelect(r, i)}
                         className="w-full text-left px-3 py-2 text-[11px] text-foreground hover:bg-default-100 transition-colors border-b border-divider/30 last:border-0"
                       >

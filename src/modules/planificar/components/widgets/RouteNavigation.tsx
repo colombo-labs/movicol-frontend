@@ -52,11 +52,13 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
           return (
             <div key={`nav-${i}-${s}`} className="flex items-stretch gap-3">
               <div className="flex flex-col items-center w-4 shrink-0">
-                {isFirst ? (
+                {isFirst && (
                   <div className="w-3 h-3 rounded-full bg-success border-2 border-success/30 shrink-0 mt-1.5" />
-                ) : isLast ? (
+                )}
+                {!isFirst && isLast && (
                   <div className="w-3 h-3 rounded-full bg-danger border-2 border-danger/30 shrink-0 mt-1.5" />
-                ) : (
+                )}
+                {!isFirst && !isLast && (
                   <div className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0 mt-2" />
                 )}
                 {!isLast && (
@@ -182,7 +184,7 @@ export function VehicleNavSteps({
           .filter((s) => s.distance_m > 0 || s.maneuver === "arrive")
           .map((s, i) => (
             <div
-              key={`nav-v-${i}`}
+              key={`nav-v-${s.street}-${s.distance_m}`}
               className="flex items-stretch gap-2.5 py-1.5"
             >
               <div className="flex flex-col items-center w-5 shrink-0">

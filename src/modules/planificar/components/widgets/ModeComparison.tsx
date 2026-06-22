@@ -208,9 +208,9 @@ export function SelectedRouteDetail({
         </span>
       </div>
       <div className="space-y-0 border-l-2 border-primary/20 ml-2 pl-3">
-        {option.legs.map((leg, i) => (
+        {option.legs.map((leg) => (
           <div
-            key={`detail-${i}`}
+            key={`detail-${leg.from}-${leg.to}`}
             className="flex items-center gap-2 py-1.5 relative"
           >
             <div

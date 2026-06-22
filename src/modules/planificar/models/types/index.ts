@@ -61,6 +61,8 @@ export interface RutaCercana {
   distanciaMinima: number;
 }
 
+const RISK_LEVELS = ["low", "medium", "high", "critical"] as const;
+
 export const RISK_COLORS: Record<string, string> = {
   low: "text-success",
   medium: "text-warning",
@@ -68,9 +70,9 @@ export const RISK_COLORS: Record<string, string> = {
   critical: "text-danger",
 };
 
-export const RISK_BG: Record<string, string> = {
-  low: "bg-success/20 text-success",
-  medium: "bg-warning/20 text-warning",
-  high: "bg-orange-500/20 text-orange-500",
-  critical: "bg-danger/20 text-danger",
-};
+export const RISK_BG: Record<string, string> = Object.fromEntries(
+  RISK_LEVELS.map((level) => [
+    level,
+    `${RISK_COLORS[level].replace("text-", "bg-")}/20 ${RISK_COLORS[level]}`,
+  ]),
+);

@@ -89,7 +89,7 @@ export function SidePanel({
             <span className="w-px h-2.5 bg-divider" />
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-              Conectado
+              <span>Conectado</span>
             </span>
             <span className="w-px h-2.5 bg-divider" />
             <span>

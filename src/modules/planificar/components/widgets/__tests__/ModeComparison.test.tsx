@@ -64,62 +64,42 @@ describe("RouteOptionsList", () => {
     },
   ];
 
-  it("should render all options", () => {
-    render(
-      <RouteOptionsList
-        options={mockOptions}
-        selectedId={null}
-        onSelect={vi.fn()}
-      />,
-    );
-    expect(screen.getByText("TM B5")).toBeDefined();
-    expect(screen.getByText("SITP 112B")).toBeDefined();
-  });
-
-  it("should show time for each option", () => {
-    render(
-      <RouteOptionsList
-        options={mockOptions}
-        selectedId={null}
-        onSelect={vi.fn()}
-      />,
-    );
-    expect(screen.getByText("24 min")).toBeDefined();
-    expect(screen.getByText("35 min")).toBeDefined();
-  });
-
-  it("should show tag label", () => {
-    render(
-      <RouteOptionsList
-        options={mockOptions}
-        selectedId={null}
-        onSelect={vi.fn()}
-      />,
-    );
-    expect(screen.getByText("Más rápida")).toBeDefined();
-  });
-
-  it("should call onSelect when option clicked", () => {
-    const onSelect = vi.fn();
-    render(
+  function renderList(onSelect = vi.fn()) {
+    return render(
       <RouteOptionsList
         options={mockOptions}
         selectedId={null}
         onSelect={onSelect}
       />,
     );
+  }
+
+  it("should render all options", () => {
+    renderList();
+    expect(screen.getByText("TM B5")).toBeDefined();
+    expect(screen.getByText("SITP 112B")).toBeDefined();
+  });
+
+  it("should show time for each option", () => {
+    renderList();
+    expect(screen.getByText("24 min")).toBeDefined();
+    expect(screen.getByText("35 min")).toBeDefined();
+  });
+
+  it("should show tag label", () => {
+    renderList();
+    expect(screen.getByText("Más rápida")).toBeDefined();
+  });
+
+  it("should call onSelect when option clicked", () => {
+    const onSelect = vi.fn();
+    renderList(onSelect);
     fireEvent.click(screen.getByText("SITP 112B"));
     expect(onSelect).toHaveBeenCalledWith(mockOptions[1]);
   });
 
   it("should show count text", () => {
-    render(
-      <RouteOptionsList
-        options={mockOptions}
-        selectedId={null}
-        onSelect={vi.fn()}
-      />,
-    );
+    renderList();
     expect(screen.getByText(/2 opci/)).toBeDefined();
   });
 });

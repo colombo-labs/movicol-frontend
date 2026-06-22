@@ -20,6 +20,12 @@ interface Props {
   readonly getETA: () => string | null;
 }
 
+function getSafetyColor(score: number): string {
+  if (score >= 70) return "text-success";
+  if (score >= 40) return "text-warning";
+  return "text-danger";
+}
+
 function getRiskLabel(risk: string) {
   if (risk === "low") return "Fluido";
   if (risk === "medium") return "Moderado";
@@ -185,18 +191,9 @@ export function TripDetails({
         <p className="text-[8px] text-default-400">Caminando</p>
       </div>
       <div className="flex flex-col items-center p-2 rounded-lg bg-default-100">
-        <Shield
-          size={14}
-          className={
-            prediction.safety_score >= 70
-              ? "text-success"
-              : prediction.safety_score >= 40
-                ? "text-warning"
-                : "text-danger"
-          }
-        />
+        <Shield size={14} className={getSafetyColor(prediction.safety_score)} />
         <p
-          className={`text-[10px] font-bold ${prediction.safety_score >= 70 ? "text-success" : prediction.safety_score >= 40 ? "text-warning" : "text-danger"}`}
+          className={`text-[10px] font-bold ${getSafetyColor(prediction.safety_score)}`}
         >
           {prediction.safety_score ?? 75}%
         </p>

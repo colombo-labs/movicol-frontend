@@ -133,9 +133,9 @@ export function RouteAlerts({
         </span>
       </div>
       <div className="space-y-1">
-        {alerts.map((s, i) => (
+        {alerts.map((s) => (
           <div
-            key={`rs-${i}`}
+            key={`rs-${s.from_station}-${s.to_station}`}
             className="flex items-center gap-2 text-[10px] text-default-500"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-warning shrink-0" />

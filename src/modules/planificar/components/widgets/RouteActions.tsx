@@ -211,8 +211,9 @@ export function NearDestination({
   useEffect(() => {
     if (!destLat || !destLng) return;
     const key = `${destLat.toFixed(3)},${destLng.toFixed(3)}`;
-    if (cacheRef.current.has(key)) {
-      setPlaces(cacheRef.current.get(key)!);
+    const cached = cacheRef.current.get(key);
+    if (cached) {
+      setPlaces(cached);
       return;
     }
 
@@ -235,9 +236,9 @@ export function NearDestination({
         Cerca de tu destino
       </span>
       <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-        {places.map((p, i) => (
+        {places.map((p) => (
           <div
-            key={`poi-${i}`}
+            key={`poi-${p.name}-${p.dist}`}
             className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg bg-default-100 min-w-[56px]"
           >
             <PoiIcon type={p.type} />

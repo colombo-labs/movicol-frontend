@@ -10,6 +10,12 @@ interface SiniestroPoint {
   paradero: string;
 }
 
+function getHeatColor(norm: number): string {
+  if (norm > 0.7) return "#ef4444";
+  if (norm > 0.4) return "#f59e0b";
+  return "#22c55e";
+}
+
 export function SiniestroLayer() {
   const [points, setPoints] = useState<SiniestroPoint[]>([]);
 
@@ -36,8 +42,7 @@ export function SiniestroLayer() {
             radius={4 + norm * 8}
             pathOptions={{
               color: "transparent",
-              fillColor:
-                norm > 0.7 ? "#ef4444" : norm > 0.4 ? "#f59e0b" : "#22c55e",
+              fillColor: getHeatColor(norm),
               fillOpacity: 0.3 + norm * 0.4,
             }}
           >
