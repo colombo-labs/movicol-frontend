@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import {
   Navigation,
   Bell,
@@ -5,11 +6,18 @@ import {
   MapPinned,
   MapPin,
   AlertCircle,
+  ThumbsUp,
+  ThumbsDown,
+  Coffee,
+  Landmark,
+  Pill,
+  UtensilsCrossed,
+  Bike,
+  Store,
 } from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { RoutePrediction } from "@modules/predicciones/models";
 import type { TripPoint } from "@/app/Layout";
-import type { TransportMode } from "../../models/types";
 
 export function ActionButtons({
   prediction,
@@ -33,7 +41,7 @@ export function ActionButtons({
                 title: "Mi ruta MoviCol",
                 text: `Ruta de ${Math.round(prediction.total_time_minutes)} min`,
                 url: globalThis.location.href,
-              });
+              }).catch(() => {});
           }}
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
@@ -41,12 +49,19 @@ export function ActionButtons({
         </button>
         <button
           onClick={() => {
+            const origin = tripPoints[0];
+            const dest = tripPoints.slice(-1)[0];
+            if (!origin || !dest) return;
             const saved = JSON.parse(
               localStorage.getItem("movicol_saved_routes") || "[]",
             );
             saved.unshift({
-              origin: tripPoints[0]?.label,
-              dest: tripPoints.slice(-1)[0]?.label,
+              origin: origin.label || `${origin.lat.toFixed(4)}, ${origin.lng.toFixed(4)}`,
+              originLat: origin.lat,
+              originLng: origin.lng,
+              dest: dest.label || `${dest.lat.toFixed(4)}, ${dest.lng.toFixed(4)}`,
+              destLat: dest.lat,
+              destLng: dest.lng,
               time: Math.round(prediction.total_time_minutes),
               date: new Date().toLocaleDateString(),
             });
@@ -54,6 +69,9 @@ export function ActionButtons({
               "movicol_saved_routes",
               JSON.stringify(saved.slice(0, 5)),
             );
+            // Feedback visual
+            const btn = document.activeElement as HTMLButtonElement;
+            if (btn) { btn.textContent = "✓ Guardado"; setTimeout(() => { btn.textContent = "Guardar"; }, 1500); }
           }}
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
@@ -89,26 +107,91 @@ export function QuickActions() {
   );
 }
 
-export function NearDestination() {
-  const places = [
-    { name: "Café", dist: "50m" },
-    { name: "Cajero", dist: "120m" },
-    { name: "Tienda", dist: "80m" },
-    { name: "Bici TM", dist: "30m" },
-  ];
+function PoiIcon({ type }: { type: string }) {
+  const cls = "text-primary";
+  const s = 13;
+  if (type === "cafe") return <Coffee size={s} className={cls} />;
+  if (type === "atm" || type === "bank") return <Landmark size={s} className={cls} />;
+  if (type === "pharmacy") return <Pill size={s} className={cls} />;
+  if (type === "restaurant") return <UtensilsCrossed size={s} className={cls} />;
+  if (type === "bike") return <Bike size={s} className={cls} />;
+  if (type === "supermarket" || type === "store") return <Store size={s} className={cls} />;
+  return <MapPin size={s} className={cls} />;
+}
+
+export function NearDestination({ destLat, destLng }: { readonly destLat?: number; readonly destLng?: number }) {
+  const [places, setPlaces] = useState<{ name: string; dist: string; type: string }[]>([]);
+  const cacheRef = useRef<Map<string, any>>(new Map());
+
+  useEffect(() => {
+    if (!destLat || !destLng) return;
+    const key = `${destLat.toFixed(3)},${destLng.toFixed(3)}`;
+    if (cacheRef.current.has(key)) { setPlaces(cacheRef.current.get(key)); return; }
+
+    const timer = setTimeout(() => {
+      const radius = 200;
+      const query = `[out:json][timeout:5];(
+        node["amenity"="cafe"](around:${radius},${destLat},${destLng});
+        node["amenity"="atm"](around:${radius},${destLat},${destLng});
+        node["shop"](around:${radius},${destLat},${destLng});
+        node["amenity"="pharmacy"](around:${radius},${destLat},${destLng});
+        node["amenity"="restaurant"](around:${radius},${destLat},${destLng});
+      );out body 6;`;
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+
+      fetch("https://overpass-api.de/api/interpreter", {
+        method: "POST",
+        body: `data=${encodeURIComponent(query)}`,
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        signal: controller.signal,
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          clearTimeout(timeout);
+          if (!data) return;
+          const results = (data.elements || []).map((el: any) => {
+          const d = Math.round(
+            Math.sqrt((el.lat - destLat) ** 2 + (el.lon - destLng) ** 2) * 111000
+          );
+          const tags = el.tags || {};
+          const type = tags.amenity || tags.shop || "lugar";
+          const typeLabel: Record<string, string> = {
+            cafe: "cafe", atm: "atm", bank: "bank",
+            pharmacy: "pharmacy", restaurant: "restaurant",
+            bicycle_rental: "bike", supermarket: "supermarket",
+            convenience: "store",
+          };
+          return {
+            name: tags.name || type,
+            dist: `${d}m`,
+            type: typeLabel[type] || "pin",
+          };
+        }).slice(0, 6);
+        setPlaces(results);
+        cacheRef.current.set(key, results);
+      })
+      .catch(() => { clearTimeout(timeout); });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [destLat, destLng]);
+
+  if (places.length === 0) return null;
+
   return (
     <GlassCard>
       <span className="text-[10px] font-semibold mb-1.5 block">
         Cerca de tu destino
       </span>
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {places.map((p) => (
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+        {places.map((p, i) => (
           <div
-            key={p.name}
-            className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg bg-default-100 min-w-[52px]"
+            key={`poi-${i}`}
+            className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg bg-default-100 min-w-[56px]"
           >
-            <MapPin size={12} className="text-primary" />
-            <span className="text-[8px] text-foreground font-medium">
+            <PoiIcon type={p.type} />
+            <span className="text-[8px] text-foreground font-medium text-center leading-tight truncate max-w-[52px]">
               {p.name}
             </span>
             <span className="text-[8px] text-default-400">{p.dist}</span>
@@ -119,7 +202,8 @@ export function NearDestination() {
   );
 }
 
-export function TravelTips({ mode }: { readonly mode: TransportMode }) {
+export function TravelTips({ mode }: { readonly mode: string }) {
+  const [vote, setVote] = useState<"up" | "down" | null>(null);
   const hour = new Date().getHours();
   let tip: string;
   if (hour < 10)
@@ -148,11 +232,17 @@ export function TravelTips({ mode }: { readonly mode: TransportMode }) {
       <div className="flex items-center justify-between px-2 py-2 rounded-lg bg-default-100/50">
         <p className="text-[9px] text-default-400">¿Te fue útil esta ruta?</p>
         <div className="flex gap-2">
-          <button className="text-[16px] hover:scale-125 transition-transform">
-            👍
+          <button
+            className="p-1.5 rounded-full hover:bg-success/20 transition-colors"
+            onClick={() => setVote(vote === "up" ? null : "up")}
+          >
+            <ThumbsUp size={14} className={vote === "up" ? "text-success" : "text-default-400"} fill={vote === "up" ? "currentColor" : "none"} />
           </button>
-          <button className="text-[16px] hover:scale-125 transition-transform">
-            👎
+          <button
+            className="p-1.5 rounded-full hover:bg-danger/20 transition-colors"
+            onClick={() => setVote(vote === "down" ? null : "down")}
+          >
+            <ThumbsDown size={14} className={vote === "down" ? "text-danger" : "text-default-400"} fill={vote === "down" ? "currentColor" : "none"} />
           </button>
         </div>
       </div>

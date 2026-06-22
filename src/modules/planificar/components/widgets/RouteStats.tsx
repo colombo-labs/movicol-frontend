@@ -25,7 +25,7 @@ export function EcoInfo({
         <Flame size={14} className="text-orange-500" />
         <div>
           <p className="text-[10px] font-bold text-orange-600">
-            {Math.round(prediction.total_time_minutes * 3.5)} cal
+            {Math.round(prediction.total_distance_km * 0.15 * 12 * 3.5)} cal
           </p>
           <p className="text-[8px] text-orange-500/70">Calorías caminando</p>
         </div>
@@ -133,9 +133,9 @@ export function RouteAlerts({
         </span>
       </div>
       <div className="space-y-1">
-        {alerts.map((s) => (
+        {alerts.map((s, i) => (
           <div
-            key={`${s.from_station}-${s.to_station}`}
+            key={`rs-${i}`}
             className="flex items-center gap-2 text-[10px] text-default-500"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-warning shrink-0" />

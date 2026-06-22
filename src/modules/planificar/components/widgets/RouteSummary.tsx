@@ -10,12 +10,12 @@ import {
 } from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { RoutePrediction } from "@modules/predicciones/models";
-import type { TransportMode } from "../../models/types";
+type LegacyMode = "transmilenio" | "sitp" | "vehiculo";
 import { RISK_BG } from "../../models/types";
 
 interface Props {
   readonly prediction: RoutePrediction;
-  readonly mode: TransportMode;
+  readonly mode: LegacyMode;
   readonly rutasDisponibles: { ruta: string }[];
   readonly getETA: () => string | null;
 }
@@ -95,9 +95,7 @@ export function RouteSummaryCard({
         <div className="text-center p-1.5 rounded-lg bg-default-100">
           <p className="text-[9px] text-default-400">Costo</p>
           <p className="text-base font-bold text-xs">
-            {mode === "vehiculo"
-              ? `$${Math.round(prediction.total_distance_km * 800 + 5000).toLocaleString()}`
-              : prediction.cost}
+            {prediction.cost}
           </p>
         </div>
         <div className="text-center p-1.5 rounded-lg bg-primary/10">
@@ -142,7 +140,7 @@ export function TripDetails({
   mode,
 }: {
   readonly prediction: RoutePrediction;
-  readonly mode: TransportMode;
+  readonly mode: LegacyMode;
 }) {
   if (mode === "vehiculo") {
     return (
@@ -150,9 +148,9 @@ export function TripDetails({
         <div className="flex flex-col items-center p-2 rounded-lg bg-default-100">
           <Car size={14} className="text-default-500 mb-0.5" />
           <p className="text-[10px] font-bold">
-            {(prediction.total_distance_km * 800).toLocaleString()}
+            ${Math.round(prediction.total_distance_km * 1500).toLocaleString()}
           </p>
-          <p className="text-[8px] text-default-400">Gasolina (COP)</p>
+          <p className="text-[8px] text-default-400">Costo estimado</p>
         </div>
         <div className="flex flex-col items-center p-2 rounded-lg bg-default-100">
           <MapPin size={14} className="text-default-500 mb-0.5" />
@@ -189,9 +187,11 @@ export function TripDetails({
         <p className="text-[8px] text-default-400">Caminando</p>
       </div>
       <div className="flex flex-col items-center p-2 rounded-lg bg-default-100">
-        <Shield size={14} className="text-success" />
-        <p className="text-[10px] font-bold text-success">Sí</p>
-        <p className="text-[8px] text-default-400">Accesible</p>
+        <Shield size={14} className={prediction.safety_score >= 70 ? "text-success" : prediction.safety_score >= 40 ? "text-warning" : "text-danger"} />
+        <p className={`text-[10px] font-bold ${prediction.safety_score >= 70 ? "text-success" : prediction.safety_score >= 40 ? "text-warning" : "text-danger"}`}>
+          {prediction.safety_score ?? 75}%
+        </p>
+        <p className="text-[8px] text-default-400">Seguridad</p>
       </div>
     </div>
   );
