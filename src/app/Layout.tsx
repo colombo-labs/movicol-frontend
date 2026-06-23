@@ -301,7 +301,7 @@ export function Layout() {
               </div>
             ) : null}
 
-            <MapView
+            {activePanel !== "admin" && <><MapView
               selectedTroncal={selectedTroncal}
               showTroncalesOnMap={showTroncales}
               showEstacionesOnMap={showEstaciones}
@@ -363,6 +363,7 @@ export function Layout() {
             >
               <AlertTriangle size={18} />
             </button>
+            </>}
           </main>
 
           <MobileNav activePanel={activePanel} onTogglePanel={togglePanel} />
