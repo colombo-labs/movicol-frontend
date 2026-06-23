@@ -50,7 +50,7 @@ export function AuthButton({
             `https://ui-avatars.com/api/?name=${user!.name}&size=28&background=random`
           }
           alt={user!.name}
-          className="w-8 h-8 rounded-full border border-divider"
+          referrerPolicy="no-referrer" className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-divider object-cover"
         />
       </button>
 

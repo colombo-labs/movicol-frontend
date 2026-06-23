@@ -9,6 +9,7 @@ interface User {
   avatarUrl: string | null;
   role: { name: string };
   createdAt?: string;
+  permissions?: string[];
 }
 
 export function useAuth() {
@@ -49,7 +50,7 @@ export function useAuth() {
   useEffect(() => {
     if (!user) return;
 
-    const socket = io("/ws", { transports: ["websocket"] });
+    const socket = io(`${API_URL}/ws`, { transports: ["websocket"] });
     socketRef.current = socket;
 
     socket.on("connect", () => {
@@ -82,9 +83,13 @@ export function useAuth() {
     socketRef.current?.disconnect();
     // Clear server session + cookies
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    // Clear cookies client-side as fallback
+    document.cookie = "access_token=; Max-Age=0; path=/";
     // Clear local state
     setUser(null);
   };
+
+  const can = (permission: string) => user?.permissions?.includes(permission) ?? false;
 
   return {
     user,
@@ -92,5 +97,6 @@ export function useAuth() {
     isLoading,
     login,
     logout,
+    can,
   };
 }

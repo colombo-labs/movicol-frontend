@@ -189,7 +189,7 @@ export function UsersTab() {
             className="flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl border border-divider hover:border-primary/30 hover:bg-default-50 cursor-pointer transition-all"
           >
             <img
-              src={user.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}&size=36`}
+              referrerPolicy="no-referrer" src={user.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}&size=36`}
               alt=""
               className="w-9 h-9 rounded-full shrink-0"
             />
@@ -216,7 +216,7 @@ export function UsersTab() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-divider shrink-0">
               <div className="flex items-center gap-3">
                 <img
-                  src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${selectedUser.name}&size=40`}
+                  referrerPolicy="no-referrer" src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${selectedUser.name}&size=40`}
                   alt=""
                   className="w-10 h-10 rounded-full"
                 />

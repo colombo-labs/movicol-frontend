@@ -33,8 +33,8 @@ interface SidebarProps {
 export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
-  const { user } = useAuth();
-  const isAdmin = user?.role?.name === "admin";
+  const { can } = useAuth();
+  const isAdmin = can("admin.users") || can("admin.roles") || can("admin.permissions");
 
   const visiblePanels = isAdmin
     ? [...panels, { id: "admin" as const, icon: ShieldCheck, label: "nav.admin" }]

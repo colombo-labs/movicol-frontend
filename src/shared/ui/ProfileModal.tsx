@@ -48,7 +48,7 @@ export function ProfileModal({ isOpen, onClose }: Props) {
             <img
               src={user.avatarUrl}
               alt={user.name}
-              className="w-14 h-14 rounded-full border-2 border-primary/30"
+              referrerPolicy="no-referrer" className="w-14 h-14 rounded-full border-2 border-primary/30"
             />
           ) : (
             <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center">
