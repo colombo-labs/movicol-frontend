@@ -151,7 +151,7 @@ export function UsersTab() {
         </div>
         <div className="w-[140px]">
           <p className="text-[9px] font-medium text-default-500 mb-1">Rol</p>
-          <Select
+          <Select aria-label="Filtro de rol"
             size="sm"
             variant="bordered"
             selectedKeys={filterRole === "all" ? ["all"] : [String(filterRole)]}

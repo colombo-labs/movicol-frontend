@@ -97,7 +97,7 @@ export function PermissionsTab({
         </div>
         <div className="w-[140px]">
           <p className="text-[9px] font-medium text-default-500 mb-1">Módulo</p>
-          <Select
+          <Select aria-label="Filtro de módulo"
             size="sm"
             variant="bordered"
             selectedKeys={[filterModule]}
