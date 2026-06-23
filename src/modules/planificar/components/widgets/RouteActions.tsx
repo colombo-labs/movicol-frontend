@@ -124,20 +124,44 @@ export function ActionButtons({
   );
 }
 
-export function QuickActions() {
+export function QuickActions({ onFocusMap }: { readonly onFocusMap: () => void }) {
   const { t } = useTranslation();
+  const [alarmSet, setAlarmSet] = useState(false);
+  const [reported, setReported] = useState(false);
+
+  const handleAlarm = () => {
+    setAlarmSet(!alarmSet);
+    if (!alarmSet && "Notification" in window) {
+      Notification.requestPermission();
+    }
+  };
+
+  const handleShareLive = () => {
+    const url = `${window.location.origin}/planificar?shared=true`;
+    if (navigator.share) {
+      navigator.share({ title: "Mi viaje en MoviCol", url });
+    } else {
+      navigator.clipboard.writeText(url);
+    }
+  };
+
+  const handleReport = () => {
+    setReported(true);
+    setTimeout(() => setReported(false), 3000);
+  };
+
   return (
     <div className="grid grid-cols-2 gap-1.5">
-      <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
-        <Bell size={12} className="text-default-500" /> {t("route.alarmStop")}
+      <button onClick={handleAlarm} className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${alarmSet ? "bg-primary/20 text-primary border-primary/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}>
+        <Bell size={12} className={alarmSet ? "text-primary" : "text-default-500"} /> {alarmSet ? "✓ Activa" : t("route.alarmStop")}
       </button>
-      <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
+      <button onClick={handleShareLive} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
         <Share2 size={12} className="text-default-500" /> {t("route.shareLive")}
       </button>
-      <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
-        <AlertCircle size={12} className="text-warning" /> {t("route.reportIncident")}
+      <button onClick={handleReport} className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${reported ? "bg-success/20 text-success border-success/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}>
+        <AlertCircle size={12} className={reported ? "text-success" : "text-warning"} /> {reported ? "✓ Reportado" : t("route.reportIncident")}
       </button>
-      <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
+      <button onClick={onFocusMap} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
         <MapPinned size={12} className="text-default-500" /> {t("route.viewFullMap")}
       </button>
     </div>

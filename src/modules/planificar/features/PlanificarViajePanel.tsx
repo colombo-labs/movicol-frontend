@@ -80,7 +80,7 @@ export function PlanificarViajePanel({
     prevPointsRef.current = key;
     const dt =
       departureType === "programar" && departureTime
-        ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+        ? new Date(`${new Date().toISOString().slice(0,10)}T${departureTime}:00`).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
@@ -90,7 +90,7 @@ export function PlanificarViajePanel({
     if (!origin || !destination) return;
     const dt =
       departureType === "programar" && departureTime
-        ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+        ? new Date(`${new Date().toISOString().slice(0,10)}T${departureTime}:00`).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
@@ -102,7 +102,7 @@ export function PlanificarViajePanel({
     if (origin && destination) {
       const dt =
         departureType === "programar" && departureTime
-          ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+          ? new Date(`${new Date().toISOString().slice(0,10)}T${departureTime}:00`).toISOString()
           : new Date().toISOString();
       onPredictMulti?.(origin, destination, newMode, dt);
     }
@@ -273,7 +273,7 @@ export function PlanificarViajePanel({
                 tripPoints={tripPoints}
                 onClear={onClear}
               />
-              <QuickActions />
+              <QuickActions onFocusMap={() => {}} />
               <TravelTips
                 mode={mode === "publico" ? "transmilenio" : "vehiculo"}
               />
