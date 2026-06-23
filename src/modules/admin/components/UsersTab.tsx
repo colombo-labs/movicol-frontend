@@ -164,7 +164,8 @@ export function UsersTab() {
         </div>
         <div className="w-[120px]">
           <p className="text-[9px] font-medium text-default-500 mb-1">Estado</p>
-          <Select
+          <Select aria-label="Selector"
+            aria-label="Filtro de estado"
             size="sm"
             variant="bordered"
             selectedKeys={[filterStatus]}
@@ -242,7 +243,7 @@ export function UsersTab() {
                 <div>
                   <p className="text-[9px] text-default-400 mb-1">Rol</p>
                   {editing ? (
-                    <Select
+                    <Select aria-label="Selector"
                       size="sm"
                       variant="bordered"
                       selectedKeys={[String(draftRoleId)]}
@@ -259,7 +260,7 @@ export function UsersTab() {
                 <div>
                   <p className="text-[9px] text-default-400 mb-1">Estado</p>
                   {editing ? (
-                    <Select
+                    <Select aria-label="Selector"
                       size="sm"
                       variant="bordered"
                       selectedKeys={[draftActive ? "active" : "inactive"]}
