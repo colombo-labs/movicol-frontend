@@ -39,7 +39,7 @@ export function ConfigModal({ isOpen, onClose }: Props) {
             onClick={toggle}
             className="px-3 py-1.5 rounded-lg bg-default-100 text-xs font-semibold hover:bg-default-200 transition-colors"
           >
-            {theme === "dark" ? "Oscuro" : "Claro"}
+            {theme === "dark" ? t("config.dark") : t("config.light")}
           </button>
         </div>
 
@@ -71,7 +71,7 @@ export function ConfigModal({ isOpen, onClose }: Props) {
               </p>
             </div>
           </div>
-          <span className="text-xs text-success font-medium">t("config.enabled")</span>
+          <span className="text-xs text-success font-medium">{t("config.enabled")}</span>
         </div>
 
         <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">

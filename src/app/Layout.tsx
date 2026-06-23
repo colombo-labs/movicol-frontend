@@ -227,7 +227,7 @@ export function Layout() {
                 setActivePanel(null);
                 handleClearPrediction();
               }}
-              title="Planificar viaje"
+              title={t("nav.planificar")}
             >
               <PlanificarViajePanel
                 onPredictMulti={handlePredict}
@@ -252,7 +252,7 @@ export function Layout() {
                 setActivePanel(null);
                 setShowRoutesOnMap(false);
               }}
-              title="Rutas del sistema"
+              title={t("nav.rutas")}
             >
               <RutasPanel
                 activeFilter={routeFilter}
@@ -270,14 +270,14 @@ export function Layout() {
             <SidePanel
               isOpen={activePanel === "accesibilidad"}
               onClose={() => setActivePanel(null)}
-              title="Accesibilidad"
+              title={t("nav.accesibilidad")}
             >
               <AccesibilidadPanel />
             </SidePanel>
             <SidePanel
               isOpen={activePanel === "metricas"}
               onClose={() => setActivePanel(null)}
-              title="Métricas del Grafo"
+              title={t("nav.metricas")}
             >
               <MetricasPanel />
             </SidePanel>
@@ -361,7 +361,7 @@ export function Layout() {
                   ? "bg-danger text-white shadow-danger/30"
                   : "bg-background/90 text-default-500 border border-divider hover:text-danger"
               }`}
-              title="Zonas de riesgo vial"
+              title={t("safety.riskZones")}
             >
               <AlertTriangle size={18} />
             </button>
