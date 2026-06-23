@@ -1,6 +1,7 @@
 import { Moon, Sun, Globe, Bell, Info } from "lucide-react";
 import { AppModal } from "@shared/ui/AppModal";
 import { useTheme } from "@shared/hooks/useTheme";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   isOpen: boolean;
@@ -9,6 +10,11 @@ interface Props {
 
 export function ConfigModal({ isOpen, onClose }: Props) {
   const { theme, toggle } = useTheme();
+  const { i18n } = useTranslation();
+
+  const toggleLang = () => {
+    i18n.changeLanguage(i18n.language === "es" ? "en" : "es");
+  };
 
   return (
     <AppModal isOpen={isOpen} onClose={onClose} title="Configuración" size="md">
@@ -45,7 +51,12 @@ export function ConfigModal({ isOpen, onClose }: Props) {
               </p>
             </div>
           </div>
-          <span className="text-xs text-default-500">Español</span>
+          <button
+            onClick={toggleLang}
+            className="px-3 py-1.5 rounded-lg bg-default-100 text-xs font-semibold hover:bg-default-200 transition-colors"
+          >
+            {i18n.language === "es" ? "Español" : "English"}
+          </button>
         </div>
 
         <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">
