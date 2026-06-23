@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useNotifications, AppNotification } from "@shared/hooks/useNotifications";
 import { useState, useRef, useEffect } from "react";
 import {
   X,
@@ -9,53 +10,8 @@ import {
   Maximize2,
 } from "lucide-react";
 
-interface Notification {
-  id: string;
-  type: "alert" | "info" | "success";
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-}
 
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: "1",
-    type: "alert",
-    title: "Ruta B5 con demora",
-    message:
-      "La troncal Caracas presenta demoras de 15 min por incidente vial.",
-    time: "Hace 5 min",
-    read: false,
-  },
-  {
-    id: "2",
-    type: "info",
-    title: "Nueva ruta disponible",
-    message:
-      "Se habilitó la ruta J74 con recorrido extendido hasta Portal Norte.",
-    time: "Hace 30 min",
-    read: false,
-  },
-  {
-    id: "3",
-    type: "success",
-    title: "Ruta guardada",
-    message: "Tu ruta Portal Norte → Calle 72 fue guardada exitosamente.",
-    time: "Hace 1 hora",
-    read: true,
-  },
-  {
-    id: "4",
-    type: "alert",
-    title: "Zona de alto riesgo",
-    message: "Se detectó congestión crítica en Av. Caracas con Calle 72.",
-    time: "Hace 2 horas",
-    read: true,
-  },
-];
-
-function NotifIcon({ type }: { readonly type: Notification["type"] }) {
+function NotifIcon({ type }: { readonly type: string }) {
   if (type === "alert")
     return <AlertTriangle size={14} className="text-warning shrink-0" />;
   if (type === "success")
@@ -63,7 +19,7 @@ function NotifIcon({ type }: { readonly type: Notification["type"] }) {
   return <Info size={14} className="text-primary shrink-0" />;
 }
 
-function NotifItem({ notif }: { readonly notif: Notification }) {
+function NotifItem({ notif }: { readonly notif: AppNotification }) {
   return (
     <div
       className={`flex gap-2.5 px-4 py-3 border-b border-divider/30 hover:bg-default-50 transition-colors cursor-pointer ${
@@ -81,9 +37,9 @@ function NotifItem({ notif }: { readonly notif: Notification }) {
           )}
         </div>
         <p className="text-[10px] text-default-500 mt-0.5 line-clamp-1">
-          {notif.message}
+          {notif.body}
         </p>
-        <p className="text-[9px] text-default-400 mt-0.5">{notif.time}</p>
+        <p className="text-[9px] text-default-400 mt-0.5">{new Date(notif.createdAt).toLocaleString()}</p>
       </div>
     </div>
   );
@@ -96,9 +52,10 @@ export function NotificationsDropdown({
   readonly onExpand: () => void;
 }) {
   const { t } = useTranslation();
+  const { notifications, unreadCount, markAllRead } = useNotifications();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const unread = MOCK_NOTIFICATIONS.filter((n) => !n.read).length;
+  const unread = unreadCount;
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -147,14 +104,14 @@ export function NotificationsDropdown({
 
           {/* List (max 3) */}
           <div className="max-h-[280px] overflow-y-auto">
-            {MOCK_NOTIFICATIONS.slice(0, 3).map((n) => (
+            {notifications.slice(0, 3).map((n) => (
               <NotifItem key={n.id} notif={n} />
             ))}
           </div>
 
           {/* Footer */}
           <div className="px-4 py-2 border-t border-divider flex items-center justify-between">
-            <button className="text-[9px] text-primary font-medium hover:underline">
+            <button onClick={markAllRead} className="text-[9px] text-primary font-medium hover:underline">
               {t("notifications.markAllRead")}
             </button>
             <button
@@ -182,14 +139,15 @@ export function NotificationsModal({
   readonly onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const { notifications, unreadCount, markAllRead, clear } = useNotifications();
   const [tab, setTab] = useState<"all" | "unread">("all");
 
   if (!isOpen) return null;
 
   const filtered =
     tab === "unread"
-      ? MOCK_NOTIFICATIONS.filter((n) => !n.read)
-      : MOCK_NOTIFICATIONS;
+      ? notifications.filter((n) => !n.read)
+      : notifications;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
@@ -229,7 +187,7 @@ export function NotificationsModal({
                 : "text-default-400"
             }`}
           >
-            {t("notifications.all")} ({MOCK_NOTIFICATIONS.length})
+            {t("notifications.all")} ({notifications.length})
           </button>
           <button
             onClick={() => setTab("unread")}
@@ -239,7 +197,7 @@ export function NotificationsModal({
                 : "text-default-400"
             }`}
           >
-            {t("notifications.unread")} ({MOCK_NOTIFICATIONS.filter((n) => !n.read).length})
+            {t("notifications.unread")} ({unreadCount})
           </button>
         </div>
 
@@ -259,10 +217,10 @@ export function NotificationsModal({
 
         {/* Footer */}
         <div className="px-5 py-3 border-t border-divider flex items-center justify-between">
-          <button className="text-[10px] text-primary font-medium hover:underline">
+          <button onClick={markAllRead} className="text-[10px] text-primary font-medium hover:underline">
             {t("notifications.markAllRead")}
           </button>
-          <button className="text-[10px] text-default-400 hover:text-danger">
+          <button onClick={clear} className="text-[10px] text-default-400 hover:text-danger">
             {t("notifications.clear")}
           </button>
         </div>
