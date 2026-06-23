@@ -18,7 +18,7 @@ function getRiskLabel(risk: string) {
 
 const AI_URL = "http://localhost:8000";
 
-function ParaderoPopupContent({ id, nombre, direccion, demanda, color }: any) {
+function ParaderoPopupContent({ id, nombre, direccion, color }: any) {
   const [aiData, setAiData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -85,12 +85,7 @@ export function SitpLayer() {
     return "#22c55e"; // Baja
   };
 
-  const getDemandaLabel = (score: number) => {
-    if (!score) return "Baja";
-    if (score > 70) return "Alta";
-    if (score > 30) return "Media";
-    return "Baja";
-  };
+
   return (
     <>
       {paraderos.map((p, i) => {
@@ -118,7 +113,6 @@ export function SitpLayer() {
                 id={p.properties?.cenefa || p.id || p.properties?.objectid}
                 nombre={nombre}
                 direccion={direccion}
-                demanda={demanda}
                 color={color}
               />
             </Popup>
