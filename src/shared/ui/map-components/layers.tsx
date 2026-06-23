@@ -24,8 +24,8 @@ function ParaderoPopupContent({ id, nombre, direccion, color }: any) {
 
   useEffect(() => {
     fetch(`${AI_URL}/predictions/sitp/paradero/${id}/info`)
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
         setAiData(d);
         setLoading(false);
       })
@@ -38,27 +38,38 @@ function ParaderoPopupContent({ id, nombre, direccion, color }: any) {
       <br />
       <span style={{ color: "#888" }}>{direccion}</span>
       <br />
-      <div style={{ marginTop: 4, padding: "4px 0", borderTop: "1px solid #eee" }}>
+      <div
+        style={{ marginTop: 4, padding: "4px 0", borderTop: "1px solid #eee" }}
+      >
         {loading ? (
-          <span style={{ color: "#666" }}>Conectando con IA para predicción...</span>
+          <span style={{ color: "#666" }}>
+            Conectando con IA para predicción...
+          </span>
         ) : aiData ? (
           <>
             <span style={{ color: color, fontWeight: 600 }}>
-              Demanda {aiData.nivel_demanda} ({Math.round(aiData.demanda_actual_score)}%)
+              Demanda {aiData.nivel_demanda} (
+              {Math.round(aiData.demanda_actual_score)}%)
             </span>
             <div style={{ marginTop: 4, maxHeight: 100, overflowY: "auto" }}>
               {aiData.rutas.map((r: any) => (
                 <div key={r.ruta} style={{ marginBottom: 4 }}>
-                  <span style={{ fontWeight: 600 }}>{r.ruta}</span>: Espera {r.tiempo_espera_predicho}
-                  <span style={{ fontSize: 9, color: "#888", display: "block" }}>
-                    (Frec. base: {r.frecuencia_estimada_min}m | Riesgo: {r.congestion_esperada})
+                  <span style={{ fontWeight: 600 }}>{r.ruta}</span>: Espera{" "}
+                  {r.tiempo_espera_predicho}
+                  <span
+                    style={{ fontSize: 9, color: "#888", display: "block" }}
+                  >
+                    (Frec. base: {r.frecuencia_estimada_min}m | Riesgo:{" "}
+                    {r.congestion_esperada})
                   </span>
                 </div>
               ))}
             </div>
           </>
         ) : (
-          <span style={{ color: "#ef4444" }}>No se pudo obtener predicción AI.</span>
+          <span style={{ color: "#ef4444" }}>
+            No se pudo obtener predicción AI.
+          </span>
         )}
       </div>
     </div>
@@ -67,7 +78,7 @@ function ParaderoPopupContent({ id, nombre, direccion, color }: any) {
 
 export function SitpLayer() {
   const [paraderos, setParaderos] = useState<any[]>([]);
-  
+
   useEffect(() => {
     fetch(`${API_URL}/graph/sitp/paraderos`)
       .then((r) => (r.ok ? r.json() : { features: [] }))
@@ -85,14 +96,14 @@ export function SitpLayer() {
     return "#22c55e"; // Baja
   };
 
-
   return (
     <>
       {paraderos.map((p, i) => {
         const lat = p.geometry.coordinates[1];
         const lon = p.geometry.coordinates[0];
         const nombre = p.properties.nombre || "";
-        const direccion = p.properties.direccion_bandera || p.properties.via || "";
+        const direccion =
+          p.properties.direccion_bandera || p.properties.via || "";
         const demanda = p.properties.demanda_score || 0;
         const color = getDemandaColor(demanda);
 

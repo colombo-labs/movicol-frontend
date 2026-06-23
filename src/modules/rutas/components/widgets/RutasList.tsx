@@ -205,7 +205,9 @@ export function RutasList(props: Props) {
         !search ||
         r.ruta.toLowerCase().includes(search.toLowerCase()) ||
         r.cenefa.toLowerCase().includes(search.toLowerCase()) ||
-        r.paraderos.some((p: any) => p.nombre.toLowerCase().includes(search.toLowerCase()));
+        r.paraderos.some((p: any) =>
+          p.nombre.toLowerCase().includes(search.toLowerCase()),
+        );
       const matchNearby = filter !== "cercanas" || nearbyRutas.includes(r.ruta);
       return matchSearch && matchNearby;
     })
