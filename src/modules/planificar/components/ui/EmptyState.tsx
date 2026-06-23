@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import { useSavedRoutes } from "@shared/hooks/useSavedRoutes";
 import { Clock, ChevronRight, MapPin, LocateFixed } from "lucide-react";
 import type { TripPoint } from "@/app/Layout";
@@ -10,7 +9,6 @@ interface Props {
 }
 
 export function EmptyState({ tripPoints, onUseMyLocation, onAddPoint }: Props) {
-  const { t } = useTranslation();
   return (
     <>
       {tripPoints.length === 0 && (
@@ -30,24 +28,6 @@ export function EmptyState({ tripPoints, onUseMyLocation, onAddPoint }: Props) {
 
       {tripPoints.length === 0 && <RecentRoutes onAddPoint={onAddPoint} />}
 
-      {tripPoints.length === 0 && (
-        <button
-          onClick={() => onUseMyLocation()}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/30 text-sm font-medium text-primary hover:bg-primary/20 transition-all active:scale-[0.98]"
-        >
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-            <LocateFixed size={16} className="text-primary animate-pulse" />
-          </div>
-          <div className="text-left">
-            <span className="block text-primary font-semibold text-sm">
-              {t("planner.useMyLocation")}
-            </span>
-            <span className="block text-[10px] text-primary/60">
-              Toca para iniciar desde donde estás
-            </span>
-          </div>
-        </button>
-      )}
       {tripPoints.length === 1 && (
         <div className="flex gap-2">
           <button
