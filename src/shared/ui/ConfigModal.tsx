@@ -13,7 +13,9 @@ export function ConfigModal({ isOpen, onClose }: Props) {
   const { t, i18n } = useTranslation();
 
   const toggleLang = () => {
-    i18n.changeLanguage(i18n.language === "es" ? "en" : "es");
+    const langs = ["es", "en", "fr", "pt"];
+    const current = langs.indexOf(i18n.language);
+    i18n.changeLanguage(langs[(current + 1) % langs.length]);
   };
 
   return (
@@ -55,7 +57,7 @@ export function ConfigModal({ isOpen, onClose }: Props) {
             onClick={toggleLang}
             className="px-3 py-1.5 rounded-lg bg-default-100 text-xs font-semibold hover:bg-default-200 transition-colors"
           >
-            {i18n.language === "es" ? "Español" : "English"}
+            {i18n.language === "es" ? "Español" : i18n.language === "en" ? "English" : i18n.language === "fr" ? "Français" : "Português"}
           </button>
         </div>
 
