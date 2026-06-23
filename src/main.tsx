@@ -1,14 +1,23 @@
 import { HeroUIProvider } from "@heroui/react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import { App } from "./app/App";
+import { Layout } from "./app/Layout";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <HeroUIProvider>
     <BrowserRouter>
-      <App />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="/planificar" replace />} />
+          <Route path="planificar" element={null} />
+          <Route path="rutas" element={null} />
+          <Route path="accesibilidad" element={null} />
+          <Route path="metricas" element={null} />
+          <Route path="admin" element={null} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   </HeroUIProvider>,
 );
