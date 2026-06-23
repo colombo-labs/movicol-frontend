@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Users, Shield, Key, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { UsersTab } from "../components/UsersTab";
 import { RolesTab } from "../components/RolesTab";
 import { PermissionsTab } from "../components/PermissionsTab";
@@ -9,14 +10,15 @@ type Tab = "users" | "roles" | "permissions";
 export function AdminPanel() {
   const [tab, setTab] = useState<Tab>("users");
   const [showCreate, setShowCreate] = useState(false);
+  const { t } = useTranslation();
 
   const tabs = [
-    { id: "users" as Tab, label: "Usuarios", icon: Users },
-    { id: "roles" as Tab, label: "Roles", icon: Shield },
-    { id: "permissions" as Tab, label: "Permisos", icon: Key },
+    { id: "users" as Tab, label: t("admin.users"), icon: Users },
+    { id: "roles" as Tab, label: t("admin.roles"), icon: Shield },
+    { id: "permissions" as Tab, label: t("admin.permissions"), icon: Key },
   ];
 
-  const createLabel = tab === "roles" ? "Crear rol" : tab === "permissions" ? "Crear permiso" : null;
+  const createLabel = tab === "roles" ? t("admin.create") + " " + t("admin.roles").toLowerCase() : tab === "permissions" ? t("admin.create") + " " + t("admin.permissions").toLowerCase() : null;
 
   return (
     <div className="h-full flex flex-col border border-divider rounded-xl overflow-hidden bg-background">

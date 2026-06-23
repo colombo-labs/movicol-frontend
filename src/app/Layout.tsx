@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
 
 import { Sidebar, type PanelId } from "@shared/ui/Sidebar";
@@ -53,6 +54,7 @@ function handleGeoSuccess(
 
 export function Layout() {
   const location = useLocation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const activePanel = (location.pathname.split("/")[1] || "planificar") as PanelId;
   const setActivePanel = useCallback(
@@ -285,13 +287,13 @@ export function Layout() {
                 <div className="w-full max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-5 min-h-full flex flex-col">
                   <div className="flex items-center justify-between mb-4 md:mb-5 shrink-0">
                     <h1 className="text-sm md:text-base font-bold text-foreground">
-                      Administración
+                      {t("admin.title")}
                     </h1>
                     <button
                       onClick={() => setActivePanel("planificar")}
                       className="text-[10px] md:text-[11px] text-default-500 hover:text-foreground px-2.5 py-1.5 rounded-lg border border-divider hover:border-primary/50 transition-all"
                     >
-                      ← Mapa
+                      {t("admin.back")}
                     </button>
                   </div>
                   <div className="flex-1 min-h-0 overflow-y-auto">
