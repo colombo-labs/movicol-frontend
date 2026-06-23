@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/shared/hooks/useAuth";
 import { LogIn, LogOut, User, Settings } from "lucide-react";
@@ -10,6 +11,7 @@ export function AuthButton({
   readonly onProfileOpen?: () => void;
 }) {
   const { user, isAuthenticated, isLoading, login, logout } = useAuth();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -31,7 +33,7 @@ export function AuthButton({
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-default-100 border border-divider text-[11px] font-medium text-default-600 hover:bg-default-200 transition-all"
       >
         <LogIn size={14} />
-        Iniciar sesión
+        {t("auth.login")}
       </button>
     );
   }
@@ -71,7 +73,7 @@ export function AuthButton({
               className="w-full flex items-center gap-2 px-4 py-2 text-[11px] text-default-600 hover:bg-default-100 transition-all"
             >
               <User size={14} />
-              Mi perfil
+              {t("auth.profile")}
             </button>
             <button
               onClick={() => {
@@ -81,7 +83,7 @@ export function AuthButton({
               className="w-full flex items-center gap-2 px-4 py-2 text-[11px] text-default-600 hover:bg-default-100 transition-all"
             >
               <Settings size={14} />
-              Configuración
+              {t("auth.settings")}
             </button>
             <button
               onClick={() => {
@@ -91,7 +93,7 @@ export function AuthButton({
               className="w-full flex items-center gap-2 px-4 py-2 text-[11px] text-danger hover:bg-danger/10 transition-all"
             >
               <LogOut size={14} />
-              Cerrar sesión
+              {t("auth.logout")}
             </button>
           </div>
         </div>

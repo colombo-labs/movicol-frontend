@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Navigation, Route, Accessibility, BarChart3, ShieldCheck } from "lucide-react";
 import type { PanelId } from "./Sidebar";
 import { useAuth } from "@/shared/hooks/useAuth";
@@ -12,18 +13,19 @@ const items: {
   icon: typeof Navigation;
   label: string;
 }[] = [
-  { id: "planificar", icon: Navigation, label: "Viaje" },
-  { id: "rutas", icon: Route, label: "Rutas" },
-  { id: "accesibilidad", icon: Accessibility, label: "Acceso" },
-  { id: "metricas", icon: BarChart3, label: "Datos" },
+  { id: "planificar", icon: Navigation, label: "nav.viaje" },
+  { id: "rutas", icon: Route, label: "nav.rutas" },
+  { id: "accesibilidad", icon: Accessibility, label: "nav.acceso" },
+  { id: "metricas", icon: BarChart3, label: "nav.datos" },
 ];
 
 export function MobileNav({ activePanel, onTogglePanel }: MobileNavProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const isAdmin = user?.role?.name === "admin";
 
   const visibleItems = isAdmin
-    ? [...items, { id: "admin" as const, icon: ShieldCheck, label: "Admin" }]
+    ? [...items, { id: "admin" as const, icon: ShieldCheck, label: "nav.admin" }]
     : items;
 
   return (
@@ -45,7 +47,7 @@ export function MobileNav({ activePanel, onTogglePanel }: MobileNavProps) {
             <span
               className={`text-[9px] leading-tight ${isActive ? "font-bold" : "font-medium"}`}
             >
-              {item.label}
+              {t(item.label)}
             </span>
           </button>
         );
