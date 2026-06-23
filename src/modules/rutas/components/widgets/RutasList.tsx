@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useRequireAuth } from "@shared/hooks/useRequireAuth";
+import { useFavorites } from "@shared/hooks/useFavorites";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import {
@@ -113,6 +114,15 @@ interface Props extends RutasPanelProps {
 export function RutasList(props: Props) {
   const { t } = useTranslation();
   const { requireAuth } = useRequireAuth();
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const isFav = (code: string) => favorites.some((f) => f.data?.code === code);
+  const toggleFav = (code: string, label: string) => {
+    requireAuth(() => {
+      const existing = favorites.find((f) => f.data?.code === code);
+      if (existing) removeFavorite(existing.id);
+      else addFavorite("route", label, { code });
+    });
+  };
   const {
     tab,
     tmTroncales,
@@ -210,7 +220,8 @@ export function RutasList(props: Props) {
         r.ruta.toLowerCase().includes(search.toLowerCase()) ||
         r.cenefa.toLowerCase().includes(search.toLowerCase());
       const matchNearby = filter !== "cercanas" || nearbyRutas.includes(r.ruta);
-      return matchSearch && matchNearby;
+      const matchFav = filter !== "favoritas" || isFav(r.ruta);
+      return matchSearch && matchNearby && matchFav;
     })
     .sort((a, b) => {
       if (filter !== "cercanas") return 0;
@@ -435,6 +446,9 @@ export function RutasList(props: Props) {
                         {r.paraderos.length} paradas
                       </span>
                     )}
+                    <button onClick={(e) => { e.stopPropagation(); toggleFav(r.ruta, r.ruta); }} className="p-1 hover:scale-110 transition-transform">
+                      <Star size={12} className={isFav(r.ruta) ? "fill-yellow-400 text-yellow-400" : "text-default-300"} />
+                    </button>
                   </div>
                   <p className="text-xs text-default-500">
                     {r.paraderos.length > 0
@@ -507,7 +521,8 @@ export function RutasList(props: Props) {
               const matchDemora =
                 filter !== "demora" ||
                 alerts.affectedCodes.some((c) => r.codigo.includes(c));
-              return matchSearch && matchType && matchNearby && matchDemora;
+              const matchFav = filter !== "favoritas" || isFav(r.codigo);
+              return matchSearch && matchType && matchNearby && matchDemora && matchFav;
             });
             const pageSize = 15;
             const totalPages = Math.ceil(filtered.length / pageSize);
@@ -599,6 +614,9 @@ export function RutasList(props: Props) {
                               ? `📍 ${nearbyInfo.get(r.codigo)!.distancia}m`
                               : r.tipo_bus.toLowerCase()}
                           </span>
+                          <button onClick={(e) => { e.stopPropagation(); toggleFav(r.codigo, r.codigo); }} className="p-1 hover:scale-110 transition-transform">
+                            <Star size={12} className={isFav(r.codigo) ? "fill-yellow-400 text-yellow-400" : "text-default-300"} />
+                          </button>
                         </div>
                         <p className="text-xs text-default-500">
                           {r.origen} → {r.destino}
