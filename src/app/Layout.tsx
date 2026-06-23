@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { AlertTriangle } from "lucide-react";
 
 import { Sidebar, type PanelId } from "@shared/ui/Sidebar";
@@ -51,7 +52,18 @@ function handleGeoSuccess(
 }
 
 export function Layout() {
-  const [activePanel, setActivePanel] = useState<PanelId>("planificar");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activePanel = (searchParams.get("panel") || "planificar") as PanelId;
+  const setActivePanel = useCallback(
+    (id: PanelId) => {
+      if (id && id !== "planificar") {
+        setSearchParams({ panel: id });
+      } else {
+        setSearchParams({});
+      }
+    },
+    [setSearchParams],
+  );
   const [showTroncales, setShowTroncales] = useState(false);
   const [showEstaciones, setShowEstaciones] = useState(false);
   const [showSitpOnMap, setShowSitpOnMap] = useState(false);
