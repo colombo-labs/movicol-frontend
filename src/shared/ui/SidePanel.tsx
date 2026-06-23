@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { X, ChevronUp, ChevronDown, Minus } from "lucide-react";
 import {
   type ReactNode,
@@ -30,6 +31,7 @@ export function SidePanel({
 }: SidePanelProps) {
   const startY = useRef(0);
   const [snap, setSnap] = useState<SnapPoint>("half");
+  const { t } = useTranslation();
   const [city, setCity] = useState("");
 
   useEffect(() => {
@@ -114,7 +116,7 @@ export function SidePanel({
             {city && <span className="w-px h-2.5 bg-divider" />}
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-              <span>Conectado</span>
+              <span>{t("app.connected")}</span>
             </span>
             <span className="w-px h-2.5 bg-divider" />
             <span>

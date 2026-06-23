@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import {
@@ -109,6 +110,7 @@ interface Props extends RutasPanelProps {
 }
 
 export function RutasList(props: Props) {
+  const { t } = useTranslation();
   const {
     tab,
     tmTroncales,
@@ -306,7 +308,7 @@ export function RutasList(props: Props) {
         <Search size={14} className="text-default-400" />
         <input
           type="text"
-          placeholder="Buscar ruta, origen o destino..."
+          placeholder={t("routes.search")}
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);

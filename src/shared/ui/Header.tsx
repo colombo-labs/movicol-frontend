@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Moon, Sun, Bus } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@shared/hooks/useTheme";
@@ -7,6 +8,7 @@ import { AuthButton } from "./AuthButton";
 import { NotificationsDropdown, NotificationsModal } from "./NotificationsModal";
 
 export function Header() {
+  const { t } = useTranslation();
   const { theme, toggle } = useTheme();
   const [configOpen, setConfigOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -25,7 +27,7 @@ export function Header() {
               Movi<span className="text-[#2d8a5e]">Col</span>
             </span>
             <span className="text-[9px] text-default-400">
-              Transporte inteligente
+              {t("app.subtitle")}
             </span>
           </span>
         </span>
