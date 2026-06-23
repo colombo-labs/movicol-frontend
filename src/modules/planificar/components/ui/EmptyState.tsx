@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useSavedRoutes } from "@shared/hooks/useSavedRoutes";
 import { Clock, ChevronRight, MapPin, LocateFixed } from "lucide-react";
 import type { TripPoint } from "@/app/Layout";
 
@@ -91,9 +92,8 @@ function RecentRoutes({
 }: {
   readonly onAddPoint?: (lat: number, lng: number, label: string) => void;
 }) {
-  const saved = JSON.parse(
-    localStorage.getItem("movicol_saved_routes") || "[]",
-  );
+  const { routes: rawSaved } = useSavedRoutes();
+  const saved = rawSaved.map((r) => ({ origin: r.originLabel, dest: r.destLabel, originLat: r.originLat, originLng: r.originLng, destLat: r.destLat, destLng: r.destLng, time: r.estimatedMinutes || 0, date: new Date(r.createdAt).toLocaleDateString() }));
   if (saved.length === 0) return null;
   return (
     <div className="space-y-1.5">

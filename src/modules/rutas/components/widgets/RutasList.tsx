@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useRequireAuth } from "@shared/hooks/useRequireAuth";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import {
@@ -111,6 +112,7 @@ interface Props extends RutasPanelProps {
 
 export function RutasList(props: Props) {
   const { t } = useTranslation();
+  const { requireAuth } = useRequireAuth();
   const {
     tab,
     tmTroncales,
@@ -330,7 +332,7 @@ export function RutasList(props: Props) {
           <button
             key={f.id}
             onClick={() => {
-              setFilter(f.id);
+              if (f.id === "favoritas") { requireAuth(() => { setFilter(f.id); setSitpPage(() => 0); }); return; } setFilter(f.id);
               setSitpPage(() => 0);
             }}
             className={`flex-1 py-1.5 rounded-lg text-[10px] font-semibold transition-all capitalize flex items-center justify-center gap-1 ${filter === f.id ? "bg-primary/20 text-primary" : "text-default-400 hover:text-foreground"}`}

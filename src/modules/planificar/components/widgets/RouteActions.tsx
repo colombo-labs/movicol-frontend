@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import { useRequireAuth } from "@shared/hooks/useRequireAuth";
+import { useSavedRoutes } from "@shared/hooks/useSavedRoutes";
 import { useState, useEffect, useRef } from "react";
 import {
   Navigation,
@@ -30,6 +32,8 @@ export function ActionButtons({
   readonly onClear: () => void;
 }) {
   const { t } = useTranslation();
+  const { requireAuth } = useRequireAuth();
+  const { save: saveRoute } = useSavedRoutes();
   return (
     <>
       <button className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.95] shadow-lg shadow-primary/30">
@@ -52,39 +56,59 @@ export function ActionButtons({
           {t("route.share")}
         </button>
         <button
-          onClick={() => {
+          onClick={() => requireAuth(async () => {
             const origin = tripPoints[0];
             const dest = tripPoints.slice(-1)[0];
             if (!origin || !dest) return;
-            const saved = JSON.parse(
-              localStorage.getItem("movicol_saved_routes") || "[]",
-            );
-            saved.unshift({
-              origin:
-                origin.label ||
-                `${origin.lat.toFixed(4)}, ${origin.lng.toFixed(4)}`,
+            await saveRoute({
+              originLabel: origin.label || `${origin.lat.toFixed(4)}, ${origin.lng.toFixed(4)}`,
               originLat: origin.lat,
               originLng: origin.lng,
-              dest:
-                dest.label || `${dest.lat.toFixed(4)}, ${dest.lng.toFixed(4)}`,
+              destLabel: dest.label || `${dest.lat.toFixed(4)}, ${dest.lng.toFixed(4)}`,
               destLat: dest.lat,
               destLng: dest.lng,
-              time: Math.round(prediction.total_time_minutes),
-              date: new Date().toLocaleDateString(),
+              estimatedMinutes: Math.round(prediction.total_time_minutes),
+              mode: "publico",
             });
-            localStorage.setItem(
-              "movicol_saved_routes",
-              JSON.stringify(saved.slice(0, 5)),
-            );
-            // Feedback visual
             const btn = document.activeElement as HTMLButtonElement;
             if (btn) {
-              btn.textContent = "✓ Guardado";
-              setTimeout(() => {
-                btn.textContent = t("planner.save");
-              }, 1500);
+              btn.textContent = "✓";
+              setTimeout(() => { btn.textContent = t("planner.save"); }, 1500);
             }
-          }}
+          })}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
           {t("route.save")}
