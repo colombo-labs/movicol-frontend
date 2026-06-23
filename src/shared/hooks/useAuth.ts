@@ -20,6 +20,14 @@ export function useAuth() {
       const res = await fetch("/api/auth/me");
       if (res.ok) {
         setUser(await res.json());
+      } else if (res.status === 401) {
+        // Try refresh token
+        const refreshRes = await fetch("/api/auth/refresh", { method: "POST" });
+        if (refreshRes.ok) {
+          const retry = await fetch("/api/auth/me");
+          if (retry.ok) { setUser(await retry.json()); return; }
+        }
+        setUser(null);
       } else {
         setUser(null);
       }
