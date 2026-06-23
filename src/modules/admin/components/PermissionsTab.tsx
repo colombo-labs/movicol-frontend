@@ -92,7 +92,7 @@ export function PermissionsTab({
           <p className="text-[9px] font-medium text-default-500 mb-1">Buscar</p>
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider">
             <Search size={13} className="text-default-400" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Permiso o descripción..." className="flex-1 bg-transparent text-[11px] outline-none" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} name="admin-search-perms" placeholder="Permiso o descripción..." className="flex-1 bg-transparent text-[11px] outline-none" />
           </div>
         </div>
         <div className="w-[140px]">
@@ -213,15 +213,15 @@ export function PermissionsTab({
             <div className="space-y-3">
               <div>
                 <p className="text-[9px] font-medium text-default-500 mb-1">Módulo</p>
-                <input value={module} onChange={(e) => setModule(e.target.value)} placeholder="ej: rutas" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
+                <input value={module} onChange={(e) => setModule(e.target.value)} name="perm-module" placeholder="ej: rutas" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
               </div>
               <div>
                 <p className="text-[9px] font-medium text-default-500 mb-1">Acción</p>
-                <input value={action} onChange={(e) => setAction(e.target.value)} placeholder="ej: crear" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
+                <input value={action} onChange={(e) => setAction(e.target.value)} name="perm-action" placeholder="ej: crear" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
               </div>
               <div>
                 <p className="text-[9px] font-medium text-default-500 mb-1">Descripción</p>
-                <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="ej: Crear rutas nuevas" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
+                <input value={description} onChange={(e) => setDescription(e.target.value)} name="perm-desc" placeholder="ej: Crear rutas nuevas" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
               </div>
               <p className="text-[9px] text-default-400">Key: <strong>{module || "modulo"}.{action || "accion"}</strong></p>
               <button onClick={create} className="w-full py-2.5 rounded-lg bg-primary text-white text-[11px] font-medium">Crear permiso</button>

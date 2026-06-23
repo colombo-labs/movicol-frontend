@@ -144,7 +144,7 @@ export function UsersTab() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Nombre o email..."
+              name="admin-search-users" placeholder="Nombre o email..."
               className="flex-1 bg-transparent text-[11px] outline-none"
             />
           </div>

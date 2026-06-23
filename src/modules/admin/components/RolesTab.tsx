@@ -110,7 +110,7 @@ export function RolesTab({
           <p className="text-[9px] font-medium text-default-500 mb-1">Buscar</p>
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider">
             <Search size={13} className="text-default-400" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nombre del rol..." className="flex-1 bg-transparent text-[11px] outline-none" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} name="admin-search-roles" placeholder="Nombre del rol..." className="flex-1 bg-transparent text-[11px] outline-none" />
           </div>
         </div>
       </div>
@@ -149,11 +149,11 @@ export function RolesTab({
             <div className="space-y-3">
               <div>
                 <p className="text-[9px] font-medium text-default-500 mb-1">Nombre</p>
-                <input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Nombre del rol" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
+                <input value={newName} onChange={(e) => setNewName(e.target.value)} name="role-name" placeholder="Nombre del rol" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
               </div>
               <div>
                 <p className="text-[9px] font-medium text-default-500 mb-1">Descripción</p>
-                <input value={newDesc} onChange={(e) => setNewDesc(e.target.value)} placeholder="Descripción (opcional)" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
+                <input value={newDesc} onChange={(e) => setNewDesc(e.target.value)} name="role-desc" placeholder="Descripción (opcional)" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
               </div>
               <button onClick={createRole} className="w-full py-2 rounded-lg bg-primary text-white text-[11px] font-medium">Crear</button>
             </div>
