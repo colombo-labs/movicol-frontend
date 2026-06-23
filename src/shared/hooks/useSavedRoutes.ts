@@ -21,7 +21,10 @@ export function useSavedRoutes() {
   const fetch_ = useCallback(async () => {
     if (!isAuthenticated) return;
     const res = await fetch("/api/saved-routes");
-    if (res.ok) setRoutes(await res.json());
+    if (res.ok) {
+      const data = await res.json();
+      setRoutes(data.map((r: any) => ({ ...r, originLat: +r.originLat, originLng: +r.originLng, destLat: +r.destLat, destLng: +r.destLng })));
+    }
   }, [isAuthenticated]);
 
   useEffect(() => { fetch_(); }, [fetch_]);

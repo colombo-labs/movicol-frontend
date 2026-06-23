@@ -10,6 +10,7 @@ import type {
   RouteOption,
 } from "../models/types";
 import { TripPointsList } from "../components/ui/TripPointsList";
+import { EmptyState } from "../components/ui/EmptyState";
 import {
   ModeTabs,
   RouteOptionsList,
@@ -137,6 +138,8 @@ export function PlanificarViajePanel({
         onUpdatePoint={onUpdatePoint}
         onRequestAddPoint={onRequestAddPoint}
       />
+
+      <EmptyState tripPoints={tripPoints} onUseMyLocation={onUseMyLocation} onAddPoint={onAddPoint} />
 
       {/* Departure time */}
       <div className="flex items-center gap-2 flex-wrap">
