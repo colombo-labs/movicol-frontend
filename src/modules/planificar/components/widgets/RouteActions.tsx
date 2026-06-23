@@ -136,14 +136,14 @@ export function QuickActions({ onFocusMap }: { readonly onFocusMap: () => void }
     }
   };
 
-  const handleShareLive = () => {
+  const handleShareLive = async () => {
     const url = `${window.location.origin}/planificar?shared=true`;
-    if (navigator.share) {
-      navigator.share({ title: "Mi viaje en MoviCol", url });
-    } else {
-      navigator.clipboard.writeText(url);
-    }
+    try {
+      if (navigator.share) await navigator.share({ title: "Mi viaje en MoviCol", url });
+      else await navigator.clipboard.writeText(url);
+    } catch { /* user cancelled */ }
   };
+
 
   const handleReport = () => {
     setReported(true);

@@ -413,8 +413,7 @@ export function RutasList(props: Props) {
           filteredSitp
             .slice(sitpPage * SITP_PAGE_SIZE, (sitpPage + 1) * SITP_PAGE_SIZE)
             .map((r) => (
-              <button
-                type="button"
+              <div
                 key={r.ruta}
                 onClick={() => onSelectRuta(r)}
                 className="cursor-pointer w-full text-left"
@@ -462,7 +461,7 @@ export function RutasList(props: Props) {
                     </p>
                   )}
                 </GlassCard>
-              </button>
+              </div>
             ))}
         {tab === "sitp" &&
           (() => {
@@ -581,8 +580,7 @@ export function RutasList(props: Props) {
                     props.onSelectTmRuta?.(r);
                   };
                   return (
-                    <button
-                      type="button"
+                    <div
                       key={`tmr-${r.codigo}`}
                       onClick={handleTmClick}
                       className="cursor-pointer w-full text-left"
@@ -626,7 +624,7 @@ export function RutasList(props: Props) {
                           {r.estado}
                         </p>
                       </GlassCard>
-                    </button>
+                    </div>
                   );
                 })}
                 {totalPages > 1 && (
