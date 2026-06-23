@@ -10,6 +10,7 @@ interface ModeTabsProps {
 }
 
 export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex gap-1.5">
       <button
@@ -18,7 +19,7 @@ export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
         className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border text-[11px] font-semibold transition-all ${mode === "publico" ? "border-primary bg-primary/10 text-primary" : "border-divider text-default-500 hover:border-primary/50"}`}
       >
         <Train size={14} />
-        Transporte público
+        {t("planner.publicTransport")}
         {optionsCount && mode === "publico" ? (
           <span className="text-[8px] px-1 py-0.5 rounded-full bg-primary/20">
             {optionsCount}
@@ -31,7 +32,7 @@ export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
         className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border text-[11px] font-semibold transition-all ${mode === "vehiculo" ? "border-primary bg-primary/10 text-primary" : "border-divider text-default-500 hover:border-primary/50"}`}
       >
         <Car size={14} />
-        Vehículo
+        {t("planner.vehicle")}
       </button>
     </div>
   );
@@ -92,11 +93,11 @@ function getDotColor(type: RouteLeg["type"]): string {
   return "bg-blue-500";
 }
 
-function getLegLabel(type: RouteLeg["type"], line?: string): string {
+function getLegLabel(type: RouteLeg["type"], line: string | undefined, t: (k: string) => string): string {
   const labels: Record<string, string> = {
-    walk: "Caminar",
+    walk: t("planner.walking"),
     transmilenio: "TransMilenio",
-    drive: "Vehículo",
+    drive: t("planner.vehicle"),
     sitp: "SITP",
   };
   const base = labels[type] || type;
@@ -112,8 +113,9 @@ export function RouteOptionsList({
   return (
     <div className="space-y-1.5">
       <p className="text-[10px] text-default-400 font-medium">
-        {options.length} opción{options.length > 1 ? "es" : ""} encontrada
-        {options.length > 1 ? "s" : ""}
+        {t("route.optionsFound", { count: options.length })}
+
+
       </p>
       {options.map((opt) => {
         const isSelected = selectedId === opt.id;
@@ -127,7 +129,7 @@ export function RouteOptionsList({
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] font-semibold text-foreground">
-                  {opt.label}
+                  {t(opt.label)}
                 </span>
                 {opt.tag && TAG_LABELS[opt.tag] && (
                   <span
@@ -175,7 +177,7 @@ export function RouteOptionsList({
               {opt.transfers > 0 && (
                 <span className="flex items-center gap-0.5">
                   <ArrowRightLeft size={8} />
-                  {opt.transfers} transbordo{opt.transfers > 1 ? "s" : ""}
+                  {opt.transfers} {t("planner.transfers")}
                 </span>
               )}
               {opt.legs.some((l) => l.type === "walk") && (
@@ -184,7 +186,7 @@ export function RouteOptionsList({
                   {opt.legs
                     .filter((l) => l.type === "walk")
                     .reduce((a, l) => a + l.duration_minutes, 0)}
-                  ' caminando
+                  ' {t("planner.walking")}
                 </span>
               )}
             </div>
@@ -201,10 +203,11 @@ export function SelectedRouteDetail({
 }: {
   readonly option: RouteOption;
 }) {
+  const { t } = useTranslation();
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-semibold">{option.label}</span>
+        <span className="text-[10px] font-semibold">{t(option.label)}</span>
         <span className="text-[10px] font-bold text-primary">
           {Math.round(option.total_time_minutes)} min
         </span>
@@ -225,7 +228,7 @@ export function SelectedRouteDetail({
             </span>
             <div className="flex-1 min-w-0">
               <p className="text-[10px] text-foreground font-medium truncate">
-                {getLegLabel(leg.type, leg.line)}
+                {getLegLabel(leg.type, leg.line, t)}
               </p>
               <p className="text-[9px] text-default-400 truncate">
                 {leg.from} → {leg.to}
@@ -241,7 +244,7 @@ export function SelectedRouteDetail({
         <div className="mt-2 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-warning/10 border border-warning/20">
           <ArrowRightLeft size={10} className="text-warning" />
           <span className="text-[9px] text-warning font-medium">
-            {option.transfers} transbordo{option.transfers > 1 ? "s" : ""} —
+            {option.transfers} {t("planner.transfers")} —
             Sigue las señales de conexión
           </span>
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation, Clock, AlertCircle } from "lucide-react";
 import { useWeather } from "@shared/hooks/useWeather";
 import { RouteSkeleton } from "@shared/ui/Skeleton";
@@ -48,6 +49,7 @@ export function PlanificarViajePanel({
   onSelectRoute,
   selectedRouteIdx,
 }: PlanificarProps) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<TransportMode>("publico");
   const temp = useWeather();
   const [departureType, setDepartureType] = useState<DepartureType>("ahora");
@@ -143,13 +145,13 @@ export function PlanificarViajePanel({
           onClick={() => setDepartureType("ahora")}
           className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "ahora" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
         >
-          Salir ahora
+          {t("planner.departNow")}
         </button>
         <button
           onClick={() => setDepartureType("programar")}
           className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "programar" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
         >
-          Programar
+          {t("planner.schedule")}
         </button>
         {departureType === "programar" && (
           <input
@@ -167,7 +169,7 @@ export function PlanificarViajePanel({
           onClick={handleSearch}
           className="w-full py-1.5 rounded-lg border border-primary/30 text-primary text-[10px] font-medium flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-all"
         >
-          <Navigation size={10} /> Recalcular
+          <Navigation size={10} /> {t("planner.recalculate")}
         </button>
       )}
 
@@ -208,7 +210,7 @@ export function PlanificarViajePanel({
         <div className="space-y-2.5">
           <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-default-100/50 text-[9px] text-default-400">
             <span>{temp ?? "..."}°C Bogotá</span>
-            <span>Datos en vivo</span>
+            <span>{t("metrics.liveData")}</span>
             <span>
               {new Date().toLocaleTimeString("es-CO", {
                 hour: "2-digit",

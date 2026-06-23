@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { Search, Shield, X, Edit2 } from "lucide-react";
 import { Select, SelectItem } from "@heroui/react";
@@ -26,6 +27,7 @@ interface Permission {
 }
 
 export function UsersTab() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [allPerms, setAllPerms] = useState<Permission[]>([]);
@@ -119,32 +121,32 @@ export function UsersTab() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-4">
         <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
           <p className="text-lg md:text-xl font-bold text-primary">{users.length}</p>
-          <p className="text-[9px] text-primary/70">Total usuarios</p>
+          <p className="text-[9px] text-primary/70">{t("admin.totalUsers")}</p>
         </div>
         <div className="p-3 rounded-xl bg-success/10 border border-success/20">
           <p className="text-lg md:text-xl font-bold text-success">{users.filter((u) => u.isActive).length}</p>
-          <p className="text-[9px] text-success/70">Activos</p>
+          <p className="text-[9px] text-success/70">{t("admin.activeUsers")}</p>
         </div>
         <div className="p-3 rounded-xl bg-danger/10 border border-danger/20">
           <p className="text-lg md:text-xl font-bold text-danger">{users.filter((u) => !u.isActive).length}</p>
-          <p className="text-[9px] text-danger/70">Inactivos</p>
+          <p className="text-[9px] text-danger/70">{t("admin.inactiveUsers")}</p>
         </div>
         <div className="p-3 rounded-xl bg-warning/10 border border-warning/20">
           <p className="text-lg md:text-xl font-bold text-warning">{roles.length}</p>
-          <p className="text-[9px] text-warning/70">Roles</p>
+          <p className="text-[9px] text-warning/70">{t("admin.roles")}</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4">
         <div className="flex-1 min-w-[150px]">
-          <p className="text-[9px] font-medium text-default-500 mb-1">Buscar</p>
+          <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.search")}</p>
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider">
             <Search size={13} className="text-default-400" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              name="admin-search-users" placeholder="Nombre o email..."
+              name="admin-search-users" placeholder={t("admin.searchPlaceholder")}
               className="flex-1 bg-transparent text-[11px] outline-none"
             />
           </div>
@@ -157,7 +159,7 @@ export function UsersTab() {
             selectedKeys={filterRole === "all" ? ["all"] : [String(filterRole)]}
             onChange={(e) => setFilterRole(e.target.value === "all" ? "all" : Number(e.target.value))}
             classNames={{ trigger: "h-9 min-h-9", value: "text-[10px]" }}
-            items={[{ id: "all", name: "Todos" }, ...roles.map((r) => ({ id: String(r.id), name: r.name }))]}
+            items={[{ id: "all", name: t("admin.total") }, ...roles.map((r) => ({ id: String(r.id), name: r.name }))]}
           >
             {(item) => <SelectItem key={item.id}>{item.name}</SelectItem>}
           </Select>
@@ -170,7 +172,7 @@ export function UsersTab() {
             selectedKeys={[filterStatus]}
             onChange={(e) => setFilterStatus(e.target.value as "all" | "active" | "inactive")}
             classNames={{ trigger: "h-9 min-h-9", value: "text-[10px]" }}
-            items={[{ id: "all", name: "Todos" }, { id: "active", name: "Activos" }, { id: "inactive", name: "Inactivos" }]}
+            items={[{ id: "all", name: t("admin.total") }, { id: "active", name: t("admin.activeUsers") }, { id: "inactive", name: t("admin.inactiveUsers") }]}
           >
             {(item) => <SelectItem key={item.id}>{item.name}</SelectItem>}
           </Select>
@@ -179,7 +181,7 @@ export function UsersTab() {
 
       {/* User List */}
       <div className="space-y-2">
-        <p className="text-[9px] text-default-400">{filtered.length} resultados</p>
+        <p className="text-[9px] text-default-400">{filtered.length} {t("admin.results")}</p>
         {filtered.map((user) => (
           <div
             key={user.id}
@@ -331,13 +333,13 @@ export function UsersTab() {
                   onClick={cancelEditing}
                   className="px-4 py-2 rounded-lg text-[11px] font-medium text-default-500 border border-divider hover:bg-default-100 transition-all"
                 >
-                  Cancelar
+                  {t("admin.cancel")}
                 </button>
                 <button
                   onClick={saveChanges}
                   className="px-4 py-2 rounded-lg text-[11px] font-medium text-white bg-primary hover:bg-primary/90 transition-all"
                 >
-                  Guardar cambios
+                  {t("admin.save")}
                 </button>
               </div>
             )}

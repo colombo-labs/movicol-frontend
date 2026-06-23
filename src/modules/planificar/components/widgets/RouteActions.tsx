@@ -33,7 +33,7 @@ export function ActionButtons({
   return (
     <>
       <button className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.95] shadow-lg shadow-primary/30">
-        <Navigation size={14} className="animate-pulse" /> Iniciar navegación
+        <Navigation size={14} className="animate-pulse" /> {t("route.startNav")}
       </button>
       <div className="flex gap-2">
         <button
@@ -49,7 +49,7 @@ export function ActionButtons({
           }}
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
-          Compartir
+          {t("route.share")}
         </button>
         <button
           onClick={() => {
@@ -87,13 +87,13 @@ export function ActionButtons({
           }}
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
-          Guardar
+          {t("route.save")}
         </button>
         <button
           onClick={onClear}
           className="flex-1 py-2 rounded-lg border border-danger/30 text-[10px] font-medium text-danger hover:bg-danger/10 transition-all flex items-center justify-center gap-1"
         >
-          Nueva
+          {t("route.new")}
         </button>
       </div>
     </>
@@ -101,19 +101,20 @@ export function ActionButtons({
 }
 
 export function QuickActions() {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-2 gap-1.5">
       <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
-        <Bell size={12} className="text-default-500" /> Alarma de bajada
+        <Bell size={12} className="text-default-500" /> {t("route.alarmStop")}
       </button>
       <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
-        <Share2 size={12} className="text-default-500" /> Compartir en vivo
+        <Share2 size={12} className="text-default-500" /> {t("route.shareLive")}
       </button>
       <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
-        <AlertCircle size={12} className="text-warning" /> Reportar incidencia
+        <AlertCircle size={12} className="text-warning" /> {t("route.reportIncident")}
       </button>
       <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
-        <MapPinned size={12} className="text-default-500" /> Ver mapa completo
+        <MapPinned size={12} className="text-default-500" /> {t("route.viewFullMap")}
       </button>
     </div>
   );
@@ -203,6 +204,7 @@ export function NearDestination({
   readonly destLat?: number;
   readonly destLng?: number;
 }) {
+  const { t } = useTranslation();
   const [places, setPlaces] = useState<
     { name: string; dist: string; type: string }[]
   >([]);
@@ -235,7 +237,7 @@ export function NearDestination({
   return (
     <GlassCard>
       <span className="text-[10px] font-semibold mb-1.5 block">
-        Cerca de tu destino
+        {t("route.nearDestination")}
       </span>
       <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
         {places.map((p) => (
@@ -256,22 +258,22 @@ export function NearDestination({
 }
 
 export function TravelTips({ mode }: { readonly mode: string }) {
+  const { t } = useTranslation();
   const [vote, setVote] = useState<"up" | "down" | null>(null);
   const hour = new Date().getHours();
   let tip: string;
   if (hour < 10)
-    tip = "En la mañana, los vagones traseros suelen ir menos llenos.";
+    tip = t("route.tipMorning");
   else if (hour < 16)
-    tip = "A esta hora el servicio es más frecuente. Buen momento para viajar.";
+    tip = t("route.tipMidday");
   else
-    tip =
-      "En hora pico, considera usar las puertas centrales para subir más rápido.";
+    tip = t("route.tipEvening");
 
   return (
     <>
       <div className="px-3 py-2 rounded-lg bg-blue-500/5 border border-blue-500/10">
         <p className="text-[9px] text-blue-600">
-          <strong>Tip:</strong> {tip}
+          <strong>{t("route.tip")}</strong> {tip}
         </p>
       </div>
       {(hour >= 19 || hour < 5) && (
@@ -283,7 +285,7 @@ export function TravelTips({ mode }: { readonly mode: string }) {
         </div>
       )}
       <div className="flex items-center justify-between px-2 py-2 rounded-lg bg-default-100/50">
-        <p className="text-[9px] text-default-400">¿Te fue útil esta ruta?</p>
+        <p className="text-[9px] text-default-400">{t("route.wasUseful")}</p>
         <div className="flex gap-2">
           <button
             className="p-1.5 rounded-full hover:bg-success/20 transition-colors"
@@ -313,17 +315,18 @@ export function TravelTips({ mode }: { readonly mode: string }) {
 }
 
 function TuLlaveCard() {
+  const { t } = useTranslation();
   return (
     <GlassCard>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-5 rounded bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center">
-            <span className="text-[7px] font-bold text-white">TL</span>
+          <div className="w-10 h-6 rounded overflow-hidden flex items-center justify-center">
+            <img src="/icons/tullave.svg" alt="TuLlave" className="w-full h-full object-cover" />
           </div>
           <div>
-            <p className="text-[10px] font-semibold">Tarjeta TuLlave</p>
+            <p className="text-[10px] font-semibold">{t("route.tullave")}</p>
             <p className="text-[9px] text-default-400">
-              Saldo estimado después del viaje
+              {t("route.estimatedBalance")}
             </p>
           </div>
         </div>

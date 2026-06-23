@@ -249,22 +249,22 @@ export function RutasList(props: Props) {
       <div className="grid grid-cols-3 gap-1.5">
         <div className="text-center p-2 rounded-lg bg-success/10">
           <p className="text-sm font-bold text-success">{alerts.operating}</p>
-          <p className="text-[8px] text-success/70">Operando</p>
+          <p className="text-[8px] text-success/70">{t("routes.operating")}</p>
         </div>
         <div className="text-center p-2 rounded-lg bg-warning/10">
           <p className="text-sm font-bold text-warning">{alerts.delayed}</p>
-          <p className="text-[8px] text-warning/70">Con demora</p>
+          <p className="text-[8px] text-warning/70">{t("routes.delayed")}</p>
         </div>
         <div className="text-center p-2 rounded-lg bg-danger/10">
           <p className="text-sm font-bold text-danger">{alerts.suspended}</p>
-          <p className="text-[8px] text-danger/70">Suspendidas</p>
+          <p className="text-[8px] text-danger/70">{t("routes.suspended")}</p>
         </div>
       </div>
 
       {/* Layers */}
       <div className="p-2.5 rounded-xl bg-default-100/50 border border-default-200/50">
         <p className="text-[10px] font-semibold text-default-500 mb-1.5 uppercase tracking-wider">
-          Capas en mapa
+          {t("routes.layers")}
         </p>
         <div className="flex flex-col gap-1">
           {tab === "tm" && (
@@ -276,7 +276,7 @@ export function RutasList(props: Props) {
                   onChange={() => onToggleTroncales?.()}
                   className="w-3 h-3 rounded accent-emerald-400"
                 />{" "}
-                Troncales
+                {t("routes.troncales")}
               </label>
               <label className="flex items-center gap-1.5 cursor-pointer text-xs text-default-600">
                 <input
@@ -285,7 +285,7 @@ export function RutasList(props: Props) {
                   onChange={() => onToggleEstaciones?.()}
                   className="w-3 h-3 rounded accent-emerald-400"
                 />{" "}
-                Estaciones
+                {t("routes.stations")}
               </label>
             </>
           )}
@@ -297,7 +297,7 @@ export function RutasList(props: Props) {
                 onChange={() => onToggleSitp?.()}
                 className="w-3 h-3 rounded accent-blue-400"
               />{" "}
-              Paraderos SITP
+              {t("routes.sitpStops")}
             </label>
           )}
         </div>
@@ -340,7 +340,7 @@ export function RutasList(props: Props) {
             {f.icon === "alert" && <AlertCircle size={10} />}
             {f.icon === "list" && <List size={10} />}
             {f.icon === "pin" && <MapPin size={10} />}
-            {f.id}
+            {{todas:t("routes.all"),operando:t("routes.operating"),demora:t("routes.delayed"),cercanas:t("routes.nearby"),favoritas:t("routes.favorites")}[f.id]}
           </button>
         ))}
       </div>
@@ -348,12 +348,11 @@ export function RutasList(props: Props) {
       {/* Info */}
       <div className="flex items-center justify-between text-[10px] text-default-400 px-1">
         <span>
-          {tab === "tm" ? filteredTm.length : filteredSitp.length} rutas
-          encontradas
+          {tab === "tm" ? filteredTm.length : filteredSitp.length} {t("routes.found")}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-          <Clock size={10} /> Tiempo real
+          <Clock size={10} /> {t("routes.realtime")}
         </span>
       </div>
 
@@ -460,7 +459,7 @@ export function RutasList(props: Props) {
                   onClick={() => setSitpPage((p) => p - 1)}
                   className="text-[10px] px-2 py-1 rounded-lg bg-default-100 text-default-600 disabled:opacity-30"
                 >
-                  ← Anterior
+                  ← {t("common.previous")}
                 </button>
                 <span className="text-[10px] text-default-400">
                   {sitpPage + 1} / {totalPages}
@@ -470,14 +469,14 @@ export function RutasList(props: Props) {
                   onClick={() => setSitpPage((p) => p + 1)}
                   className="text-[10px] px-2 py-1 rounded-lg bg-default-100 text-default-600 disabled:opacity-30"
                 >
-                  Siguiente →
+                  {t("common.next")} →
                 </button>
               </div>
             );
           })()}
         {tab === "tm" && tmTroncales.length === 0 && !props.tmRutas?.length && (
           <p className="text-xs text-default-400 text-center py-4">
-            No se encontraron rutas
+            {t("routes.noResults")}
           </p>
         )}
         {/* TM Rutas (J74, F51, etc.) */}
@@ -536,13 +535,13 @@ export function RutasList(props: Props) {
                 {filter !== "cercanas" && (
                   <div className="flex gap-1 mt-2">
                     {["todas", "articulado", "biarticulado", "dual"].map(
-                      (t) => (
+                      (bt) => (
                         <button
-                          key={t}
-                          onClick={() => handleBusFilter(t)}
-                          className={`flex-1 py-1.5 rounded-lg text-[9px] font-semibold transition-all capitalize ${filter === t ? "bg-emerald-500/20 text-emerald-500" : "text-default-400 hover:text-foreground"}`}
+                          key={bt}
+                          onClick={() => handleBusFilter(bt)}
+                          className={`flex-1 py-1.5 rounded-lg text-[9px] font-semibold transition-all capitalize ${filter === bt ? "bg-emerald-500/20 text-emerald-500" : "text-default-400 hover:text-foreground"}`}
                         >
-                          {t} ({typeCounts[t]})
+                          {bt === "todas" ? t("routes.all") : bt} ({typeCounts[bt]})
                         </button>
                       ),
                     )}
@@ -550,7 +549,7 @@ export function RutasList(props: Props) {
                 )}
 
                 <p className="text-[10px] text-default-400 px-1">
-                  {filtered.length} rutas
+                  {filtered.length} {t("routes.found")}
                 </p>
 
                 {paged.map((r) => {
@@ -619,7 +618,7 @@ export function RutasList(props: Props) {
                       }
                       className="text-[10px] px-2 py-1 rounded-lg bg-default-100 text-default-600 disabled:opacity-30"
                     >
-                      ← Anterior
+                      ← {t("common.previous")}
                     </button>
                     <span className="text-[10px] text-default-400">
                       {sitpPage + 1} / {totalPages}
@@ -633,7 +632,7 @@ export function RutasList(props: Props) {
                       }
                       className="text-[10px] px-2 py-1 rounded-lg bg-default-100 text-default-600 disabled:opacity-30"
                     >
-                      Siguiente →
+                      {t("common.next")} →
                     </button>
                   </div>
                 )}

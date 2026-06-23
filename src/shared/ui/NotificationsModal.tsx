@@ -129,7 +129,7 @@ export function NotificationsDropdown({
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-divider">
             <span className="text-[11px] font-semibold text-foreground">
-              Notificaciones
+              {t("notifications.title")}
             </span>
             <div className="flex items-center gap-1">
               <button
@@ -155,7 +155,7 @@ export function NotificationsDropdown({
           {/* Footer */}
           <div className="px-4 py-2 border-t border-divider flex items-center justify-between">
             <button className="text-[9px] text-primary font-medium hover:underline">
-              Marcar todas como leídas
+              {t("notifications.markAllRead")}
             </button>
             <button
               onClick={() => {
@@ -164,7 +164,7 @@ export function NotificationsDropdown({
               }}
               className="text-[9px] text-default-400 hover:text-foreground"
             >
-              Ver todas →
+              {t("notifications.viewAll")} →
             </button>
           </div>
         </div>
@@ -181,6 +181,7 @@ export function NotificationsModal({
   readonly isOpen: boolean;
   readonly onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<"all" | "unread">("all");
 
   if (!isOpen) return null;
@@ -207,7 +208,7 @@ export function NotificationsModal({
           <div className="flex items-center gap-2">
             <Bell size={18} className="text-primary" />
             <h2 className="text-sm font-semibold text-foreground">
-              Notificaciones
+              {t("notifications.title")}
             </h2>
           </div>
           <button
@@ -228,7 +229,7 @@ export function NotificationsModal({
                 : "text-default-400"
             }`}
           >
-            Todas ({MOCK_NOTIFICATIONS.length})
+            {t("notifications.all")} ({MOCK_NOTIFICATIONS.length})
           </button>
           <button
             onClick={() => setTab("unread")}
@@ -238,7 +239,7 @@ export function NotificationsModal({
                 : "text-default-400"
             }`}
           >
-            No leídas ({MOCK_NOTIFICATIONS.filter((n) => !n.read).length})
+            {t("notifications.unread")} ({MOCK_NOTIFICATIONS.filter((n) => !n.read).length})
           </button>
         </div>
 
@@ -259,10 +260,10 @@ export function NotificationsModal({
         {/* Footer */}
         <div className="px-5 py-3 border-t border-divider flex items-center justify-between">
           <button className="text-[10px] text-primary font-medium hover:underline">
-            Marcar todas como leídas
+            {t("notifications.markAllRead")}
           </button>
           <button className="text-[10px] text-default-400 hover:text-danger">
-            Limpiar notificaciones
+            {t("notifications.clear")}
           </button>
         </div>
       </div>

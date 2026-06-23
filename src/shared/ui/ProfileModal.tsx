@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { AppModal } from "@shared/ui/AppModal";
 import { User, Mail, Shield, Calendar, MapPin } from "lucide-react";
 import { useAuth } from "@/shared/hooks/useAuth";
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function ProfileModal({ isOpen, onClose }: Props) {
+  const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
   const [city, setCity] = useState("");
 
@@ -38,7 +40,7 @@ export function ProfileModal({ isOpen, onClose }: Props) {
   }, [isOpen]);
 
   return (
-    <AppModal isOpen={isOpen} onClose={onClose} title="Mi perfil" size="md">
+    <AppModal isOpen={isOpen} onClose={onClose} title={t("auth.profile")} size="md">
       <div className="space-y-4">
         {/* Avatar + Name */}
         <div className="flex items-center gap-3">
@@ -67,14 +69,14 @@ export function ProfileModal({ isOpen, onClose }: Props) {
         <div className="space-y-2.5 pt-3 border-t border-divider">
           <div className="flex items-center gap-2 text-xs">
             <Mail size={13} className="text-default-400" />
-            <span className="text-default-500">Email</span>
+            <span className="text-default-500">{t("auth.email")}</span>
             <span className="ml-auto font-medium text-foreground">
               {user?.email || "—"}
             </span>
           </div>
           <div className="flex items-center gap-2 text-xs">
             <Shield size={13} className="text-default-400" />
-            <span className="text-default-500">Rol</span>
+            <span className="text-default-500">{t("auth.role")}</span>
             <span className="ml-auto font-medium text-foreground capitalize">
               {user?.role?.name || "—"}
             </span>
@@ -82,7 +84,7 @@ export function ProfileModal({ isOpen, onClose }: Props) {
           {city && (
             <div className="flex items-center gap-2 text-xs">
               <MapPin size={13} className="text-default-400" />
-              <span className="text-default-500">Ciudad</span>
+              <span className="text-default-500">{t("auth.city")}</span>
               <span className="ml-auto font-medium text-foreground">
                 {city}
               </span>
@@ -90,7 +92,7 @@ export function ProfileModal({ isOpen, onClose }: Props) {
           )}
           <div className="flex items-center gap-2 text-xs">
             <Calendar size={13} className="text-default-400" />
-            <span className="text-default-500">Miembro desde</span>
+            <span className="text-default-500">{t("auth.memberSince")}</span>
             <span className="ml-auto font-medium text-foreground">
               {user?.createdAt
                 ? new Date(user.createdAt).toLocaleDateString("es-CO", {
@@ -107,15 +109,15 @@ export function ProfileModal({ isOpen, onClose }: Props) {
         <div className="grid grid-cols-3 gap-2 pt-3 border-t border-divider">
           <div className="text-center p-2 rounded-lg bg-default-100">
             <p className="text-sm font-bold text-foreground">0</p>
-            <p className="text-[9px] text-default-400">Viajes</p>
+            <p className="text-[9px] text-default-400">{t("auth.trips")}</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-default-100">
             <p className="text-sm font-bold text-foreground">0</p>
-            <p className="text-[9px] text-default-400">Favoritos</p>
+            <p className="text-[9px] text-default-400">{t("auth.favorites")}</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-default-100">
             <p className="text-sm font-bold text-foreground">0</p>
-            <p className="text-[9px] text-default-400">Reportes</p>
+            <p className="text-[9px] text-default-400">{t("auth.reports")}</p>
           </div>
         </div>
 
@@ -128,7 +130,7 @@ export function ProfileModal({ isOpen, onClose }: Props) {
             }}
             className="w-full py-2.5 rounded-xl bg-danger/10 text-danger text-xs font-semibold hover:bg-danger/20 transition-colors"
           >
-            Cerrar sesión
+            {t("auth.logout")}
           </button>
         )}
       </div>

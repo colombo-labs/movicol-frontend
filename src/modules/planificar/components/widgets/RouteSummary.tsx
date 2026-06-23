@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Clock,
   Train,
@@ -146,6 +147,7 @@ export function TripDetails({
   readonly prediction: RoutePrediction;
   readonly mode: LegacyMode;
 }) {
+  const { t } = useTranslation();
   if (mode === "vehiculo") {
     return (
       <div className="grid grid-cols-3 gap-1.5">
@@ -188,7 +190,7 @@ export function TripDetails({
         <p className="text-[10px] font-bold">
           {Math.round(prediction.total_distance_km * 0.15 * 12)} min
         </p>
-        <p className="text-[8px] text-default-400">Caminando</p>
+        <p className="text-[8px] text-default-400">{t("planner.walking")}</p>
       </div>
       <div className="flex flex-col items-center p-2 rounded-lg bg-default-100">
         <Shield size={14} className={getSafetyColor(prediction.safety_score)} />

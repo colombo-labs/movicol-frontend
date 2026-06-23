@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Clock, ChevronRight, MapPin, LocateFixed } from "lucide-react";
 import type { TripPoint } from "@/app/Layout";
 
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function EmptyState({ tripPoints, onUseMyLocation, onAddPoint }: Props) {
+  const { t } = useTranslation();
   return (
     <>
       {tripPoints.length === 0 && (
@@ -37,7 +39,7 @@ export function EmptyState({ tripPoints, onUseMyLocation, onAddPoint }: Props) {
           </div>
           <div className="text-left">
             <span className="block text-primary font-semibold text-sm">
-              Usar mi ubicación
+              {t("planner.useMyLocation")}
             </span>
             <span className="block text-[10px] text-primary/60">
               Toca para iniciar desde donde estás

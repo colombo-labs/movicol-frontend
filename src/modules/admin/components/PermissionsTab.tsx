@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { Key, Search, X } from "lucide-react";
 import { Select, SelectItem } from "@heroui/react";
@@ -18,6 +19,7 @@ export function PermissionsTab({
   readonly showCreate: boolean;
   readonly onCloseCreate: () => void;
 }) {
+  const { t } = useTranslation();
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [search, setSearch] = useState("");
   const [filterModule, setFilterModule] = useState<string>("all");
@@ -74,36 +76,36 @@ export function PermissionsTab({
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-4">
         <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
           <p className="text-lg md:text-xl font-bold text-primary">{permissions.length}</p>
-          <p className="text-[9px] text-primary/70">Total permisos</p>
+          <p className="text-[9px] text-primary/70">{t("admin.permissions")}</p>
         </div>
         <div className="p-3 rounded-xl bg-success/10 border border-success/20">
           <p className="text-lg md:text-xl font-bold text-success">{[...new Set(permissions.map((p) => p.module))].length}</p>
-          <p className="text-[9px] text-success/70">Módulos</p>
+          <p className="text-[9px] text-success/70">{t("admin.modules")}</p>
         </div>
         <div className="p-3 rounded-xl bg-warning/10 border border-warning/20">
           <p className="text-lg md:text-xl font-bold text-warning">{[...new Set(permissions.map((p) => p.action))].length}</p>
-          <p className="text-[9px] text-warning/70">Acciones únicas</p>
+          <p className="text-[9px] text-warning/70">{t("admin.uniqueActions")}</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4">
         <div className="flex-1 min-w-[150px]">
-          <p className="text-[9px] font-medium text-default-500 mb-1">Buscar</p>
+          <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.search")}</p>
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider">
             <Search size={13} className="text-default-400" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} name="admin-search-perms" placeholder="Permiso o descripción..." className="flex-1 bg-transparent text-[11px] outline-none" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} name="admin-search-perms" placeholder={t("admin.searchPermPlaceholder")} className="flex-1 bg-transparent text-[11px] outline-none" />
           </div>
         </div>
         <div className="w-[140px]">
-          <p className="text-[9px] font-medium text-default-500 mb-1">Módulo</p>
+          <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.module")}</p>
           <Select aria-label="Filtro de módulo"
             size="sm"
             variant="bordered"
             selectedKeys={[filterModule]}
             onChange={(e) => setFilterModule(e.target.value)}
             classNames={{ trigger: "h-9 min-h-9", value: "text-[10px]" }}
-            items={[{ id: "all", name: "Todos" }, ...allModules.map((m) => ({ id: m, name: m }))]}
+            items={[{ id: "all", name: t("admin.total") }, ...allModules.map((m) => ({ id: m, name: m }))]}
           >
             {(item) => <SelectItem key={item.id}>{item.name}</SelectItem>}
           </Select>
@@ -112,7 +114,7 @@ export function PermissionsTab({
 
       {/* List */}
       <div className="space-y-4">
-        <p className="text-[9px] text-default-400">{filtered.length} permisos</p>
+        <p className="text-[9px] text-default-400">{filtered.length} {t("admin.permissions")}</p>
         {modules.map((mod) => (
           <div key={mod}>
             <p className="text-[9px] font-bold text-default-400 uppercase tracking-wider mb-2 flex items-center gap-1">
@@ -159,7 +161,7 @@ export function PermissionsTab({
 
             <div className="space-y-3">
               <div>
-                <p className="text-[9px] font-medium text-default-500 mb-1">Descripción</p>
+                <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.description")}</p>
                 {editingPerm ? (
                   <input
                     value={draftDesc}
@@ -171,11 +173,11 @@ export function PermissionsTab({
                 )}
               </div>
               <div>
-                <p className="text-[9px] font-medium text-default-500 mb-1">Módulo</p>
+                <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.module")}</p>
                 <p className="text-[11px]">{selectedPerm.module}</p>
               </div>
               <div>
-                <p className="text-[9px] font-medium text-default-500 mb-1">Acción</p>
+                <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.action")}</p>
                 <p className="text-[11px]">{selectedPerm.action}</p>
               </div>
             </div>
@@ -186,7 +188,7 @@ export function PermissionsTab({
                 onClick={() => { remove(selectedPerm.id); setSelectedPerm(null); }}
                 className="px-3 py-1.5 rounded-lg text-[10px] font-medium text-danger bg-danger/10 hover:bg-danger/20 transition-all"
               >
-                Eliminar
+                {t("admin.delete")}
               </button>
               {editingPerm ? (
                 <div className="flex gap-2">
@@ -194,7 +196,7 @@ export function PermissionsTab({
                   <button onClick={() => { setEditingPerm(false); /* TODO: save desc */ }} className="px-3 py-1.5 rounded-lg text-[10px] font-medium text-white bg-primary">Guardar</button>
                 </div>
               ) : (
-                <button onClick={() => setEditingPerm(true)} className="px-3 py-1.5 rounded-lg text-[10px] font-medium text-primary border border-primary/30 hover:bg-primary/10">Editar</button>
+                <button onClick={() => setEditingPerm(true)} className="px-3 py-1.5 rounded-lg text-[10px] font-medium text-primary border border-primary/30 hover:bg-primary/10">{t("admin.edit")}</button>
               )}
             </div>
           </div>
@@ -212,15 +214,15 @@ export function PermissionsTab({
             </div>
             <div className="space-y-3">
               <div>
-                <p className="text-[9px] font-medium text-default-500 mb-1">Módulo</p>
+                <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.module")}</p>
                 <input value={module} onChange={(e) => setModule(e.target.value)} name="perm-module" placeholder="ej: rutas" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
               </div>
               <div>
-                <p className="text-[9px] font-medium text-default-500 mb-1">Acción</p>
+                <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.action")}</p>
                 <input value={action} onChange={(e) => setAction(e.target.value)} name="perm-action" placeholder="ej: crear" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
               </div>
               <div>
-                <p className="text-[9px] font-medium text-default-500 mb-1">Descripción</p>
+                <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.description")}</p>
                 <input value={description} onChange={(e) => setDescription(e.target.value)} name="perm-desc" placeholder="ej: Crear rutas nuevas" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
               </div>
               <p className="text-[9px] text-default-400">Key: <strong>{module || "modulo"}.{action || "accion"}</strong></p>

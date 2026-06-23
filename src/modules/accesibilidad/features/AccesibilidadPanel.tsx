@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { GlassCard } from "@shared/ui/GlassCard";
 import { Accessibility, MapPin, Bus, Train } from "lucide-react";
-
 import { API_URL as API } from "@/shared/config";
 
 interface AccData {
@@ -16,6 +16,7 @@ interface AccData {
 }
 
 export function AccesibilidadPanel() {
+  const { t } = useTranslation();
   const [data, setData] = useState<AccData | null>(null);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function AccesibilidadPanel() {
   if (!data)
     return (
       <div className="text-center py-8 text-xs text-default-400">
-        Cargando datos...
+        {t("accessibility.loading")}
       </div>
     );
 
@@ -37,10 +38,10 @@ export function AccesibilidadPanel() {
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <Accessibility size={16} className="text-primary" />
-          <p className="text-xs text-default-400">Cobertura del sistema</p>
+          <p className="text-xs text-default-400">{t("accessibility.systemCoverage")}</p>
         </div>
         <div className="text-right">
-          <p className="text-[9px] text-default-400">Cobertura</p>
+          <p className="text-[9px] text-default-400">{t("accessibility.coverage")}</p>
           <p className="text-sm font-bold text-primary">
             {data.cobertura}
             <span className="text-[9px] text-default-400">%</span>
@@ -51,7 +52,7 @@ export function AccesibilidadPanel() {
       <GlassCard>
         <div className="flex items-center justify-between mb-2">
           <span className="text-[10px] text-default-400 uppercase tracking-wider">
-            Cobertura urbana
+            {t("accessibility.urbanCoverage")}
           </span>
           <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-medium">
             {data.areaCubierta} km² / {data.areaBogota} km²
@@ -75,7 +76,7 @@ export function AccesibilidadPanel() {
 
       <GlassCard>
         <span className="text-[10px] text-default-400 uppercase tracking-wider mb-2 block">
-          Infraestructura del sistema
+          {t("accessibility.infrastructure")}
         </span>
         <div className="grid grid-cols-2 gap-2">
           <div className="p-2 rounded-lg bg-default-100 text-center">
@@ -83,36 +84,36 @@ export function AccesibilidadPanel() {
             <p className="text-lg font-bold">
               {data.totalParaderos.toLocaleString()}
             </p>
-            <p className="text-[9px] text-default-400">Paraderos SITP</p>
+            <p className="text-[9px] text-default-400">{t("accessibility.sitpStops")}</p>
           </div>
           <div className="p-2 rounded-lg bg-default-100 text-center">
             <Bus size={14} className="text-green-500 mx-auto mb-1" />
             <p className="text-lg font-bold">{data.totalRutas}</p>
-            <p className="text-[9px] text-default-400">Rutas totales</p>
+            <p className="text-[9px] text-default-400">{t("accessibility.totalRoutes")}</p>
           </div>
           <div className="p-2 rounded-lg bg-default-100 text-center">
             <Train size={14} className="text-red-500 mx-auto mb-1" />
             <p className="text-lg font-bold">{data.rutasTroncales}</p>
-            <p className="text-[9px] text-default-400">Rutas troncales</p>
+            <p className="text-[9px] text-default-400">{t("accessibility.troncalRoutes")}</p>
           </div>
           <div className="p-2 rounded-lg bg-default-100 text-center">
             <Bus size={14} className="text-yellow-500 mx-auto mb-1" />
             <p className="text-lg font-bold">{data.rutasZonales}</p>
-            <p className="text-[9px] text-default-400">Rutas zonales</p>
+            <p className="text-[9px] text-default-400">{t("accessibility.zonalRoutes")}</p>
           </div>
         </div>
       </GlassCard>
 
       <GlassCard>
         <span className="text-[10px] text-default-400 uppercase tracking-wider mb-2 block">
-          Puntos de servicio
+          {t("accessibility.servicePoints")}
         </span>
         <div className="flex items-end gap-3">
           <p className="text-2xl font-bold">
             {data.totalPuntos.toLocaleString()}
           </p>
           <p className="text-[10px] text-default-400">
-            paradas activas en el sistema integrado
+            {t("accessibility.activeStops")}
           </p>
         </div>
         <div className="mt-2 h-1.5 rounded-full bg-default-100 overflow-hidden">
@@ -122,22 +123,22 @@ export function AccesibilidadPanel() {
           />
         </div>
         <div className="flex justify-between mt-1 text-[8px] text-default-300">
-          <span>Troncales</span>
-          <span>Alimentadoras</span>
-          <span>Zonales</span>
+          <span>{t("accessibility.troncales")}</span>
+          <span>{t("accessibility.feeders")}</span>
+          <span>{t("accessibility.zonales")}</span>
         </div>
       </GlassCard>
 
       <GlassCard>
         <span className="text-[10px] text-default-400 uppercase tracking-wider mb-2 block">
-          Tarifa integrada
+          {t("accessibility.integratedFare")}
         </span>
         <p className="text-lg font-bold">
           $3,550{" "}
           <span className="text-[10px] text-default-400 font-normal">COP</span>
         </p>
         <p className="text-[10px] text-default-500 mt-1">
-          Tarjeta TuLlave — Válida en todo el sistema (TM + SITP)
+          {t("accessibility.tullave")}
         </p>
       </GlassCard>
     </div>

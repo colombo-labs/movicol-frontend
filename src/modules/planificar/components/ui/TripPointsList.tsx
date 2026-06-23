@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useRef } from "react";
 import {
   X,
@@ -35,10 +36,10 @@ function getDotStyle(isFirst: boolean, isLast: boolean) {
   return "border-blue-500 bg-blue-500/30";
 }
 
-function getPlaceholder(index: number, total: number) {
-  if (index === 0) return "Origen — buscar dirección";
-  if (index === total - 1) return "Destino — buscar dirección";
-  return "Parada intermedia";
+function getPlaceholder(index: number, total: number, t: (k: string) => string) {
+  if (index === 0) return t("planner.originPlaceholder");
+  if (index === total - 1) return t("planner.destinationPlaceholder");
+  return t("planner.stopPlaceholder");
 }
 
 export function TripPointsList({
@@ -52,6 +53,7 @@ export function TripPointsList({
   onUpdatePoint,
   onRequestAddPoint,
 }: Props) {
+  const { t } = useTranslation();
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -160,7 +162,7 @@ export function TripPointsList({
                       id={`trip-point-${i}`}
                       name={`trip-point-${i}`}
                       value={editingIdx === i ? query : pt?.label || ""}
-                      placeholder={getPlaceholder(i, slots.length)}
+                      placeholder={getPlaceholder(i, slots.length, t)}
                       onFocus={() => {
                         setEditingIdx(i);
                         setQuery(pt?.label || "");
@@ -254,10 +256,10 @@ export function TripPointsList({
           <LocateFixed size={16} className="text-primary animate-pulse" />
           <div className="text-left">
             <span className="block text-[11px] text-primary font-semibold">
-              Usar mi ubicación
+              {t("planner.useMyLocation")}
             </span>
             <span className="block text-[9px] text-primary/60">
-              Iniciar desde donde estás
+              {t("planner.startFromHere")}
             </span>
           </div>
         </button>
@@ -271,7 +273,7 @@ export function TripPointsList({
           }}
           className="flex items-center gap-1 text-[10px] text-danger hover:underline"
         >
-          <Trash2 size={10} /> Limpiar
+          <Trash2 size={10} /> {t("common.clear")}
         </button>
       )}
     </>

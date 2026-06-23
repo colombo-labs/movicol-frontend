@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { GlassCard } from "@shared/ui/GlassCard";
 
 export function AlertsCard({
@@ -8,22 +9,23 @@ export function AlertsCard({
   readonly critical: number;
   readonly high: number;
 }) {
+  const { t } = useTranslation();
   if (critical === 0 && high === 0) return null;
   return (
     <GlassCard>
       <div className="flex items-center gap-2 mb-2">
         <AlertTriangle size={14} className="text-warning" />
-        <span className="text-xs font-semibold">Alertas activas</span>
+        <span className="text-xs font-semibold">{t("metrics.systemStatus")}</span>
       </div>
       <div className="space-y-1">
         {critical > 0 && (
           <p className="text-[10px] text-danger">
-            {critical} estaciones en estado crítico
+            {critical} {t("metrics.criticalStations")}
           </p>
         )}
         {high > 0 && (
           <p className="text-[10px] text-orange-500">
-            {high} estaciones con alta congestión
+            {high} {t("metrics.highCongestion")}
           </p>
         )}
       </div>
@@ -32,11 +34,12 @@ export function AlertsCard({
 }
 
 export function LiveCounter() {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-default-100/50 text-[9px] text-default-400">
       <span className="flex items-center gap-1">
         <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />{" "}
-        Datos en vivo
+        {t("metrics.liveData")}
       </span>
       <span>
         {new Date().toLocaleTimeString("es-CO", {
@@ -54,6 +57,7 @@ export function PassengersCard({
 }: {
   readonly avgCongestion: number;
 }) {
+  const { t } = useTranslation();
   const hour = new Date().getHours();
   let base = 800000;
   if (hour >= 6 && hour <= 9) base = 1800000;
@@ -64,12 +68,12 @@ export function PassengersCard({
       <div className="flex items-center justify-between">
         <div>
           <p className="text-[10px] text-default-400 uppercase tracking-wider">
-            Pasajeros ahora
+            {t("metrics.passengersNow")}
           </p>
           <p className="text-2xl font-bold">{base.toLocaleString()}</p>
         </div>
         <div className="text-right">
-          <p className="text-[9px] text-default-400">Capacidad usada</p>
+          <p className="text-[9px] text-default-400">{t("metrics.capacityUsed")}</p>
           <p className="text-lg font-bold text-warning">
             {Math.round(avgCongestion * 100 + 15)}%
           </p>
@@ -87,11 +91,12 @@ function getBarColor(isNow: boolean, h: number) {
 }
 
 export function NetworkEfficiency() {
+  const { t } = useTranslation();
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-2">
         <span className="text-[10px] text-default-400 uppercase tracking-wider">
-          Eficiencia de la red
+          {t("metrics.networkEfficiency")}
         </span>
       </div>
       <div className="flex items-end gap-1 h-12">

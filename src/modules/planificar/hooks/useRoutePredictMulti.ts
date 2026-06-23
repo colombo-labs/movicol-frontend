@@ -216,7 +216,7 @@ function buildCombinedOption(
 function buildSimpleVehicleOptions(results: RoutePrediction[]): RouteOption[] {
   return results.map((result, i) => ({
     id: `vehiculo-${i}`,
-    label: i === 0 ? "Más rápida" : `Alternativa ${i}`,
+    label: i === 0 ? "planner.fastest" : `planner.alternative${i}`,
     total_time_minutes: result.total_time_minutes,
     total_distance_km: result.total_distance_km,
     cost: result.cost,
@@ -265,7 +265,7 @@ function buildMultiWaypointOptions(
   return [
     {
       id: "vehiculo",
-      label: "Vehículo particular",
+      label: "planner.privateVehicle",
       total_time_minutes: totalTime,
       total_distance_km: totalDist,
       cost,

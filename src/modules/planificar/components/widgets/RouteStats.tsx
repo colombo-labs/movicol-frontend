@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Leaf, Flame, AlertCircle } from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { RoutePrediction } from "@modules/predicciones/models";
@@ -8,6 +9,7 @@ export function EcoInfo({
 }: {
   readonly prediction: RoutePrediction;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex gap-2">
       <div className="flex-1 flex items-center gap-2 px-2.5 py-2 rounded-lg bg-success/10 border border-success/20">
@@ -17,7 +19,7 @@ export function EcoInfo({
             {(prediction.total_distance_km * 0.21).toFixed(1)} kg
           </p>
           <p className="text-[8px] text-success/70">
-            CO\u2082 ahorrado vs auto
+            {t("route.co2Saved")}
           </p>
         </div>
       </div>
@@ -27,7 +29,7 @@ export function EcoInfo({
           <p className="text-[10px] font-bold text-orange-600">
             {Math.round(prediction.total_distance_km * 0.15 * 12 * 3.5)} cal
           </p>
-          <p className="text-[8px] text-orange-500/70">Calorías caminando</p>
+          <p className="text-[8px] text-orange-500/70">{t("route.caloriesBurned")}</p>
         </div>
       </div>
     </div>
@@ -39,16 +41,17 @@ export function CongestionBar({
 }: {
   readonly prediction: RoutePrediction;
 }) {
+  const { t } = useTranslation();
   const avg =
     prediction.risk_segments.reduce((a, s) => a + s.congestion_level, 0) /
     Math.max(prediction.risk_segments.length, 1);
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-semibold">Congestión predicha</span>
+        <span className="text-[10px] font-semibold">{t("route.predictedCongestion")}</span>
         <span className="text-[8px] text-default-400 flex items-center gap-1">
           <span className="w-1 h-1 rounded-full bg-success animate-pulse" />{" "}
-          Actualizado ahora
+          {t("route.updatedNow")}
         </span>
       </div>
       <div className="flex items-center gap-2">
@@ -73,24 +76,25 @@ export function WaitEstimation({
 }: {
   readonly prediction: RoutePrediction;
 }) {
+  const { t } = useTranslation();
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[10px] font-semibold">
-          Espera estimada en estación
+          {t("route.estimatedWait")}
         </span>
       </div>
       <div className="flex items-center gap-3">
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[9px] text-default-400">
-              Tiempo de espera
+              {t("route.waitTime")}
             </span>
             <span className="text-[10px] font-bold">3 min</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[9px] text-default-400">
-              Ocupación del bus
+              {t("route.busOccupancy")}
             </span>
             <div className="flex items-center gap-1">
               {Array.from({ length: 5 }, (_, idx) => (
@@ -107,8 +111,8 @@ export function WaitEstimation({
         </div>
       </div>
       <p className="text-[9px] text-default-400 mt-1.5 border-t border-divider/30 pt-1.5">
-        Probabilidad de asiento:{" "}
-        <strong className="text-foreground">Baja</strong> — Viaja de pie ~
+        {t("route.seatProbability")}{" "}
+        <strong className="text-foreground">{t("route.low")}</strong> — {t("route.standingTime")} ~
         {Math.round(prediction.total_time_minutes * 0.7)} min
       </p>
     </GlassCard>

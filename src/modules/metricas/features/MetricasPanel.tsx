@@ -1,4 +1,5 @@
 import { Activity } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useMetricsData } from "../hooks/useMetricsData";
 import { SystemStatus } from "../components/widgets/SystemStatus";
 import {
@@ -17,13 +18,14 @@ import {
 export function MetricasPanel() {
   const { stats, loading, avgCongestion, critical, high, topCongested } =
     useMetricsData();
+  const { t } = useTranslation();
 
   if (loading)
     return (
       <div className="flex items-center justify-center py-8 text-primary">
         <Activity size={20} className="animate-pulse" />
         <span className="ml-2 text-sm">
-          Cargando métricas en tiempo real...
+          {t("metrics.loading")}
         </span>
       </div>
     );
