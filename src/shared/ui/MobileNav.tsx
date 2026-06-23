@@ -1,5 +1,6 @@
-import { Navigation, Route, Accessibility, BarChart3 } from "lucide-react";
+import { Navigation, Route, Accessibility, BarChart3, ShieldCheck } from "lucide-react";
 import type { PanelId } from "./Sidebar";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 interface MobileNavProps {
   activePanel: PanelId;
@@ -18,16 +19,23 @@ const items: {
 ];
 
 export function MobileNav({ activePanel, onTogglePanel }: MobileNavProps) {
+  const { user } = useAuth();
+  const isAdmin = user?.role?.name === "admin";
+
+  const visibleItems = isAdmin
+    ? [...items, { id: "admin" as const, icon: ShieldCheck, label: "Admin" }]
+    : items;
+
   return (
     <nav className="md:hidden h-14 flex items-center justify-around border-t border-divider bg-background shrink-0 px-1 safe-area-bottom">
-      {items.map((item) => {
+      {visibleItems.map((item) => {
         const Icon = item.icon;
         const isActive = activePanel === item.id;
         return (
           <button
             key={item.id}
             onClick={() => onTogglePanel(isActive ? null : item.id)}
-            className={`relative flex flex-col items-center justify-center gap-0.5 px-4 py-1.5 rounded-xl transition-all duration-200 ${
+            className={`relative flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200 ${
               isActive
                 ? "bg-primary/15 text-primary"
                 : "text-default-400 active:scale-95 active:bg-default-100"

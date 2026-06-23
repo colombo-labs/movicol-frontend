@@ -1,12 +1,14 @@
-import { Bus, Navigation, Route, Accessibility, BarChart3 } from "lucide-react";
+import { Bus, Navigation, Route, Accessibility, BarChart3, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { LucideIcon } from "lucide-react";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 export type PanelId =
   | "planificar"
   | "rutas"
   | "accesibilidad"
   | "metricas"
+  | "admin"
   | null;
 
 interface PanelItem {
@@ -29,6 +31,12 @@ interface SidebarProps {
 
 export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
   const [expanded, setExpanded] = useState(false);
+  const { user } = useAuth();
+  const isAdmin = user?.role?.name === "admin";
+
+  const visiblePanels = isAdmin
+    ? [...panels, { id: "admin" as const, icon: ShieldCheck, label: "Admin" }]
+    : panels;
   const [time, setTime] = useState(
     new Date().toLocaleTimeString("es-CO", {
       hour: "2-digit",
@@ -80,7 +88,7 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
         </div>
 
         <div className="flex-1 flex flex-col items-center gap-1.5 py-4">
-          {panels.map((p) => {
+          {visiblePanels.map((p) => {
             const isActive = activePanel === p.id;
             const Icon = p.icon;
             return (
@@ -129,7 +137,7 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
 
       {/* Mobile bottom navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[600] bg-background/95 backdrop-blur-xl border-t border-divider px-2 py-1.5 flex items-center justify-around safe-bottom">
-        {panels.map((p) => {
+        {visiblePanels.map((p) => {
           const isActive = activePanel === p.id;
           const Icon = p.icon;
           return (

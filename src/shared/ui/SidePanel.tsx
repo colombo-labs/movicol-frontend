@@ -30,6 +30,31 @@ export function SidePanel({
 }: SidePanelProps) {
   const startY = useRef(0);
   const [snap, setSnap] = useState<SnapPoint>("half");
+  const [city, setCity] = useState("");
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`,
+          );
+          const data = await res.json();
+          setCity(
+            data.address?.city ||
+              data.address?.town ||
+              data.address?.state ||
+              "Bogotá D.C.",
+          );
+        } catch {
+          /* keep default */
+        }
+      },
+      () => {},
+      { timeout: 5000 },
+    );
+  }, []);
 
   // Reset snap al abrir
   useEffect(() => {
@@ -85,8 +110,8 @@ export function SidePanel({
         >
           <div className="w-10 h-1 rounded-full bg-default-300 mb-1.5" />
           <div className="flex items-center gap-2 text-[8px] text-default-400">
-            <span>Bogotá D.C.</span>
-            <span className="w-px h-2.5 bg-divider" />
+            {city && <span>{city}</span>}
+            {city && <span className="w-px h-2.5 bg-divider" />}
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
               <span>Conectado</span>

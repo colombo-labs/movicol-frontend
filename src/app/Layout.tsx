@@ -10,6 +10,7 @@ import { ChatWidget } from "@modules/chat/components/widgets/ChatWidget";
 import { PlanificarViajePanel } from "@modules/planificar/features/PlanificarViajePanel";
 import { RutasPanel } from "@modules/rutas/features/RutasPanel";
 import { AccesibilidadPanel } from "@modules/accesibilidad/features/AccesibilidadPanel";
+import { AdminPanel } from "@modules/admin/features/AdminPanel";
 import { MetricasPanel } from "@modules/metricas/features/MetricasPanel";
 import { useRoutePredictMulti } from "@modules/planificar/hooks/useRoutePredictMulti";
 import type { Coordinates } from "@modules/predicciones/models";
@@ -270,6 +271,27 @@ export function Layout() {
               <MetricasPanel />
             </SidePanel>
 
+            {activePanel === "admin" ? (
+              <div className="absolute inset-0 z-[600] bg-background overflow-y-auto pb-20 md:pb-0">
+                <div className="w-full max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-5 min-h-full flex flex-col">
+                  <div className="flex items-center justify-between mb-4 md:mb-5 shrink-0">
+                    <h1 className="text-sm md:text-base font-bold text-foreground">
+                      Administración
+                    </h1>
+                    <button
+                      onClick={() => setActivePanel("planificar")}
+                      className="text-[10px] md:text-[11px] text-default-500 hover:text-foreground px-2.5 py-1.5 rounded-lg border border-divider hover:border-primary/50 transition-all"
+                    >
+                      ← Mapa
+                    </button>
+                  </div>
+                  <div className="flex-1 min-h-0 overflow-y-auto">
+                    <AdminPanel />
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
             <MapView
               selectedTroncal={selectedTroncal}
               showTroncalesOnMap={showTroncales}
@@ -337,7 +359,7 @@ export function Layout() {
           <MobileNav activePanel={activePanel} onTogglePanel={togglePanel} />
         </div>
       </div>
-      <ChatWidget activeModule={activePanel} />
+      <ChatWidget activeModule={activePanel === "admin" ? undefined : activePanel} />
     </>
   );
 }
