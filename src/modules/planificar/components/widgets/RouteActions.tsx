@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useEffect, useRef } from "react";
 import {
   Navigation,
@@ -28,6 +29,7 @@ export function ActionButtons({
   readonly tripPoints: TripPoint[];
   readonly onClear: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <>
       <button className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.95] shadow-lg shadow-primary/30">
@@ -79,7 +81,7 @@ export function ActionButtons({
             if (btn) {
               btn.textContent = "✓ Guardado";
               setTimeout(() => {
-                btn.textContent = "Guardar";
+                btn.textContent = t("planner.save");
               }, 1500);
             }
           }}

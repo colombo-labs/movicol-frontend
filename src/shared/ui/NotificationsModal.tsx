@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useRef, useEffect } from "react";
 import {
   X,
@@ -94,6 +95,7 @@ export function NotificationsDropdown({
 }: {
   readonly onExpand: () => void;
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const unread = MOCK_NOTIFICATIONS.filter((n) => !n.read).length;
@@ -112,7 +114,7 @@ export function NotificationsDropdown({
       <button
         onClick={() => setOpen(!open)}
         className="w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center hover:bg-default-100 transition-all duration-200 text-default-500 hover:text-foreground active:scale-90 relative"
-        title="Notificaciones"
+        title={t("notifications.title")}
       >
         <Bell size={16} />
         {unread > 0 && (

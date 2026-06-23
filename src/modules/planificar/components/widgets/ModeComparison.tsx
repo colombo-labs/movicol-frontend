@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Train, Car, ArrowRightLeft, Footprints } from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { TransportMode, RouteOption, RouteLeg } from "../../models/types";
@@ -43,9 +44,9 @@ interface RouteOptionsListProps {
 }
 
 const TAG_LABELS: Record<string, { label: string; color: string }> = {
-  fastest: { label: "Más rápida", color: "bg-primary text-primary-foreground" },
-  cheapest: { label: "Económica", color: "bg-success text-success-foreground" },
-  less_walking: { label: "Menos caminata", color: "bg-blue-500 text-white" },
+  fastest: { label: "planner.fastest", color: "bg-primary text-primary-foreground" },
+  cheapest: { label: "planner.cheapest", color: "bg-success text-success-foreground" },
+  less_walking: { label: "planner.lessWalking", color: "bg-blue-500 text-white" },
 };
 
 function LegIcon({
@@ -107,6 +108,7 @@ export function RouteOptionsList({
   selectedId,
   onSelect,
 }: RouteOptionsListProps) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-1.5">
       <p className="text-[10px] text-default-400 font-medium">
@@ -131,7 +133,7 @@ export function RouteOptionsList({
                   <span
                     className={`text-[7px] px-1.5 py-0.5 rounded-full font-medium ${TAG_LABELS[opt.tag].color}`}
                   >
-                    {TAG_LABELS[opt.tag].label}
+                    {t(TAG_LABELS[opt.tag].label)}
                   </span>
                 )}
               </div>
