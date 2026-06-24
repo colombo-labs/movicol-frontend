@@ -223,7 +223,7 @@ function buildSimpleVehicleOptions(results: RoutePrediction[]): RouteOption[] {
     transfers: 0,
     legs: [
       {
-        type: "drive" as const,
+        type: ({"vehiculo":"drive","moto":"moto","bicicleta":"bike","caminando":"foot"} as Record<string,any>)[result.mode] || "drive",
         from: result.stations[0] || "Origen",
         to: result.stations[result.stations.length - 1] || "Destino",
         duration_minutes: result.total_time_minutes,
@@ -272,7 +272,7 @@ function buildMultiWaypointOptions(
       transfers: 0,
       legs: [
         {
-          type: "drive" as const,
+          type: ({"vehiculo":"drive","moto":"moto","bicicleta":"bike","caminando":"foot"} as Record<string,any>)[legResults[0]?.mode] || "drive",
           from: allStations[0] || "Origen",
           to: allStations[allStations.length - 1] || "Destino",
           duration_minutes: totalTime,

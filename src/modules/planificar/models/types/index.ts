@@ -9,7 +9,7 @@ export type DepartureType = "ahora" | "programar";
 
 /** Un tramo del viaje (caminar, TM, SITP) */
 export interface RouteLeg {
-  type: "walk" | "transmilenio" | "sitp" | "drive";
+  type: "walk" | "transmilenio" | "sitp" | "drive" | "moto" | "bike" | "foot";
   from: string;
   to: string;
   duration_minutes: number;

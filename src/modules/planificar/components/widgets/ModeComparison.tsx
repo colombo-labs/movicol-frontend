@@ -68,6 +68,9 @@ function LegIcon({
       />
     );
   if (type === "drive") return <Car size={size} className="text-emerald-400" />;
+  if (type === "moto") return <Car size={size} className="text-orange-400" />;
+  if (type === "bike") return <Bike size={size} className="text-blue-400" />;
+  if (type === "foot") return <Footprints size={size} className="text-purple-400" />;
   return (
     <img
       src="/icons/sitp-logo.svg"
@@ -82,6 +85,9 @@ function getLegBg(type: RouteLeg["type"]) {
   if (type === "walk") return "bg-default-200/80";
   if (type === "transmilenio") return "bg-red-500/15";
   if (type === "drive") return "bg-emerald-500/15";
+  if (type === "moto") return "bg-orange-500/15";
+  if (type === "bike") return "bg-blue-500/15";
+  if (type === "foot") return "bg-purple-500/15";
   return "bg-blue-500/15";
 }
 
@@ -89,6 +95,9 @@ function getDotColor(type: RouteLeg["type"]): string {
   if (type === "walk") return "bg-default-300";
   if (type === "transmilenio") return "bg-danger";
   if (type === "drive") return "bg-emerald-500";
+  if (type === "moto") return "bg-orange-500";
+  if (type === "bike") return "bg-blue-500";
+  if (type === "foot") return "bg-purple-500";
   return "bg-blue-500";
 }
 
@@ -97,6 +106,9 @@ function getLegLabel(type: RouteLeg["type"], line: string | undefined, t: (k: st
     walk: t("planner.walking"),
     transmilenio: "TransMilenio",
     drive: t("planner.vehicle"),
+    moto: "Moto",
+    bike: "Bici",
+    foot: t("planner.walking"),
     sitp: "SITP",
   };
   const base = labels[type] || type;

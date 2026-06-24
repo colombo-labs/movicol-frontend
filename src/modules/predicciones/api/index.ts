@@ -28,6 +28,6 @@ export const routePredictionApi = {
       ...params,
       origin: toApiCoordinates(params.origin),
       destination: toApiCoordinates(params.destination),
-      mode: "vehiculo",
+      mode: params.mode ?? "vehiculo",
     }),
 };
