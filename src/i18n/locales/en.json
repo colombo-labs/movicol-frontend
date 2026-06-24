@@ -158,7 +158,8 @@
     "previous": "Previous",
     "min": "min",
     "km": "km",
-    "clear": "Clear"
+    "clear": "Clear",
+    "offline": "No internet connection"
   },
   "metrics": {
     "loading": "Loading real-time metrics...",

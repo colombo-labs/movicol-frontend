@@ -6,6 +6,7 @@ import { AlertTriangle } from "lucide-react";
 import { Sidebar, type PanelId } from "@shared/ui/Sidebar";
 import { MobileNav } from "@shared/ui/MobileNav";
 import { Header } from "@shared/ui/Header";
+import { OfflineBanner } from "@shared/ui/OfflineBanner";
 import { SidePanel } from "@shared/ui/SidePanel";
 import { MapView } from "@shared/ui/MapView";
 import { ChatWidget } from "@modules/chat/components/widgets/ChatWidget";
@@ -213,6 +214,7 @@ export function Layout() {
 
   return (
     <>
+      <OfflineBanner />
       <div className="flex h-screen w-screen overflow-hidden bg-background">
         <div className="hidden md:block">
           <Sidebar activePanel={activePanel} onTogglePanel={togglePanel} />

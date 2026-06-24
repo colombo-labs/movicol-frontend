@@ -158,7 +158,8 @@
     "previous": "Anterior",
     "min": "min",
     "km": "km",
-    "clear": "Limpar"
+    "clear": "Limpar",
+    "offline": "Sem ligação à internet"
   },
   "metrics": {
     "loading": "A carregar métricas em tempo real...",

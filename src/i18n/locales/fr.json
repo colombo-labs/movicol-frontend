@@ -158,7 +158,8 @@
     "previous": "Précédent",
     "min": "min",
     "km": "km",
-    "clear": "Effacer"
+    "clear": "Effacer",
+    "offline": "Pas de connexion internet"
   },
   "metrics": {
     "loading": "Chargement des métriques en temps réel...",
