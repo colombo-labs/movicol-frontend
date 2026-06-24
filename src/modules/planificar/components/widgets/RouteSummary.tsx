@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 function formatTime(min: number): string { const m = Math.round(min); if (m < 60) return `${m} min`; const h = Math.floor(m / 60); const r = m % 60; return r === 0 ? `${h} h` : `${h} h ${r} min`; }
+function formatTimeLong(min: number): string { const m = Math.round(min); if (m < 60) return `${m} minutos`; const h = Math.floor(m / 60); const r = m % 60; if (r === 0) return h === 1 ? "1 hora" : `${h} horas`; return `${h === 1 ? "1 hora" : `${h} horas`} ${r} minutos`; }
 import {
   Clock,
   Train,
@@ -88,7 +89,7 @@ export function RouteSummaryCard({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
         <div className="text-center p-1.5 rounded-lg bg-default-100">
           <p className="text-[9px] text-default-400">Tiempo</p>
-          <p className="text-base font-bold">{formatTime(prediction.total_time_minutes)}</p>
+          <p className="text-base font-bold">{formatTimeLong(prediction.total_time_minutes)}</p>
 
 
 
