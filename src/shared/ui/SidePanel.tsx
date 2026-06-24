@@ -41,14 +41,14 @@ export function SidePanel({
         try {
           const { latitude, longitude } = pos.coords;
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`,
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`, { signal: AbortSignal.timeout(5000) }
           );
           const data = await res.json();
           setCity(
             data.address?.city ||
               data.address?.town ||
               data.address?.state ||
-              "Bogotá D.C.",
+              "",
           );
         } catch {
           /* keep default */
