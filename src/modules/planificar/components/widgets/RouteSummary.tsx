@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+function formatTime(min: number): string { const m = Math.round(min); if (m < 60) return `${m} min`; const h = Math.floor(m / 60); const r = m % 60; return r === 0 ? `${h} h` : `${h} h ${r} min`; }
 import {
   Clock,
   Train,
@@ -58,7 +59,7 @@ export function LiveTimeBanner({
       <div className="text-right">
         <p className="text-[10px] text-default-400">Duración estimada</p>
         <p className="text-base font-bold">
-          {Math.round(prediction.total_time_minutes)} min
+          {formatTime(prediction.total_time_minutes)}
         </p>
       </div>
       <div className="text-center">
@@ -87,10 +88,11 @@ export function RouteSummaryCard({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5">
         <div className="text-center p-1.5 rounded-lg bg-default-100">
           <p className="text-[9px] text-default-400">Tiempo</p>
-          <p className="text-base font-bold">
-            {Math.round(prediction.total_time_minutes)}
-            <span className="text-[9px] font-normal"> min</span>
-          </p>
+          <p className="text-base font-bold">{formatTime(prediction.total_time_minutes)}</p>
+
+
+
+
         </div>
         <div className="text-center p-1.5 rounded-lg bg-default-100">
           <p className="text-[9px] text-default-400">Distancia</p>

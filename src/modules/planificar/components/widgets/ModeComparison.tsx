@@ -3,6 +3,14 @@ import { Train, Car, ArrowRightLeft, Footprints, Bike, Motorbike } from "lucide-
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { TransportMode, RouteOption, RouteLeg } from "../../models/types";
 
+function formatTime(min: number): string {
+  const m = Math.round(min);
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  const r = m % 60;
+  return r === 0 ? `${h} h` : `${h} h ${r} min`;
+}
+
 interface ModeTabsProps {
   readonly mode: TransportMode;
   readonly onModeChange: (mode: TransportMode) => void;
@@ -151,7 +159,7 @@ export function RouteOptionsList({
                 )}
               </div>
               <span className="text-[11px] font-bold text-foreground">
-                {Math.round(opt.total_time_minutes)} min
+                {formatTime(opt.total_time_minutes)}
               </span>
             </div>
 
@@ -220,7 +228,7 @@ export function SelectedRouteDetail({
       <div className="flex items-center justify-between mb-2">
         <span className="text-[10px] font-semibold">{t(option.label)}</span>
         <span className="text-[10px] font-bold text-primary">
-          {Math.round(option.total_time_minutes)} min
+          {formatTime(option.total_time_minutes)}
         </span>
       </div>
       <div className="space-y-0 border-l-2 border-primary/20 ml-2 pl-3">
