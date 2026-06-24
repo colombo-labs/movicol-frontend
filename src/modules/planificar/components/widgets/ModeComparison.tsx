@@ -20,9 +20,9 @@ interface ModeTabsProps {
 export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex gap-1 overflow-x-auto">
+    <div className="flex gap-1 overflow-x-auto scrollbar-hide">
       {([
-        { id: "publico", icon: Train, label: t("planner.publicTransport") },
+        { id: "publico", icon: Train, label: "Bus" },
         { id: "vehiculo", icon: Car, label: t("planner.vehicle") },
         { id: "moto", icon: Motorbike, label: "Moto" },
         { id: "bicicleta", icon: Bike, label: "Bici" },
@@ -32,9 +32,9 @@ export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
           key={m.id}
           type="button"
           onClick={() => onModeChange(m.id as TransportMode)}
-          className={`flex items-center justify-center gap-1 px-2.5 py-2 rounded-lg border text-[10px] font-semibold transition-all whitespace-nowrap ${mode === m.id ? "border-primary bg-primary/10 text-primary" : "border-divider text-default-500 hover:border-primary/50"}`}
+          className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg border text-[9px] font-semibold transition-all whitespace-nowrap ${mode === m.id ? "border-primary bg-primary/10 text-primary" : "border-divider text-default-500 hover:border-primary/50"}`}
         >
-          <m.icon size={13} />
+          <m.icon size={11} />
           {m.label}
           {optionsCount && mode === m.id ? (
             <span className="text-[8px] px-1 py-0.5 rounded-full bg-primary/20">{optionsCount}</span>
