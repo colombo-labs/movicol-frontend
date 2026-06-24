@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Train, Car, ArrowRightLeft, Footprints, Bike } from "lucide-react";
+import { Train, Car, ArrowRightLeft, Footprints, Bike, Motorbike } from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { TransportMode, RouteOption, RouteLeg } from "../../models/types";
 
@@ -16,7 +16,7 @@ export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
       {([
         { id: "publico", icon: Train, label: t("planner.publicTransport") },
         { id: "vehiculo", icon: Car, label: t("planner.vehicle") },
-        { id: "moto", icon: Car, label: "Moto" },
+        { id: "moto", icon: Motorbike, label: "Moto" },
         { id: "bicicleta", icon: Bike, label: "Bici" },
         { id: "caminando", icon: Footprints, label: t("planner.walking") },
       ] as const).map((m) => (
@@ -68,7 +68,7 @@ function LegIcon({
       />
     );
   if (type === "drive") return <Car size={size} className="text-emerald-400" />;
-  if (type === "moto") return <Car size={size} className="text-orange-400" />;
+  if (type === "moto") return <Motorbike size={size} className="text-orange-400" />;
   if (type === "bike") return <Bike size={size} className="text-blue-400" />;
   if (type === "foot") return <Footprints size={size} className="text-purple-400" />;
   return (
