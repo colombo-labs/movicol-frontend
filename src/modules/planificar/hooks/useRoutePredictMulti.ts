@@ -251,7 +251,7 @@ function buildMultiWaypointOptions(
     total_time_minutes: totalTime,
     total_distance_km: totalDist,
     cost,
-    mode: "vehiculo",
+    mode: legResults[0]?.mode || "vehiculo",
     risk_segments: allSegments,
     overall_risk: legResults[0]?.overall_risk || "low",
     safety_score: Math.round(
@@ -298,7 +298,7 @@ async function fetchVehicleRoute(
       origin: params.origin,
       destination: params.destination,
       departure_time: params.departureTime,
-      mode: "vehiculo",
+      mode: params.mode,
     });
     return buildSimpleVehicleOptions(results);
   }
@@ -309,7 +309,7 @@ async function fetchVehicleRoute(
       origin: points[i],
       destination: points[i + 1],
       departure_time: params.departureTime,
-      mode: "vehiculo",
+      mode: params.mode,
     });
     legResults.push(res);
   }
@@ -374,7 +374,7 @@ export function useRoutePredictMulti() {
 
     try {
       const opts =
-        params.mode === "vehiculo"
+        ["vehiculo", "moto", "bicicleta", "caminando"].includes(params.mode)
           ? await fetchVehicleRoute(params)
           : await fetchTransitRoute(params);
 

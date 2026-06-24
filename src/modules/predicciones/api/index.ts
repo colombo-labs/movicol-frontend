@@ -5,7 +5,7 @@ interface PredictRouteParams {
   origin: Coordinates;
   destination: Coordinates;
   departure_time: string;
-  mode?: "transmilenio" | "sitp" | "vehiculo";
+  mode?: string;
 }
 function toApiCoordinates(coords: Coordinates): { lat: number; lng: number } {
   const lng = coords.lng ?? coords.lon;

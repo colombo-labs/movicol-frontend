@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Train, Car, ArrowRightLeft, Footprints } from "lucide-react";
+import { Train, Car, ArrowRightLeft, Footprints, Bike } from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { TransportMode, RouteOption, RouteLeg } from "../../models/types";
 
@@ -12,28 +12,27 @@ interface ModeTabsProps {
 export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex gap-1.5">
-      <button
-        type="button"
-        onClick={() => onModeChange("publico")}
-        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border text-[11px] font-semibold transition-all ${mode === "publico" ? "border-primary bg-primary/10 text-primary" : "border-divider text-default-500 hover:border-primary/50"}`}
-      >
-        <Train size={14} />
-        {t("planner.publicTransport")}
-        {optionsCount && mode === "publico" ? (
-          <span className="text-[8px] px-1 py-0.5 rounded-full bg-primary/20">
-            {optionsCount}
-          </span>
-        ) : null}
-      </button>
-      <button
-        type="button"
-        onClick={() => onModeChange("vehiculo")}
-        className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border text-[11px] font-semibold transition-all ${mode === "vehiculo" ? "border-primary bg-primary/10 text-primary" : "border-divider text-default-500 hover:border-primary/50"}`}
-      >
-        <Car size={14} />
-        {t("planner.vehicle")}
-      </button>
+    <div className="flex gap-1 overflow-x-auto">
+      {([
+        { id: "publico", icon: Train, label: t("planner.publicTransport") },
+        { id: "vehiculo", icon: Car, label: t("planner.vehicle") },
+        { id: "moto", icon: Car, label: "Moto" },
+        { id: "bicicleta", icon: Bike, label: "Bici" },
+        { id: "caminando", icon: Footprints, label: t("planner.walking") },
+      ] as const).map((m) => (
+        <button
+          key={m.id}
+          type="button"
+          onClick={() => onModeChange(m.id as TransportMode)}
+          className={`flex items-center justify-center gap-1 px-2.5 py-2 rounded-lg border text-[10px] font-semibold transition-all whitespace-nowrap ${mode === m.id ? "border-primary bg-primary/10 text-primary" : "border-divider text-default-500 hover:border-primary/50"}`}
+        >
+          <m.icon size={13} />
+          {m.label}
+          {optionsCount && mode === m.id ? (
+            <span className="text-[8px] px-1 py-0.5 rounded-full bg-primary/20">{optionsCount}</span>
+          ) : null}
+        </button>
+      ))}
     </div>
   );
 }

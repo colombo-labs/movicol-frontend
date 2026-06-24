@@ -8,7 +8,7 @@ import {
   Trash2,
   Search,
 } from "lucide-react";
-import type { PlanificarProps } from "../../models/types";
+import type { PlanificarProps, TransportMode } from "../../models/types";
 
 interface Props extends Pick<
   PlanificarProps,
@@ -21,7 +21,7 @@ interface Props extends Pick<
   | "onUpdatePoint"
   | "onRequestAddPoint"
 > {
-  readonly mode: "publico" | "vehiculo";
+  readonly mode: TransportMode;
 }
 
 interface SearchResult {
