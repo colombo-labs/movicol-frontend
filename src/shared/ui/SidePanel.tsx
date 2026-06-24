@@ -35,6 +35,7 @@ export function SidePanel({
   const [city, setCity] = useState("");
 
   useEffect(() => {
+    if (!navigator.onLine) return;
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
