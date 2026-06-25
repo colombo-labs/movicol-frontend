@@ -16,56 +16,120 @@ function getRiskLabel(risk: string) {
   return "Bajo";
 }
 
+const AI_URL = "http://localhost:8000";
+
+function ParaderoPopupContent({ id, nombre, direccion, color }: any) {
+  const [aiData, setAiData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${AI_URL}/predictions/sitp/paradero/${id}/info`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        setAiData(d);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [id]);
+
+  return (
+    <div style={{ fontSize: 11, minWidth: 160 }}>
+      <strong>{nombre}</strong>
+      <br />
+      <span style={{ color: "#888" }}>{direccion}</span>
+      <br />
+      <div
+        style={{ marginTop: 4, padding: "4px 0", borderTop: "1px solid #eee" }}
+      >
+        {loading ? (
+          <span style={{ color: "#666" }}>
+            Conectando con IA para predicción...
+          </span>
+        ) : aiData ? (
+          <>
+            <span style={{ color: color, fontWeight: 600 }}>
+              Demanda {aiData.nivel_demanda} (
+              {Math.round(aiData.demanda_actual_score)}%)
+            </span>
+            <div style={{ marginTop: 4, maxHeight: 100, overflowY: "auto" }}>
+              {aiData.rutas.map((r: any) => (
+                <div key={r.ruta} style={{ marginBottom: 4 }}>
+                  <span style={{ fontWeight: 600 }}>{r.ruta}</span>: Espera{" "}
+                  {r.tiempo_espera_predicho}
+                  <span
+                    style={{ fontSize: 9, color: "#888", display: "block" }}
+                  >
+                    (Frec. base: {r.frecuencia_estimada_min}m | Riesgo:{" "}
+                    {r.congestion_esperada})
+                  </span>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <span style={{ color: "#ef4444" }}>
+            No se pudo obtener predicción AI.
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function SitpLayer() {
-  const [paraderos, setParaderos] = useState<
-    { lat: number; lon: number; nombre: string; direccion: string }[]
-  >([]);
+  const [paraderos, setParaderos] = useState<any[]>([]);
+
   useEffect(() => {
     fetch(`${API_URL}/graph/sitp/paraderos`)
       .then((r) => (r.ok ? r.json() : { features: [] }))
       .then((d) => {
         const features = d.features || [];
-        setParaderos(
-          features
-            .filter((f: any) => f.geometry)
-            .map((f: any) => ({
-              lat: f.geometry.coordinates[1],
-              lon: f.geometry.coordinates[0],
-              nombre: f.properties.nombre || "",
-              direccion:
-                f.properties.direccion_bandera || f.properties.via || "",
-            })),
-        );
+        setParaderos(features.filter((f: any) => f.geometry));
       })
       .catch(() => {});
   }, []);
+
+  const getDemandaColor = (score: number) => {
+    if (!score) return "#22c55e"; // Default baja
+    if (score > 70) return "#ef4444"; // Alta
+    if (score > 30) return "#eab308"; // Media
+    return "#22c55e"; // Baja
+  };
+
   return (
     <>
-      {paraderos.map((p, i) => (
-        <CircleMarker
-          key={`sitp-${i}-${p.lat}-${p.lon}`}
-          center={[p.lat, p.lon]}
-          radius={3}
-          pathOptions={{
-            color: "#3b82f6",
-            fillColor: "#3b82f6",
-            fillOpacity: 0.7,
-            weight: 1,
-          }}
-        >
-          <Popup>
-            <div style={{ fontSize: 11, minWidth: 120 }}>
-              <strong>{p.nombre}</strong>
-              <br />
-              <span style={{ color: "#888" }}>{p.direccion}</span>
-              <br />
-              <span style={{ color: "#3b82f6", fontWeight: 500 }}>
-                Paradero SITP Zonal
-              </span>
-            </div>
-          </Popup>
-        </CircleMarker>
-      ))}
+      {paraderos.map((p, i) => {
+        const lat = p.geometry.coordinates[1];
+        const lon = p.geometry.coordinates[0];
+        const nombre = p.properties.nombre || "";
+        const direccion =
+          p.properties.direccion_bandera || p.properties.via || "";
+        const demanda = p.properties.demanda_score || 0;
+        const color = getDemandaColor(demanda);
+
+        return (
+          <CircleMarker
+            key={`sitp-${i}-${lat}-${lon}`}
+            center={[lat, lon]}
+            radius={4}
+            pathOptions={{
+              color: color,
+              fillColor: color,
+              fillOpacity: 0.8,
+              weight: 1,
+            }}
+          >
+            <Popup>
+              <ParaderoPopupContent
+                id={p.properties?.cenefa || p.id || p.properties?.objectid}
+                nombre={nombre}
+                direccion={direccion}
+                color={color}
+              />
+            </Popup>
+          </CircleMarker>
+        );
+      })}
     </>
   );
 }
