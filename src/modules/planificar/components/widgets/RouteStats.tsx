@@ -73,6 +73,10 @@ export function WaitEstimation({
 }: {
   readonly prediction: RoutePrediction;
 }) {
+  const waitMin = prediction.estimated_wait_minutes ?? 5;
+  const occupancy = Math.min(Math.round(waitMin * 8), 100);
+  const filledBars = Math.round(occupancy / 20);
+
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-1.5">
@@ -86,7 +90,9 @@ export function WaitEstimation({
             <span className="text-[9px] text-default-400">
               Tiempo de espera
             </span>
-            <span className="text-[10px] font-bold">3 min</span>
+            <span className="text-[10px] font-bold">
+              {Math.round(waitMin)} min
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-[9px] text-default-400">
@@ -96,11 +102,11 @@ export function WaitEstimation({
               {Array.from({ length: 5 }, (_, idx) => (
                 <div
                   key={`occ-${idx}`}
-                  className={`w-3 h-4 rounded-sm ${idx < 3 ? "bg-warning" : "bg-default-200"}`}
+                  className={`w-3 h-4 rounded-sm ${idx < filledBars ? "bg-warning" : "bg-default-200"}`}
                 />
               ))}
               <span className="text-[9px] text-warning font-medium ml-1">
-                60%
+                {occupancy}%
               </span>
             </div>
           </div>
@@ -108,8 +114,10 @@ export function WaitEstimation({
       </div>
       <p className="text-[9px] text-default-400 mt-1.5 border-t border-divider/30 pt-1.5">
         Probabilidad de asiento:{" "}
-        <strong className="text-foreground">Baja</strong> — Viaja de pie ~
-        {Math.round(prediction.total_time_minutes * 0.7)} min
+        <strong className="text-foreground">
+          {waitMin <= 4 ? "Alta" : waitMin <= 8 ? "Media" : "Baja"}
+        </strong>{" "}
+        — Viaja de pie ~{Math.round(prediction.total_time_minutes * 0.7)} min
       </p>
     </GlassCard>
   );
