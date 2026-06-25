@@ -10,6 +10,7 @@ export function RutasPanel(props: RutasPanelProps) {
   const {
     tab,
     sitpRutas,
+    sitpShapes,
     tmTroncales,
     tmRutas,
     tmStations,
@@ -88,8 +89,31 @@ export function RutasPanel(props: RutasPanelProps) {
       handleTab={handleTab}
       onSelectRuta={(r: SitpRuta) => {
         setSelectedSitpRuta(r.ruta);
+        let coords = r.paraderos.map((p) => [p.lat, p.lon] as [number, number]);
+
+        // Si tenemos los shapes exactos, los usamos
+        if (sitpShapes && sitpShapes.features) {
+          const shapeFeature = sitpShapes.features.find(
+            (f: any) => f.properties?.ruta === r.ruta,
+          );
+          if (shapeFeature && shapeFeature.geometry) {
+            if (shapeFeature.geometry.type === "LineString") {
+              // GeoJSON es [lon, lat], Leaflet usa [lat, lon]
+              coords = shapeFeature.geometry.coordinates.map((c: any) => [
+                c[1],
+                c[0],
+              ]);
+            } else if (shapeFeature.geometry.type === "MultiLineString") {
+              coords = shapeFeature.geometry.coordinates[0].map((c: any) => [
+                c[1],
+                c[0],
+              ]);
+            }
+          }
+        }
+
         props.onSelectSitpRoute?.({
-          coords: r.paraderos.map((p) => [p.lat, p.lon] as [number, number]),
+          coords,
           stops: r.paraderos,
         });
       }}

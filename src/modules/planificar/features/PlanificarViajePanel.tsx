@@ -160,7 +160,16 @@ export function PlanificarViajePanel({
           <input
             type="time"
             value={departureTime}
-            onChange={(e) => setDepartureTime(e.target.value)}
+            onChange={(e) => {
+              setDepartureTime(e.target.value);
+              if (e.target.value && origin && destination) {
+                const dt = new Date(
+                  `2026-06-12T${e.target.value}:00`,
+                ).toISOString();
+                setSelectedOptionId(null);
+                onPredictMulti?.(origin, destination, mode, dt);
+              }
+            }}
             className="px-2 py-0.5 rounded-lg bg-default-100 border border-divider text-[10px] outline-none text-foreground"
           />
         )}

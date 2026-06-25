@@ -218,7 +218,10 @@ export function RutasList(props: Props) {
       const matchSearch =
         !search ||
         r.ruta.toLowerCase().includes(search.toLowerCase()) ||
-        r.cenefa.toLowerCase().includes(search.toLowerCase());
+        r.cenefa.toLowerCase().includes(search.toLowerCase()) ||
+        r.paraderos.some((p: any) =>
+          p.nombre.toLowerCase().includes(search.toLowerCase()),
+        );
       const matchNearby = filter !== "cercanas" || nearbyRutas.includes(r.ruta);
       const matchFav = filter !== "favoritas" || isFav(r.ruta);
       return matchSearch && matchNearby && matchFav;
