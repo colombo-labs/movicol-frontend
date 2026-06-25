@@ -7,7 +7,7 @@ import { Sidebar, type PanelId } from "@shared/ui/Sidebar";
 import { MobileNav } from "@shared/ui/MobileNav";
 import { Header } from "@shared/ui/Header";
 import { OfflineBanner } from "@shared/ui/OfflineBanner";
-import { StreetViewModal } from "@shared/ui/StreetViewModal";
+import { openStreetView } from "@shared/ui/StreetViewModal";
 import { SidePanel } from "@shared/ui/SidePanel";
 import { MapView } from "@shared/ui/MapView";
 import { ChatWidget } from "@modules/chat/components/widgets/ChatWidget";
@@ -78,7 +78,6 @@ export function Layout() {
   const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
   const [showCongestion] = useState(false);
   const [showSiniestros, setShowSiniestros] = useState(false);
-  const [streetView, setStreetView] = useState<{ lat: number; lng: number; title?: string } | null>(null);
   const { predictMulti, options, isLoading, error, clear } =
     useRoutePredictMulti();
   const [selectedRouteIdx, setSelectedRouteIdx] = useState(0);
@@ -376,7 +375,7 @@ export function Layout() {
                 const center = tripPoints.length > 0
                   ? tripPoints[0]
                   : { lat: 4.65, lng: -74.08 };
-                setStreetView({ lat: center.lat, lng: center.lng, title: center.label });
+                openStreetView(center.lat, center.lng);
               }}
               className="absolute top-[130px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg bg-background border border-divider hover:bg-default-100 transition-all"
               title="Vista de calle"
@@ -390,7 +389,6 @@ export function Layout() {
         </div>
       </div>
       <ChatWidget activeModule={activePanel === "admin" ? undefined : activePanel} />
-      <StreetViewModal isOpen={!!streetView} onClose={() => setStreetView(null)} lat={streetView?.lat ?? 4.65} lng={streetView?.lng ?? -74.08} title={streetView?.title} />
     </>
   );
 }
