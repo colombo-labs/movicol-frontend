@@ -190,13 +190,34 @@ export function RouteOptionsList({
             </div>
 
             {/* Summary line */}
-            <div className="flex items-center gap-3 text-[9px] text-default-400">
+            <div className="flex items-center gap-3 text-[9px] text-default-400 flex-wrap">
               <span>{opt.total_distance_km.toFixed(1)} km</span>
               <span>{opt.cost}</span>
               {opt.transfers > 0 && (
                 <span className="flex items-center gap-0.5">
                   <ArrowRightLeft size={8} />
                   {opt.transfers} {t("planner.transfers")}
+                </span>
+              )}
+              {opt.prediction.overall_risk && (
+                <span
+                  className={`font-medium ${
+                    opt.prediction.overall_risk === "low"
+                      ? "text-success"
+                      : opt.prediction.overall_risk === "medium"
+                        ? "text-warning"
+                        : opt.prediction.overall_risk === "high"
+                          ? "text-orange-500"
+                          : "text-danger"
+                  }`}
+                >
+                  {opt.prediction.overall_risk === "low"
+                    ? "Fluido"
+                    : opt.prediction.overall_risk === "medium"
+                      ? "Moderado"
+                      : opt.prediction.overall_risk === "high"
+                        ? "Congestionado"
+                        : "Muy congestionado"}
                 </span>
               )}
               {opt.legs.some((l) => l.type === "walk") && (

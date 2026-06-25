@@ -6,6 +6,7 @@ import type { SitpRuta, TmTroncal, TmRuta, Tab } from "../models/types";
 export function useRutasData() {
   const [tab, setTab] = useState<Tab>("tm");
   const [sitpRutas, setSitpRutas] = useState<SitpRuta[]>([]);
+  const [sitpShapes, setSitpShapes] = useState<any>(null);
   const [tmTroncales, setTmTroncales] = useState<TmTroncal[]>([]);
   const [tmRutas, setTmRutas] = useState<TmRuta[]>([]);
   const [tmStations, setTmStations] = useState<string[]>([]);
@@ -58,6 +59,10 @@ export function useRutasData() {
         .then((r) => r.json())
         .then((d) => setSitpRutas(d.rutas || []))
         .catch(() => {});
+      fetch(API_URL + "/graph/sitp/rutas/shapes")
+        .then((r) => r.json())
+        .then((d) => setSitpShapes(d))
+        .catch(() => {});
     }
     setTab(t);
     setSearch("");
@@ -68,6 +73,7 @@ export function useRutasData() {
   return {
     tab,
     sitpRutas,
+    sitpShapes,
     tmTroncales,
     tmRutas,
     tmStations,

@@ -31,6 +31,9 @@ export interface RoutePrediction {
   stations: string[];
   departure_time: string;
   route_code?: string;
+  transfers: number;
+  estimated_wait_minutes: number;
+  alternatives: RoutePrediction[];
   navigation_steps?: {
     instruction: string;
     street: string;

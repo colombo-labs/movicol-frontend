@@ -4,7 +4,7 @@ import type {
   RoutePrediction,
 } from "@modules/predicciones/models";
 import { routePredictionApi } from "@modules/predicciones/api";
-import type { RouteOption, TransportMode } from "../models/types";
+import type { RouteOption, RouteLeg, TransportMode } from "../models/types";
 import { calcDistance, fetchRutasCercanas } from "../api/planificarApi";
 
 interface PredictMultiParams {
@@ -19,6 +19,73 @@ interface PredictMultiParams {
 function deriveLineName(prediction: RoutePrediction): string {
   if (prediction.route_code) return prediction.route_code;
   return "";
+}
+
+/** Build a RouteOption from a RoutePrediction, inferring legs from mode/stations */
+function predictionToOption(
+  prediction: RoutePrediction,
+  id: string,
+  label: string,
+  dist: number,
+  tag?: RouteOption["tag"],
+): RouteOption {
+  const walkTime = Math.round(dist * 0.15 * 12);
+  const code = deriveLineName(prediction);
+  const legType: RouteLeg["type"] =
+    prediction.mode === "transmilenio"
+      ? "transmilenio"
+      : prediction.mode === "sitp"
+        ? "sitp"
+        : prediction.mode === "vehiculo"
+          ? "drive"
+          : "transmilenio";
+
+  const legs: RouteLeg[] = [];
+  if (prediction.stations.length > 0) {
+    legs.push({
+      type: "walk",
+      from: "Tu ubicación",
+      to: prediction.stations[0],
+      duration_minutes: walkTime,
+      distance_km: dist * 0.15,
+    });
+    legs.push({
+      type: legType,
+      from: prediction.stations[0],
+      to: prediction.stations[prediction.stations.length - 1],
+      duration_minutes: prediction.total_time_minutes - walkTime * 2,
+      distance_km: prediction.total_distance_km * 0.85,
+      stations: prediction.stations,
+      line: code || prediction.mode.toUpperCase(),
+    });
+    legs.push({
+      type: "walk",
+      from: prediction.stations[prediction.stations.length - 1],
+      to: "Destino",
+      duration_minutes: walkTime,
+      distance_km: dist * 0.15,
+    });
+  } else {
+    legs.push({
+      type: legType,
+      from: "Origen",
+      to: "Destino",
+      duration_minutes: prediction.total_time_minutes,
+      distance_km: prediction.total_distance_km,
+    });
+  }
+
+  return {
+    id,
+    label,
+    total_time_minutes: prediction.total_time_minutes,
+    total_distance_km: prediction.total_distance_km,
+    cost: prediction.cost || "$3,550",
+    transfers: prediction.transfers ?? 0,
+    legs,
+    prediction,
+    tag,
+  };
 }
 
 function buildOptions(
@@ -38,80 +105,58 @@ function buildOptions(
 
   if (tm && tm.stations.length > 0) {
     const tmCode = deriveLineName(tm);
-    options.push({
-      id: "tm-direct",
-      label: tmCode ? `TM ${tmCode}` : "TransMilenio",
-      total_time_minutes: tm.total_time_minutes,
-      total_distance_km: tm.total_distance_km,
-      cost: "$3,550",
-      transfers: 0,
-      legs: [
-        {
-          type: "walk",
-          from: "Tu ubicación",
-          to: tm.stations[0],
-          duration_minutes: walkTime,
-          distance_km: dist * 0.15,
-        },
-        {
-          type: "transmilenio",
-          from: tm.stations[0],
-          to: tm.stations[tm.stations.length - 1],
-          duration_minutes: tm.total_time_minutes - walkTime * 2,
-          distance_km: tm.total_distance_km * 0.85,
-          stations: tm.stations,
-          line: tmCode || "TM",
-        },
-        {
-          type: "walk",
-          from: tm.stations[tm.stations.length - 1],
-          to: "Destino",
-          duration_minutes: walkTime,
-          distance_km: dist * 0.15,
-        },
-      ],
-      prediction: tm,
-      tag: "fastest",
-    });
+    options.push(
+      predictionToOption(
+        tm,
+        "tm-direct",
+        tmCode ? `TM ${tmCode}` : "TransMilenio",
+        dist,
+        "fastest",
+      ),
+    );
+
+    // Add AI-provided alternatives for TM
+    if (tm.alternatives && tm.alternatives.length > 0) {
+      tm.alternatives.forEach((alt, i) => {
+        const altCode = alt.route_code || deriveLineName(alt);
+        options.push(
+          predictionToOption(
+            alt,
+            `tm-alt-${i}`,
+            altCode ? `TM ${altCode}` : `TM Alt ${i + 1}`,
+            dist,
+          ),
+        );
+      });
+    }
   }
 
   if (sitp && sitp.stations.length > 0) {
     const sitpCode = deriveLineName(sitp);
-    options.push({
-      id: "sitp-direct",
-      label: sitpCode ? `SITP ${sitpCode}` : "SITP",
-      total_time_minutes: sitp.total_time_minutes,
-      total_distance_km: sitp.total_distance_km,
-      cost: "$3,550",
-      transfers: 0,
-      legs: [
-        {
-          type: "walk",
-          from: "Tu ubicación",
-          to: sitp.stations[0],
-          duration_minutes: Math.round(walkTime * 0.7),
-          distance_km: dist * 0.1,
-        },
-        {
-          type: "sitp",
-          from: sitp.stations[0],
-          to: sitp.stations[sitp.stations.length - 1],
-          duration_minutes: sitp.total_time_minutes - walkTime,
-          distance_km: sitp.total_distance_km * 0.9,
-          stations: sitp.stations,
-          line: sitpCode || "SITP",
-        },
-        {
-          type: "walk",
-          from: sitp.stations[sitp.stations.length - 1],
-          to: "Destino",
-          duration_minutes: Math.round(walkTime * 0.5),
-          distance_km: dist * 0.05,
-        },
-      ],
-      prediction: sitp,
-      tag: "less_walking",
-    });
+    options.push(
+      predictionToOption(
+        sitp,
+        "sitp-direct",
+        sitpCode ? `SITP ${sitpCode}` : "SITP",
+        dist,
+        "less_walking",
+      ),
+    );
+
+    // Add AI-provided alternatives for SITP
+    if (sitp.alternatives && sitp.alternatives.length > 0) {
+      sitp.alternatives.forEach((alt, i) => {
+        const altCode = alt.route_code || deriveLineName(alt);
+        options.push(
+          predictionToOption(
+            alt,
+            `sitp-alt-${i}`,
+            altCode ? `SITP ${altCode}` : `SITP Alt ${i + 1}`,
+            dist,
+          ),
+        );
+      });
+    }
   }
 
   if (tm && sitp && tm.stations.length > 1 && sitp.stations.length > 1) {
@@ -157,6 +202,12 @@ function buildCombinedOption(
     stations: [...tm.stations.slice(0, tmHalf), ...sitp.stations],
     departure_time: tm.departure_time,
     route_code: `${tmC}+${sitpC}`,
+    transfers: 1,
+    estimated_wait_minutes: Math.max(
+      tm.estimated_wait_minutes ?? 0,
+      sitp.estimated_wait_minutes ?? 0,
+    ),
+    alternatives: [],
   };
 
   return {
@@ -260,6 +311,9 @@ function buildMultiWaypointOptions(
     explanation: "",
     stations: allStations,
     departure_time: departureTime,
+    transfers: 0,
+    estimated_wait_minutes: 0,
+    alternatives: [],
   };
 
   return [
