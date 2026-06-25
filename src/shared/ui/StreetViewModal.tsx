@@ -37,6 +37,7 @@ export function StreetViewModal({ isOpen, onClose, lat, lng, title }: Props) {
           className="w-full h-full border-0"
           title="Street View"
           allowFullScreen
+          allow="accelerometer; gyroscope; magnetometer; xr-spatial-tracking"
         />
       </div>
     </div>
