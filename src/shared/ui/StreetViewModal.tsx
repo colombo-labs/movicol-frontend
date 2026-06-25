@@ -1,5 +1,7 @@
 import { X } from "lucide-react";
 
+const GOOGLE_KEY = "AIzaSyBk3OGVm2FaPsVH0SGIYR3txGz1SEkl4zE";
+
 interface Props {
   readonly isOpen: boolean;
   readonly onClose: () => void;
@@ -31,7 +33,7 @@ export function StreetViewModal({ isOpen, onClose, lat, lng, title }: Props) {
           </button>
         </div>
         <iframe
-          src={`https://www.mapillary.com/embed?closeTo=${lng},${lat}&style=photo&map_style=Mapillary+dark`}
+          src={`https://www.google.com/maps/embed/v1/streetview?location=${lat},${lng}&key=${GOOGLE_KEY}&fov=90`}
           className="w-full h-full border-0"
           title="Street View"
           allow="fullscreen"
