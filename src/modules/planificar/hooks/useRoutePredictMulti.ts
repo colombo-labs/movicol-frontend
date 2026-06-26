@@ -133,34 +133,42 @@ function buildOptions(
 
   if (sitp && sitp.stations.length > 0) {
     const sitpCode = deriveLineName(sitp);
-    options.push(
-      predictionToOption(
-        sitp,
-        "sitp-direct",
-        sitpCode ? `SITP ${sitpCode}` : "SITP",
-        dist,
-        "less_walking",
-      ),
-    );
+    const tmCode = tm ? deriveLineName(tm) : '';
+    // Skip SITP if it's the same route as TM (AI returned same prediction)
+    if (sitpCode !== tmCode) {
+      options.push(
+        predictionToOption(
+          sitp,
+          "sitp-direct",
+          sitpCode ? `SITP ${sitpCode}` : "SITP",
+          dist,
+          "less_walking",
+        ),
+      );
 
-    // Add AI-provided alternatives for SITP
-    if (sitp.alternatives && sitp.alternatives.length > 0) {
-      sitp.alternatives.forEach((alt, i) => {
-        const altCode = alt.route_code || deriveLineName(alt);
-        options.push(
-          predictionToOption(
-            alt,
-            `sitp-alt-${i}`,
-            altCode ? `SITP ${altCode}` : `SITP Alt ${i + 1}`,
-            dist,
-          ),
-        );
-      });
+      // Add AI-provided alternatives for SITP
+      if (sitp.alternatives && sitp.alternatives.length > 0) {
+        sitp.alternatives.forEach((alt, i) => {
+          const altCode = alt.route_code || deriveLineName(alt);
+          options.push(
+            predictionToOption(
+              alt,
+              `sitp-alt-${i}`,
+              altCode ? `SITP ${altCode}` : `SITP Alt ${i + 1}`,
+              dist,
+            ),
+          );
+        });
+      }
     }
   }
 
   if (tm && sitp && tm.stations.length > 1 && sitp.stations.length > 1) {
-    options.push(buildCombinedOption(tm, sitp, dist, walkTime));
+    const tmC = deriveLineName(tm);
+    const sitpC = deriveLineName(sitp);
+    if (tmC !== sitpC) {
+      options.push(buildCombinedOption(tm, sitp, dist, walkTime));
+    }
   }
 
   options.sort((a, b) => a.total_time_minutes - b.total_time_minutes);

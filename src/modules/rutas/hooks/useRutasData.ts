@@ -19,7 +19,6 @@ export function useRutasData() {
 
   // Load TM troncales + rutas
   if (tmTroncales.length === 0) {
-    const prefix = "transmisig2.tecnica.estacion_troncal.";
     Promise.all([
       fetch(`${API_URL}/graph/tm/troncales`).then((r) => r.json()),
       fetch(`${API_URL}/graph/tm/estaciones`).then((r) => r.json()),
@@ -28,21 +27,21 @@ export function useRutasData() {
       .then(([tData, eData, rData]) => {
         const stnsByTz: Record<string, string[]> = {};
         eData.features.forEach((f: any) => {
-          const tid = f.properties[prefix + "id_trazado"] || "";
-          const name = f.properties[prefix + "nom_est"] || "";
-          if (tid) {
-            if (!stnsByTz[tid]) stnsByTz[tid] = [];
-            stnsByTz[tid].push(name);
+          const troncal = f.properties.troncal_es || "";
+          const name = f.properties.nombre_est || "";
+          if (troncal && name) {
+            if (!stnsByTz[troncal]) stnsByTz[troncal] = [];
+            stnsByTz[troncal].push(name);
           }
         });
         setTmTroncales(
           tData.features.map((f: any) => ({
-            id: f.properties.id_trazado_troncal,
-            nombre: f.properties.nombre_trazado_troncal,
-            troncal: f.properties.troncal,
-            origen: f.properties.origen_trazado || "",
-            destino: f.properties.fin_trazado || "",
-            estaciones: stnsByTz[f.properties.id_trazado_troncal] || [],
+            id: f.properties.id_trazado || f.id || '',
+            nombre: f.properties.nombre_tra || f.properties.troncal || '',
+            troncal: f.properties.troncal || '',
+            origen: f.properties.origen_tra || '',
+            destino: f.properties.fin_trazad || '',
+            estaciones: stnsByTz[f.properties.troncal] || [],
           })),
         );
         setTmRutas(rData.rutas || []);
