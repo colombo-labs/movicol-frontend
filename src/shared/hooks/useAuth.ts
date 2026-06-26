@@ -57,7 +57,8 @@ function initAuth() {
 }
 
 export function useAuth() {
-  const [, forceRender] = useState(0);
+  const [_unused, forceRender] = useState(0);
+  void _unused;
 
   useEffect(() => {
     const cb = () => forceRender((n) => n + 1);

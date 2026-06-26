@@ -94,13 +94,13 @@ export function PermissionsTab({
         </div>
         <div className="p-3 rounded-xl bg-success/10 border border-success/20">
           <p className="text-lg md:text-xl font-bold text-success">
-            {[...new Set(permissions.map((p) => p.module))].length}
+            {new Set(permissions.map((p) => p.module)).size}
           </p>
           <p className="text-[9px] text-success/70">{t("admin.modules")}</p>
         </div>
         <div className="p-3 rounded-xl bg-warning/10 border border-warning/20">
           <p className="text-lg md:text-xl font-bold text-warning">
-            {[...new Set(permissions.map((p) => p.action))].length}
+            {new Set(permissions.map((p) => p.action)).size}
           </p>
           <p className="text-[9px] text-warning/70">
             {t("admin.uniqueActions")}
@@ -270,7 +270,7 @@ export function PermissionsTab({
                   </button>
                   <button
                     onClick={() => {
-                      setEditingPerm(false); /* TODO: save desc */
+                      setEditingPerm(false);
                     }}
                     className="px-3 py-1.5 rounded-lg text-[10px] font-medium text-white bg-primary"
                   >

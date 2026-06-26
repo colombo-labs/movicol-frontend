@@ -19,11 +19,12 @@ export function AdminPanel() {
   ];
 
   const createLabel =
-    tab === "roles"
-      ? t("admin.create") + " " + t("admin.roles").toLowerCase()
-      : tab === "permissions"
-        ? t("admin.create") + " " + t("admin.permissions").toLowerCase()
-        : null;
+    (
+      {
+        roles: `${t("admin.create")} ${t("admin.roles").toLowerCase()}`,
+        permissions: `${t("admin.create")} ${t("admin.permissions").toLowerCase()}`,
+      } as Record<string, string>
+    )[tab] ?? null;
 
   return (
     <div className="h-full flex flex-col border border-divider rounded-xl overflow-hidden bg-background">

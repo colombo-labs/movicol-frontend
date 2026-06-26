@@ -62,13 +62,12 @@ export function ConfigModal({ isOpen, onClose }: Props) {
             onClick={toggleLang}
             className="px-3 py-1.5 rounded-lg bg-default-100 text-xs font-semibold hover:bg-default-200 transition-colors"
           >
-            {i18n.language === "es"
-              ? "Español"
-              : i18n.language === "en"
-                ? "English"
-                : i18n.language === "fr"
-                  ? "Français"
-                  : "Português"}
+            {{
+              es: "Español",
+              en: "English",
+              fr: "Français",
+              "pt-pt": "Português",
+            }[i18n.language] ?? "Español"}
           </button>
         </div>
 

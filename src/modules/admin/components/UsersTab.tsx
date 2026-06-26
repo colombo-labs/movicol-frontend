@@ -449,7 +449,7 @@ export function UsersTab() {
                                 ? "text-default-400"
                                 : isExtra
                                   ? "text-primary font-medium"
-                                  : ""
+                                  : "text-default-600"
                             }
                           >
                             {perm.description || perm.key}

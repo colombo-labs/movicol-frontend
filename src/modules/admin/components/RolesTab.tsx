@@ -309,13 +309,14 @@ export function RolesTab({
                             type="checkbox"
                             checked={draftPerms.includes(perm.id)}
                             disabled={!editing}
-                            onChange={() =>
-                              setDraftPerms((prev) =>
-                                prev.includes(perm.id)
-                                  ? prev.filter((id) => id !== perm.id)
-                                  : [...prev, perm.id],
-                              )
-                            }
+                            onChange={() => {
+                              const id = perm.id;
+                              setDraftPerms((p) =>
+                                p.includes(id)
+                                  ? p.filter((x) => x !== id)
+                                  : [...p, id],
+                              );
+                            }}
                             className="w-3 h-3 rounded accent-primary"
                           />
                           {perm.description || perm.action}

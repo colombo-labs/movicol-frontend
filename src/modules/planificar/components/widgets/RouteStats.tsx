@@ -121,11 +121,11 @@ export function WaitEstimation({
       <p className="text-[9px] text-default-400 mt-1.5 border-t border-divider/30 pt-1.5">
         {t("route.seatProbability")}{" "}
         <strong className="text-foreground">
-          {waitMin <= 4
-            ? t("route.high")
-            : waitMin <= 8
-              ? t("route.medium")
-              : t("route.low")}
+          {(() => {
+            if (waitMin <= 4) return t("route.high");
+            if (waitMin <= 8) return t("route.medium");
+            return t("route.low");
+          })()}
         </strong>{" "}
         — {t("route.standingTime")} ~
         {Math.round(prediction.total_time_minutes * 0.7)} min

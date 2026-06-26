@@ -12,7 +12,8 @@ function formatTimeLong(min: number): string {
   const h = Math.floor(m / 60);
   const r = m % 60;
   if (r === 0) return h === 1 ? "1 hora" : `${h} horas`;
-  return `${h === 1 ? "1 hora" : `${h} horas`} ${r} minutos`;
+  const hLabel = h === 1 ? "1 hora" : h + " horas";
+  return `${hLabel} ${r} minutos`;
 }
 import {
   Clock,
