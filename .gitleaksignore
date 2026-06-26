@@ -1,0 +1,6 @@
+# Google Maps Embed API key (restricted to Maps Embed only, public by design)
+AIzaSyBApoqOimZb0onMDqhWTaQGqBGO02VUJsQ
+# Old Google OAuth client ID (not a secret, public identifier)
+866048227642-b2aioiia9qqarilcoqprqal1qlfsebsc.apps.googleusercontent.com
+# Google Maps key (old, already moved to env var)
+AIzaSyBk3OGVm2FaPsVH0SGIYR3txGz1SEkl4zE
