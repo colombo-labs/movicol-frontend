@@ -233,6 +233,18 @@ export function RutasList(props: Props) {
       return da - db;
     });
 
+  const handleFilterClick = (id: string) => {
+    if (id === "favoritas") {
+      requireAuth(() => {
+        setFilter(id);
+        setSitpPage(() => 0);
+      });
+      return;
+    }
+    setFilter(id);
+    setSitpPage(() => 0);
+  };
+
   return (
     <div className="space-y-3">
       {/* Tabs */}
@@ -345,14 +357,7 @@ export function RutasList(props: Props) {
         ].map((f) => (
           <button
             key={f.id}
-            onClick={() =>
-              f.id === "favoritas"
-                ? requireAuth(() => {
-                    setFilter(f.id);
-                    setSitpPage(() => 0);
-                  })
-                : (setFilter(f.id), setSitpPage(() => 0))
-            }
+            onClick={() => handleFilterClick(f.id)}
             className={`flex-1 py-1.5 rounded-lg text-[10px] font-semibold transition-all capitalize flex items-center justify-center gap-1 ${filter === f.id ? "bg-primary/20 text-primary" : "text-default-400 hover:text-foreground"}`}
           >
             {f.icon === "star" && <Star size={10} />}
@@ -430,7 +435,6 @@ export function RutasList(props: Props) {
             .slice(sitpPage * SITP_PAGE_SIZE, (sitpPage + 1) * SITP_PAGE_SIZE)
             .map((r) => (
               <button
-                type="button"
                 key={r.ruta}
                 role="button"
                 tabIndex={0}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { io, Socket } from "socket.io-client";
 import { API_URL } from "@/shared/config";
 
@@ -57,11 +57,10 @@ function initAuth() {
 }
 
 export function useAuth() {
-  const [_unused, forceRender] = useState(0);
-  void _unused;
+  const [, forceRender] = useReducer((x: number) => x + 1, 0);
 
   useEffect(() => {
-    const cb = () => forceRender((n) => n + 1);
+    const cb = () => forceRender();
     listeners.add(cb);
     initAuth();
     return () => {

@@ -110,7 +110,7 @@ export function QuickActions({
 
   const handleAlarm = () => {
     setAlarmSet(!alarmSet);
-    if (!alarmSet && "Notification" in window) {
+    if (!alarmSet && "Notification" in globalThis) {
       Notification.requestPermission();
     }
   };
