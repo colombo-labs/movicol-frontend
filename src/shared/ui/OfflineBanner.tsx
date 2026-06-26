@@ -4,16 +4,16 @@ import { useTranslation } from "react-i18next";
 
 export function OfflineBanner() {
   const { t } = useTranslation();
-  const [offline, setOffline] = useState(!navigator.onLine);
+  const [offline, setOffline] = useState(!globalThis.navigator.onLine);
 
   useEffect(() => {
     const on = () => setOffline(false);
     const off = () => setOffline(true);
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
+    globalThis.addEventListener("online", on);
+    globalThis.addEventListener("offline", off);
     return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
+      globalThis.removeEventListener("online", on);
+      globalThis.removeEventListener("offline", off);
     };
   }, []);
 

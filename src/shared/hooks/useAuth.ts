@@ -51,9 +51,8 @@ async function doFetchMe() {
 
 // Fetch only once on app load
 function initAuth() {
-  if (!fetchPromise) {
-    fetchPromise = doFetchMe();
-  }
+  fetchPromise ??= doFetchMe();
+
   return fetchPromise;
 }
 

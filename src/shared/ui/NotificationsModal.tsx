@@ -25,7 +25,7 @@ function NotifItem({ notif }: { readonly notif: AppNotification }) {
   return (
     <div
       className={`flex gap-2.5 px-4 py-3 border-b border-divider/30 hover:bg-default-50 transition-colors cursor-pointer ${
-        !notif.read ? "bg-primary/5" : ""
+        notif.read ? "" : "bg-primary/5"
       }`}
     >
       <NotifIcon type={notif.type} />

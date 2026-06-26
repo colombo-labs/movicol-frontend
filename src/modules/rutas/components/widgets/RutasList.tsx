@@ -346,15 +346,15 @@ export function RutasList(props: Props) {
           <button
             key={f.id}
             onClick={() => {
+              const action = () => {
+                setFilter(f.id);
+                setSitpPage(() => 0);
+              };
               if (f.id === "favoritas") {
-                requireAuth(() => {
-                  setFilter(f.id);
-                  setSitpPage(() => 0);
-                });
+                requireAuth(action);
                 return;
               }
-              setFilter(f.id);
-              setSitpPage(() => 0);
+              action();
             }}
             className={`flex-1 py-1.5 rounded-lg text-[10px] font-semibold transition-all capitalize flex items-center justify-center gap-1 ${filter === f.id ? "bg-primary/20 text-primary" : "text-default-400 hover:text-foreground"}`}
           >
@@ -434,6 +434,9 @@ export function RutasList(props: Props) {
             .map((r) => (
               <div
                 key={r.ruta}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && onSelectRuta(r)}
                 onClick={() => onSelectRuta(r)}
                 className="cursor-pointer w-full text-left"
               >
@@ -621,6 +624,9 @@ export function RutasList(props: Props) {
                   return (
                     <div
                       key={`tmr-${r.codigo}`}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === "Enter" && handleTmClick()}
                       onClick={handleTmClick}
                       className="cursor-pointer w-full text-left"
                     >

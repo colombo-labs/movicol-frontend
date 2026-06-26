@@ -116,7 +116,7 @@ export function QuickActions({
   };
 
   const handleShareLive = async () => {
-    const url = `${window.location.origin}/planificar?shared=true`;
+    const url = `${globalThis.location.origin}/planificar?shared=true`;
     try {
       if (navigator.share)
         await navigator.share({ title: "Mi viaje en MoviCol", url });

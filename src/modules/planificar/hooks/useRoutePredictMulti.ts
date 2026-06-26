@@ -281,7 +281,7 @@ function buildSimpleVehicleOptions(results: RoutePrediction[]): RouteOption[] {
               moto: "moto",
               bicicleta: "bike",
               caminando: "foot",
-            } as Record<string, string>
+            } as Record<string, RouteLeg["type"]>
           )[result.mode] || "drive",
         from: result.stations[0] || "Origen",
         to: result.stations[result.stations.length - 1] || "Destino",
@@ -341,7 +341,7 @@ function buildMultiWaypointOptions(
                 moto: "moto",
                 bicicleta: "bike",
                 caminando: "foot",
-              } as Record<string, string>
+              } as Record<string, RouteLeg["type"]>
             )[legResults[0]?.mode] || "drive",
           from: allStations[0] || "Origen",
           to: allStations[allStations.length - 1] || "Destino",

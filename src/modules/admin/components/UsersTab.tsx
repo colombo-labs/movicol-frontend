@@ -244,6 +244,9 @@ export function UsersTab() {
         {filtered.map((user) => (
           <div
             key={user.id}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && openUser(user)}
             onClick={() => openUser(user)}
             className="flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl border border-divider hover:border-primary/30 hover:bg-default-50 cursor-pointer transition-all"
           >
@@ -433,10 +436,11 @@ export function UsersTab() {
                             disabled={!editing || fromRole}
                             onChange={() => {
                               if (!editing) return;
-                              setDraftExtraPerms((prev) =>
-                                prev.includes(perm.id)
-                                  ? prev.filter((id) => id !== perm.id)
-                                  : [...prev, perm.id],
+                              const id = perm.id;
+                              setDraftExtraPerms((p) =>
+                                p.includes(id)
+                                  ? p.filter((x) => x !== id)
+                                  : [...p, id],
                               );
                             }}
                             className="w-3 h-3 rounded accent-primary"
