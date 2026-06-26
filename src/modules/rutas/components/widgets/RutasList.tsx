@@ -436,7 +436,6 @@ export function RutasList(props: Props) {
             .map((r) => (
               <button
                 key={r.ruta}
-                role="button"
                 tabIndex={0}
                 onKeyDown={(e) => e.key === "Enter" && onSelectRuta(r)}
                 onClick={() => onSelectRuta(r)}
