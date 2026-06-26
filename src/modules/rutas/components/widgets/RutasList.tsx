@@ -436,7 +436,6 @@ export function RutasList(props: Props) {
             .map((r) => (
               <div
                 key={r.ruta}
-                tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") onSelectRuta(r);
                 }}
@@ -627,7 +626,6 @@ export function RutasList(props: Props) {
                   return (
                     <div
                       key={`tmr-${r.codigo}`}
-                      tabIndex={0}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleTmClick();
                       }}
