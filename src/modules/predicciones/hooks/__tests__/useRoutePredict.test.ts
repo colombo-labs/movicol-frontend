@@ -13,7 +13,7 @@ const mockResponse = {
       congestion_level: 0.5,
       risk_label: "medium",
       coordinates: [
-        [4.7, -74.0],
+        [4.7, -74],
         [4.6, -74.1],
       ],
     },
@@ -25,7 +25,7 @@ const mockResponse = {
 };
 
 beforeEach(() => {
-  global.fetch = vi.fn(() =>
+  globalThis.fetch = vi.fn(() =>
     Promise.resolve({ ok: true, json: () => Promise.resolve(mockResponse) }),
   ) as unknown as typeof fetch;
 });
@@ -46,7 +46,7 @@ describe("useRoutePredict", () => {
 
     act(() => {
       result.current.predict({
-        origin: { lat: 4.7, lng: -74.0 },
+        origin: { lat: 4.7, lng: -74 },
         destination: { lat: 4.6, lng: -74.1 },
         departureTime: "2026-05-20T08:00:00Z",
       });
@@ -57,7 +57,7 @@ describe("useRoutePredict", () => {
   });
 
   it("handles errors", async () => {
-    vi.mocked(global.fetch).mockImplementationOnce(() =>
+    vi.mocked(globalThis.fetch).mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
         status: 500,
@@ -69,7 +69,7 @@ describe("useRoutePredict", () => {
 
     act(() => {
       result.current.predict({
-        origin: { lat: 4.7, lng: -74.0 },
+        origin: { lat: 4.7, lng: -74 },
         destination: { lat: 4.6, lng: -74.1 },
       });
     });
@@ -83,7 +83,7 @@ describe("useRoutePredict", () => {
 
     act(() => {
       result.current.predict({
-        origin: { lat: 4.7, lng: -74.0 },
+        origin: { lat: 4.7, lng: -74 },
         destination: { lat: 4.6, lng: -74.1 },
       });
     });

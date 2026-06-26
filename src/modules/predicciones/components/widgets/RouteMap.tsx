@@ -32,7 +32,9 @@ interface RouteMapProps {
 }
 
 /** Auto-fit map bounds when prediction changes */
-function FitBounds({ prediction }: { prediction: RoutePrediction | null }) {
+function FitBounds({
+  prediction,
+}: Readonly<{ prediction: RoutePrediction | null }>) {
   const map = useMap();
 
   useEffect(() => {
@@ -50,9 +52,9 @@ function FitBounds({ prediction }: { prediction: RoutePrediction | null }) {
 /** Click handler component */
 function MapClickHandler({
   onClick,
-}: {
+}: Readonly<{
   onClick?: (lat: number, lng: number) => void;
-}) {
+}>) {
   const map = useMap();
 
   useEffect(() => {

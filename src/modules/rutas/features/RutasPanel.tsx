@@ -92,7 +92,7 @@ export function RutasPanel(props: RutasPanelProps) {
         let coords = r.paraderos.map((p) => [p.lat, p.lon] as [number, number]);
 
         // Si tenemos los shapes exactos, los usamos
-        if (sitpShapes && sitpShapes.features) {
+        if (sitpShapes?.features) {
           const shapeFeature = sitpShapes.features.find(
             (f: any) => f.properties?.ruta === r.ruta,
           );
