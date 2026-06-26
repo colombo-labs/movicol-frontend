@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { useChat } from "../useChat";
 
 beforeEach(() => {
-  global.fetch = vi.fn(() =>
+  globalThis.fetch = vi.fn(() =>
     Promise.resolve({
       ok: true,
       json: () =>
@@ -40,7 +40,7 @@ describe("useChat", () => {
   });
 
   it("handles errors gracefully", async () => {
-    vi.mocked(global.fetch).mockImplementationOnce(() =>
+    vi.mocked(globalThis.fetch).mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
         status: 500,

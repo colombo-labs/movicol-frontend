@@ -436,8 +436,6 @@ export function RutasList(props: Props) {
             .map((r) => (
               <button
                 key={r.ruta}
-                tabIndex={0}
-                onKeyDown={(e) => e.key === "Enter" && onSelectRuta(r)}
                 onClick={() => onSelectRuta(r)}
                 className="cursor-pointer w-full text-left"
               >
@@ -624,7 +622,6 @@ export function RutasList(props: Props) {
                   };
                   return (
                     <button
-                      type="button"
                       key={`tmr-${r.codigo}`}
                       onClick={handleTmClick}
                       className="cursor-pointer w-full text-left"

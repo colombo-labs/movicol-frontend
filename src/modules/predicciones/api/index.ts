@@ -10,7 +10,7 @@ interface PredictRouteParams {
 function toApiCoordinates(coords: Coordinates): { lat: number; lng: number } {
   const lng = coords.lng ?? coords.lon;
   if (typeof lng !== "number") {
-    throw new Error("Coordenadas inválidas: se requiere lng o lon");
+    throw new TypeError("Coordenadas inválidas: se requiere lng o lon");
   }
   return { lat: coords.lat, lng };
 }
