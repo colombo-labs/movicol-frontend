@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 
-const GMAPS_KEY = "AIzaSyBApoqOimZb0onMDqhWTaQGqBGO02VUJsQ";
+const GMAPS_KEY = import.meta.env.VITE_GMAPS_KEY || "";
 
 interface Props {
   readonly isOpen: boolean;

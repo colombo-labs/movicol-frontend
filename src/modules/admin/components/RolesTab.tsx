@@ -149,7 +149,8 @@ export function RolesTab({
           {filtered.length} {t("admin.roles")}
         </p>
         {filtered.map((role) => (
-          <div
+          <button
+            type="button"
             key={role.id}
             onClick={() => openRole(role)}
             className="flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl border border-divider hover:border-primary/30 hover:bg-default-50 cursor-pointer transition-all"
@@ -173,7 +174,7 @@ export function RolesTab({
             <span className="text-[9px] text-default-500">
               {role.permissions.length} permisos
             </span>
-          </div>
+          </button>
         ))}
       </div>
 

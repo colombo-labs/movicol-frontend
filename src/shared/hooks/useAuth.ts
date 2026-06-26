@@ -100,7 +100,7 @@ export function useAuth() {
   }, [globalUser?.id]);
 
   const login = () => {
-    window.location.href = `${API_URL}/auth/google`;
+    globalThis.location.href = `${API_URL}/auth/google`;
   };
 
   const logout = async () => {

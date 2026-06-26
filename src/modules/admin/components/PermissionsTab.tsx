@@ -160,7 +160,8 @@ export function PermissionsTab({
               {filtered
                 .filter((p) => p.module === mod)
                 .map((perm) => (
-                  <div
+                  <button
+                    type="button"
                     key={perm.id}
                     onClick={() => {
                       setSelectedPerm(perm);
@@ -178,7 +179,7 @@ export function PermissionsTab({
                       </p>
                       <p className="text-[9px] text-default-400">{perm.key}</p>
                     </div>
-                  </div>
+                  </button>
                 ))}
             </div>
           </div>

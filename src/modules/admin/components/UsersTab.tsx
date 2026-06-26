@@ -242,11 +242,9 @@ export function UsersTab() {
           {filtered.length} {t("admin.results")}
         </p>
         {filtered.map((user) => (
-          <div
+          <button
+            type="button"
             key={user.id}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === "Enter" && openUser(user)}
             onClick={() => openUser(user)}
             className="flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl border border-divider hover:border-primary/30 hover:bg-default-50 cursor-pointer transition-all"
           >
@@ -273,7 +271,7 @@ export function UsersTab() {
             >
               {user.isActive ? "Activo" : "Inactivo"}
             </span>
-          </div>
+          </button>
         ))}
       </div>
 
