@@ -73,7 +73,11 @@ async function searchPhoton(query: string): Promise<GeoResult[]> {
     if (!data.features?.length) return [];
     return data.features.map((f: any) => {
       const props = f.properties;
-      const parts = [props.name, props.street, props.city || props.district].filter(Boolean);
+      const parts = [
+        props.name,
+        props.street,
+        props.city || props.district,
+      ].filter(Boolean);
       return {
         lat: f.geometry.coordinates[1],
         lng: f.geometry.coordinates[0],

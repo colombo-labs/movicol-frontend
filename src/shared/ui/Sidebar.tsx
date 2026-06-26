@@ -1,5 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { Bus, Navigation, Route, Accessibility, BarChart3, ShieldCheck } from "lucide-react";
+import {
+  Bus,
+  Navigation,
+  Route,
+  Accessibility,
+  BarChart3,
+  ShieldCheck,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/shared/hooks/useAuth";
@@ -34,10 +41,14 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const { can } = useAuth();
-  const isAdmin = can("admin.users") || can("admin.roles") || can("admin.permissions");
+  const isAdmin =
+    can("admin.users") || can("admin.roles") || can("admin.permissions");
 
   const visiblePanels = isAdmin
-    ? [...panels, { id: "admin" as const, icon: ShieldCheck, label: "nav.admin" }]
+    ? [
+        ...panels,
+        { id: "admin" as const, icon: ShieldCheck, label: "nav.admin" },
+      ]
     : panels;
   const [time, setTime] = useState(
     new Date().toLocaleTimeString("es-CO", {

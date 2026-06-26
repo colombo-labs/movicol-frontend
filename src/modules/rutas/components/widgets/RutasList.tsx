@@ -346,7 +346,14 @@ export function RutasList(props: Props) {
           <button
             key={f.id}
             onClick={() => {
-              if (f.id === "favoritas") { requireAuth(() => { setFilter(f.id); setSitpPage(() => 0); }); return; } setFilter(f.id);
+              if (f.id === "favoritas") {
+                requireAuth(() => {
+                  setFilter(f.id);
+                  setSitpPage(() => 0);
+                });
+                return;
+              }
+              setFilter(f.id);
               setSitpPage(() => 0);
             }}
             className={`flex-1 py-1.5 rounded-lg text-[10px] font-semibold transition-all capitalize flex items-center justify-center gap-1 ${filter === f.id ? "bg-primary/20 text-primary" : "text-default-400 hover:text-foreground"}`}
@@ -356,7 +363,15 @@ export function RutasList(props: Props) {
             {f.icon === "alert" && <AlertCircle size={10} />}
             {f.icon === "list" && <List size={10} />}
             {f.icon === "pin" && <MapPin size={10} />}
-            {{todas:t("routes.all"),operando:t("routes.operating"),demora:t("routes.delayed"),cercanas:t("routes.nearby"),favoritas:t("routes.favorites")}[f.id]}
+            {
+              {
+                todas: t("routes.all"),
+                operando: t("routes.operating"),
+                demora: t("routes.delayed"),
+                cercanas: t("routes.nearby"),
+                favoritas: t("routes.favorites"),
+              }[f.id]
+            }
           </button>
         ))}
       </div>
@@ -364,7 +379,8 @@ export function RutasList(props: Props) {
       {/* Info */}
       <div className="flex items-center justify-between text-[10px] text-default-400 px-1">
         <span>
-          {tab === "tm" ? filteredTm.length : filteredSitp.length} {t("routes.found")}
+          {tab === "tm" ? filteredTm.length : filteredSitp.length}{" "}
+          {t("routes.found")}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
@@ -448,8 +464,21 @@ export function RutasList(props: Props) {
                         {r.paraderos.length} paradas
                       </span>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); toggleFav(r.ruta, r.ruta); }} className="p-1 hover:scale-110 transition-transform">
-                      <Star size={12} className={isFav(r.ruta) ? "fill-yellow-400 text-yellow-400" : "text-default-300"} />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFav(r.ruta, r.ruta);
+                      }}
+                      className="p-1 hover:scale-110 transition-transform"
+                    >
+                      <Star
+                        size={12}
+                        className={
+                          isFav(r.ruta)
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-default-300"
+                        }
+                      />
                     </button>
                   </div>
                   <p className="text-xs text-default-500">
@@ -524,7 +553,13 @@ export function RutasList(props: Props) {
                 filter !== "demora" ||
                 alerts.affectedCodes.some((c) => r.codigo.includes(c));
               const matchFav = filter !== "favoritas" || isFav(r.codigo);
-              return matchSearch && matchType && matchNearby && matchDemora && matchFav;
+              return (
+                matchSearch &&
+                matchType &&
+                matchNearby &&
+                matchDemora &&
+                matchFav
+              );
             });
             const pageSize = 15;
             const totalPages = Math.ceil(filtered.length / pageSize);
@@ -560,7 +595,8 @@ export function RutasList(props: Props) {
                           onClick={() => handleBusFilter(bt)}
                           className={`flex-1 py-1.5 rounded-lg text-[9px] font-semibold transition-all capitalize ${filter === bt ? "bg-emerald-500/20 text-emerald-500" : "text-default-400 hover:text-foreground"}`}
                         >
-                          {bt === "todas" ? t("routes.all") : bt} ({typeCounts[bt]})
+                          {bt === "todas" ? t("routes.all") : bt} (
+                          {typeCounts[bt]})
                         </button>
                       ),
                     )}
@@ -615,8 +651,21 @@ export function RutasList(props: Props) {
                               ? `📍 ${nearbyInfo.get(r.codigo)!.distancia}m`
                               : r.tipo_bus.toLowerCase()}
                           </span>
-                          <button onClick={(e) => { e.stopPropagation(); toggleFav(r.codigo, r.codigo); }} className="p-1 hover:scale-110 transition-transform">
-                            <Star size={12} className={isFav(r.codigo) ? "fill-yellow-400 text-yellow-400" : "text-default-300"} />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFav(r.codigo, r.codigo);
+                            }}
+                            className="p-1 hover:scale-110 transition-transform"
+                          >
+                            <Star
+                              size={12}
+                              className={
+                                isFav(r.codigo)
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-default-300"
+                              }
+                            />
                           </button>
                         </div>
                         <p className="text-xs text-default-500">

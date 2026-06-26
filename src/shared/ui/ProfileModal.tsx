@@ -40,7 +40,12 @@ export function ProfileModal({ isOpen, onClose }: Props) {
   }, [isOpen]);
 
   return (
-    <AppModal isOpen={isOpen} onClose={onClose} title={t("auth.profile")} size="md">
+    <AppModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("auth.profile")}
+      size="md"
+    >
       <div className="space-y-4">
         {/* Avatar + Name */}
         <div className="flex items-center gap-3">
@@ -48,7 +53,8 @@ export function ProfileModal({ isOpen, onClose }: Props) {
             <img
               src={user.avatarUrl}
               alt={user.name}
-              referrerPolicy="no-referrer" className="w-14 h-14 rounded-full border-2 border-primary/30"
+              referrerPolicy="no-referrer"
+              className="w-14 h-14 rounded-full border-2 border-primary/30"
             />
           ) : (
             <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center">

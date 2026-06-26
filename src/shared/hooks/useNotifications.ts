@@ -25,11 +25,15 @@ export function useNotifications() {
     }
   }, [isAuthenticated]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   const markRead = async (id: string) => {
     await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
-    setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n));
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
+    );
     setUnreadCount((c) => Math.max(0, c - 1));
   };
 
@@ -51,5 +55,13 @@ export function useNotifications() {
     setUnreadCount((c) => Math.max(0, c - 1));
   };
 
-  return { notifications, unreadCount, markRead, markAllRead, clear, remove, refetch: fetchAll };
+  return {
+    notifications,
+    unreadCount,
+    markRead,
+    markAllRead,
+    clear,
+    remove,
+    refetch: fetchAll,
+  };
 }

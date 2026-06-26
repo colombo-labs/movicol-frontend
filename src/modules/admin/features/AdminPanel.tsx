@@ -18,7 +18,12 @@ export function AdminPanel() {
     { id: "permissions" as Tab, label: t("admin.permissions"), icon: Key },
   ];
 
-  const createLabel = tab === "roles" ? t("admin.create") + " " + t("admin.roles").toLowerCase() : tab === "permissions" ? t("admin.create") + " " + t("admin.permissions").toLowerCase() : null;
+  const createLabel =
+    tab === "roles"
+      ? t("admin.create") + " " + t("admin.roles").toLowerCase()
+      : tab === "permissions"
+        ? t("admin.create") + " " + t("admin.permissions").toLowerCase()
+        : null;
 
   return (
     <div className="h-full flex flex-col border border-divider rounded-xl overflow-hidden bg-background">
@@ -28,7 +33,10 @@ export function AdminPanel() {
           {tabs.map((t) => (
             <button
               key={t.id}
-              onClick={() => { setTab(t.id); setShowCreate(false); }}
+              onClick={() => {
+                setTab(t.id);
+                setShowCreate(false);
+              }}
               className={`flex items-center gap-1.5 px-3 md:px-4 py-2.5 md:py-3 text-[10px] md:text-[11px] font-medium border-b-2 transition-all whitespace-nowrap ${
                 tab === t.id
                   ? "border-primary text-primary"
@@ -53,8 +61,18 @@ export function AdminPanel() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-3 md:p-4">
         {tab === "users" && <UsersTab />}
-        {tab === "roles" && <RolesTab showCreate={showCreate} onCloseCreate={() => setShowCreate(false)} />}
-        {tab === "permissions" && <PermissionsTab showCreate={showCreate} onCloseCreate={() => setShowCreate(false)} />}
+        {tab === "roles" && (
+          <RolesTab
+            showCreate={showCreate}
+            onCloseCreate={() => setShowCreate(false)}
+          />
+        )}
+        {tab === "permissions" && (
+          <PermissionsTab
+            showCreate={showCreate}
+            onCloseCreate={() => setShowCreate(false)}
+          />
+        )}
       </div>
     </div>
   );

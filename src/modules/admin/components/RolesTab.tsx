@@ -36,24 +36,32 @@ export function RolesTab({
   const [editing, setEditing] = useState(false);
   const [draftPerms, setDraftPerms] = useState<number[]>([]);
 
-
   const closeRoleModal = useCallback(() => setSelectedRole(null), []);
   useEscClose(!!selectedRole, closeRoleModal);
   useEscClose(showCreate, onCloseCreate);
 
   const load = () => {
-    fetch("/api/admin/roles").then((r) => (r.ok ? r.json() : [])).then(setRoles);
-    fetch("/api/admin/permissions").then((r) => (r.ok ? r.json() : [])).then(setAllPerms);
+    fetch("/api/admin/roles")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setRoles);
+    fetch("/api/admin/permissions")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setAllPerms);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const createRole = async () => {
     if (!newName.trim()) return;
     await fetch("/api/admin/roles", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newName.trim(), description: newDesc.trim() || undefined }),
+      body: JSON.stringify({
+        name: newName.trim(),
+        description: newDesc.trim() || undefined,
+      }),
     });
     setNewName("");
     setNewDesc("");
@@ -85,7 +93,9 @@ export function RolesTab({
     load();
   };
 
-  const filtered = roles.filter((r) => !search || r.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = roles.filter(
+    (r) => !search || r.name.toLowerCase().includes(search.toLowerCase()),
+  );
   const modules = [...new Set(allPerms.map((p) => p.module))];
 
   return (
@@ -93,33 +103,51 @@ export function RolesTab({
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-4">
         <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
-          <p className="text-lg md:text-xl font-bold text-primary">{roles.length}</p>
+          <p className="text-lg md:text-xl font-bold text-primary">
+            {roles.length}
+          </p>
           <p className="text-[9px] text-primary/70">{t("admin.roles")}</p>
         </div>
         <div className="p-3 rounded-xl bg-warning/10 border border-warning/20">
-          <p className="text-lg md:text-xl font-bold text-warning">{roles.filter((r) => r.isSystem).length}</p>
+          <p className="text-lg md:text-xl font-bold text-warning">
+            {roles.filter((r) => r.isSystem).length}
+          </p>
           <p className="text-[9px] text-warning/70">{t("admin.systemRoles")}</p>
         </div>
         <div className="p-3 rounded-xl bg-success/10 border border-success/20">
-          <p className="text-lg md:text-xl font-bold text-success">{allPerms.length}</p>
-          <p className="text-[9px] text-success/70">{t("admin.availablePerms")}</p>
+          <p className="text-lg md:text-xl font-bold text-success">
+            {allPerms.length}
+          </p>
+          <p className="text-[9px] text-success/70">
+            {t("admin.availablePerms")}
+          </p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-4">
         <div className="flex-1 min-w-[150px]">
-          <p className="text-[9px] font-medium text-default-500 mb-1">{t("admin.search")}</p>
+          <p className="text-[9px] font-medium text-default-500 mb-1">
+            {t("admin.search")}
+          </p>
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider">
             <Search size={13} className="text-default-400" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} name="admin-search-roles" placeholder={t("admin.searchRolePlaceholder")} className="flex-1 bg-transparent text-[11px] outline-none" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              name="admin-search-roles"
+              placeholder={t("admin.searchRolePlaceholder")}
+              className="flex-1 bg-transparent text-[11px] outline-none"
+            />
           </div>
         </div>
       </div>
 
       {/* List */}
       <div className="space-y-2">
-        <p className="text-[9px] text-default-400">{filtered.length} {t("admin.roles")}</p>
+        <p className="text-[9px] text-default-400">
+          {filtered.length} {t("admin.roles")}
+        </p>
         {filtered.map((role) => (
           <div
             key={role.id}
@@ -130,11 +158,21 @@ export function RolesTab({
               <Shield size={16} className="text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold capitalize">{role.name}</p>
-              <p className="text-[9px] text-default-400 truncate">{role.description || "Sin descripción"}</p>
+              <p className="text-[11px] font-semibold capitalize">
+                {role.name}
+              </p>
+              <p className="text-[9px] text-default-400 truncate">
+                {role.description || "Sin descripción"}
+              </p>
             </div>
-            {role.isSystem && <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-warning/20 text-warning hidden md:inline">Sistema</span>}
-            <span className="text-[9px] text-default-500">{role.permissions.length} permisos</span>
+            {role.isSystem && (
+              <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-warning/20 text-warning hidden md:inline">
+                Sistema
+              </span>
+            )}
+            <span className="text-[9px] text-default-500">
+              {role.permissions.length} permisos
+            </span>
           </div>
         ))}
       </div>
@@ -142,22 +180,53 @@ export function RolesTab({
       {/* Create Modal */}
       {showCreate && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          <button type="button" className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCloseCreate} aria-label="Cerrar" />
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={onCloseCreate}
+            aria-label="Cerrar"
+          />
           <div className="relative w-full max-w-sm mx-4 bg-background border border-divider rounded-2xl shadow-2xl p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold">Crear Rol</h3>
-              <button onClick={onCloseCreate} className="p-1 rounded hover:bg-default-100 text-default-400"><X size={14} /></button>
+              <button
+                onClick={onCloseCreate}
+                className="p-1 rounded hover:bg-default-100 text-default-400"
+              >
+                <X size={14} />
+              </button>
             </div>
             <div className="space-y-3">
               <div>
-                <p className="text-[9px] font-medium text-default-500 mb-1">Nombre</p>
-                <input value={newName} onChange={(e) => setNewName(e.target.value)} name="role-name" placeholder={t("admin.roleName")} className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
+                <p className="text-[9px] font-medium text-default-500 mb-1">
+                  Nombre
+                </p>
+                <input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  name="role-name"
+                  placeholder={t("admin.roleName")}
+                  className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none"
+                />
               </div>
               <div>
-                <p className="text-[9px] font-medium text-default-500 mb-1">Descripción</p>
-                <input value={newDesc} onChange={(e) => setNewDesc(e.target.value)} name="role-desc" placeholder="Descripción (opcional)" className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none" />
+                <p className="text-[9px] font-medium text-default-500 mb-1">
+                  Descripción
+                </p>
+                <input
+                  value={newDesc}
+                  onChange={(e) => setNewDesc(e.target.value)}
+                  name="role-desc"
+                  placeholder="Descripción (opcional)"
+                  className="w-full text-[11px] px-3 py-2 rounded-lg bg-default-100 border border-divider outline-none"
+                />
               </div>
-              <button onClick={createRole} className="w-full py-2 rounded-lg bg-primary text-white text-[11px] font-medium">Crear</button>
+              <button
+                onClick={createRole}
+                className="w-full py-2 rounded-lg bg-primary text-white text-[11px] font-medium"
+              >
+                Crear
+              </button>
             </div>
           </div>
         </div>
@@ -166,7 +235,12 @@ export function RolesTab({
       {/* Detail Modal */}
       {selectedRole && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          <button type="button" className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedRole(null)} aria-label="Cerrar" />
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setSelectedRole(null)}
+            aria-label="Cerrar"
+          />
           <div className="relative w-full max-w-lg mx-4 bg-background border border-divider rounded-2xl shadow-2xl max-h-[85vh] flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-divider shrink-0">
@@ -175,44 +249,77 @@ export function RolesTab({
                   <Shield size={18} className="text-primary" />
                 </div>
                 <div>
-                  <p className="text-[12px] font-semibold capitalize">{selectedRole.name}</p>
-                  <p className="text-[10px] text-default-400">{selectedRole.description || "Sin descripción"}</p>
+                  <p className="text-[12px] font-semibold capitalize">
+                    {selectedRole.name}
+                  </p>
+                  <p className="text-[10px] text-default-400">
+                    {selectedRole.description || "Sin descripción"}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-1">
                 {!editing && !selectedRole.isSystem && (
-                  <button onClick={() => { setEditing(true); setDraftPerms(selectedRole.permissions.map((p) => p.id)); }} className="p-1.5 rounded-lg hover:bg-default-100 text-default-400">
+                  <button
+                    onClick={() => {
+                      setEditing(true);
+                      setDraftPerms(selectedRole.permissions.map((p) => p.id));
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-default-100 text-default-400"
+                  >
                     <Edit2 size={14} />
                   </button>
                 )}
                 {!selectedRole.isSystem && (
-                  <button onClick={deleteRole} className="p-1.5 rounded-lg hover:bg-danger/10 text-default-400 hover:text-danger">
+                  <button
+                    onClick={deleteRole}
+                    className="p-1.5 rounded-lg hover:bg-danger/10 text-default-400 hover:text-danger"
+                  >
                     <Trash2 size={14} />
                   </button>
                 )}
-                <button onClick={() => setSelectedRole(null)} className="p-1.5 rounded-lg hover:bg-default-100 text-default-400"><X size={14} /></button>
+                <button
+                  onClick={() => setSelectedRole(null)}
+                  className="p-1.5 rounded-lg hover:bg-default-100 text-default-400"
+                >
+                  <X size={14} />
+                </button>
               </div>
             </div>
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-5">
-              <p className="text-[10px] font-semibold text-default-500 mb-3">Permisos asignados</p>
+              <p className="text-[10px] font-semibold text-default-500 mb-3">
+                Permisos asignados
+              </p>
               {modules.map((mod) => (
                 <div key={mod} className="mb-3">
-                  <p className="text-[9px] font-bold text-default-400 uppercase mb-1.5">{mod}</p>
+                  <p className="text-[9px] font-bold text-default-400 uppercase mb-1.5">
+                    {mod}
+                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                    {allPerms.filter((p) => p.module === mod).map((perm) => (
-                      <label key={perm.id} className="flex items-center gap-2 text-[10px] px-2 py-1.5 rounded-lg hover:bg-default-50">
-                        <input
-                          type="checkbox"
-                          checked={draftPerms.includes(perm.id)}
-                          disabled={!editing}
-                          onChange={() => setDraftPerms((prev) => prev.includes(perm.id) ? prev.filter((id) => id !== perm.id) : [...prev, perm.id])}
-                          className="w-3 h-3 rounded accent-primary"
-                        />
-                        {perm.description || perm.action}
-                      </label>
-                    ))}
+                    {allPerms
+                      .filter((p) => p.module === mod)
+                      .map((perm) => (
+                        <label
+                          key={perm.id}
+                          className="flex items-center gap-2 text-[10px] px-2 py-1.5 rounded-lg hover:bg-default-50"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={draftPerms.includes(perm.id)}
+                            disabled={!editing}
+                            onChange={() =>
+                              setDraftPerms((prev) =>
+                                prev.includes(perm.id)
+                                  ? prev.filter((id) => id !== perm.id)
+                                  : [...prev, perm.id],
+                              )
+                            }
+                            className="w-3 h-3 rounded accent-primary"
+                          />
+                          {perm.description || perm.action}
+                        </label>
+                      ))}
                   </div>
                 </div>
               ))}
@@ -221,8 +328,18 @@ export function RolesTab({
             {/* Footer */}
             {editing && (
               <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-divider shrink-0">
-                <button onClick={() => setEditing(false)} className="px-4 py-2 rounded-lg text-[11px] font-medium text-default-500 border border-divider hover:bg-default-100">{t("admin.cancel")}</button>
-                <button onClick={saveChanges} className="px-4 py-2 rounded-lg text-[11px] font-medium text-white bg-primary hover:bg-primary/90">{t("admin.save")}</button>
+                <button
+                  onClick={() => setEditing(false)}
+                  className="px-4 py-2 rounded-lg text-[11px] font-medium text-default-500 border border-divider hover:bg-default-100"
+                >
+                  {t("admin.cancel")}
+                </button>
+                <button
+                  onClick={saveChanges}
+                  className="px-4 py-2 rounded-lg text-[11px] font-medium text-white bg-primary hover:bg-primary/90"
+                >
+                  {t("admin.save")}
+                </button>
               </div>
             )}
           </div>

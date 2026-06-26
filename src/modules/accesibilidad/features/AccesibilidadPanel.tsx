@@ -38,10 +38,14 @@ export function AccesibilidadPanel() {
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <Accessibility size={16} className="text-primary" />
-          <p className="text-xs text-default-400">{t("accessibility.systemCoverage")}</p>
+          <p className="text-xs text-default-400">
+            {t("accessibility.systemCoverage")}
+          </p>
         </div>
         <div className="text-right">
-          <p className="text-[9px] text-default-400">{t("accessibility.coverage")}</p>
+          <p className="text-[9px] text-default-400">
+            {t("accessibility.coverage")}
+          </p>
           <p className="text-sm font-bold text-primary">
             {data.cobertura}
             <span className="text-[9px] text-default-400">%</span>
@@ -84,22 +88,30 @@ export function AccesibilidadPanel() {
             <p className="text-lg font-bold">
               {data.totalParaderos.toLocaleString()}
             </p>
-            <p className="text-[9px] text-default-400">{t("accessibility.sitpStops")}</p>
+            <p className="text-[9px] text-default-400">
+              {t("accessibility.sitpStops")}
+            </p>
           </div>
           <div className="p-2 rounded-lg bg-default-100 text-center">
             <Bus size={14} className="text-green-500 mx-auto mb-1" />
             <p className="text-lg font-bold">{data.totalRutas}</p>
-            <p className="text-[9px] text-default-400">{t("accessibility.totalRoutes")}</p>
+            <p className="text-[9px] text-default-400">
+              {t("accessibility.totalRoutes")}
+            </p>
           </div>
           <div className="p-2 rounded-lg bg-default-100 text-center">
             <Train size={14} className="text-red-500 mx-auto mb-1" />
             <p className="text-lg font-bold">{data.rutasTroncales}</p>
-            <p className="text-[9px] text-default-400">{t("accessibility.troncalRoutes")}</p>
+            <p className="text-[9px] text-default-400">
+              {t("accessibility.troncalRoutes")}
+            </p>
           </div>
           <div className="p-2 rounded-lg bg-default-100 text-center">
             <Bus size={14} className="text-yellow-500 mx-auto mb-1" />
             <p className="text-lg font-bold">{data.rutasZonales}</p>
-            <p className="text-[9px] text-default-400">{t("accessibility.zonalRoutes")}</p>
+            <p className="text-[9px] text-default-400">
+              {t("accessibility.zonalRoutes")}
+            </p>
           </div>
         </div>
       </GlassCard>

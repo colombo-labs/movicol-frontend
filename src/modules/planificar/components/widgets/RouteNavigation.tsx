@@ -20,8 +20,7 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
           {t("route.detailedDirections")}
         </span>
         <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-default-100 text-default-500">
-          {prediction.stations.length}{" "}
-          {t("route.stations")}
+          {prediction.stations.length} {t("route.stations")}
         </span>
       </div>
 
@@ -35,7 +34,9 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
         </div>
         <div className="flex-1 pb-1.5">
           <p className="text-[10px] text-foreground font-medium">
-            {mode === "transmilenio" ? t("route.walkToStation") : t("route.walkToStop")}
+            {mode === "transmilenio"
+              ? t("route.walkToStation")
+              : t("route.walkToStop")}
           </p>
           <p className="text-[9px] text-default-400">
             ~{Math.round(prediction.total_distance_km * 0.15 * 12)} min ·{" "}
@@ -179,7 +180,9 @@ export function VehicleNavSteps({
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-semibold">{t("route.detailedDirections")}</span>
+        <span className="text-[10px] font-semibold">
+          {t("route.detailedDirections")}
+        </span>
         <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-default-100 text-default-500">
           {steps.length} pasos
         </span>
@@ -193,7 +196,13 @@ export function VehicleNavSteps({
               className="flex items-stretch gap-2.5 py-1.5"
             >
               <div className="flex flex-col items-center w-5 shrink-0">
-                {s.maneuver === "arrive" ? <MapPin size={11} className="text-danger" /> : <span className="text-[11px]">{maneuverIcon(s.maneuver)}</span>}
+                {s.maneuver === "arrive" ? (
+                  <MapPin size={11} className="text-danger" />
+                ) : (
+                  <span className="text-[11px]">
+                    {maneuverIcon(s.maneuver)}
+                  </span>
+                )}
                 {i < steps.length - 1 && (
                   <div className="w-0.5 flex-1 bg-primary/20 min-h-[8px]" />
                 )}

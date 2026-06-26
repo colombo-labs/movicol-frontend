@@ -300,7 +300,9 @@ export function MapView({
       {/* Tap hint when prediction mode */}
       {predictionMode && tripPoints.length < 2 && (
         <div className="absolute top-12 md:top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-[10px] md:text-[11px] font-medium shadow-lg shadow-primary/30 animate-bounce pointer-events-none">
-          {tripPoints.length === 0 ? t("map.tapOrigin") : t("map.tapDestination")}
+          {tripPoints.length === 0
+            ? t("map.tapOrigin")
+            : t("map.tapDestination")}
         </div>
       )}
 

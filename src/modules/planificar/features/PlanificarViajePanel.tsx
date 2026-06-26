@@ -80,7 +80,9 @@ export function PlanificarViajePanel({
     prevPointsRef.current = key;
     const dt =
       departureType === "programar" && departureTime
-        ? new Date(`${new Date().toISOString().slice(0,10)}T${departureTime}:00`).toISOString()
+        ? new Date(
+            `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+          ).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
@@ -90,7 +92,9 @@ export function PlanificarViajePanel({
     if (!origin || !destination) return;
     const dt =
       departureType === "programar" && departureTime
-        ? new Date(`${new Date().toISOString().slice(0,10)}T${departureTime}:00`).toISOString()
+        ? new Date(
+            `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+          ).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
@@ -102,7 +106,9 @@ export function PlanificarViajePanel({
     if (origin && destination) {
       const dt =
         departureType === "programar" && departureTime
-          ? new Date(`${new Date().toISOString().slice(0,10)}T${departureTime}:00`).toISOString()
+          ? new Date(
+              `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+            ).toISOString()
           : new Date().toISOString();
       onPredictMulti?.(origin, destination, newMode, dt);
     }
@@ -139,7 +145,11 @@ export function PlanificarViajePanel({
         onRequestAddPoint={onRequestAddPoint}
       />
 
-      <EmptyState tripPoints={tripPoints} onUseMyLocation={onUseMyLocation} onAddPoint={onAddPoint} />
+      <EmptyState
+        tripPoints={tripPoints}
+        onUseMyLocation={onUseMyLocation}
+        onAddPoint={onAddPoint}
+      />
 
       {/* Departure time */}
       <div className="flex items-center gap-2 flex-wrap">

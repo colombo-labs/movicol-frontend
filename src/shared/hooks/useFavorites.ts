@@ -19,16 +19,25 @@ export function useFavorites() {
     if (res.ok) setFavorites(await res.json());
   }, [isAuthenticated]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
-  const addFavorite = async (type: string, label: string, data: Record<string, unknown>) => {
+  const addFavorite = async (
+    type: string,
+    label: string,
+    data: Record<string, unknown>,
+  ) => {
     if (!isAuthenticated) return null;
     const res = await fetch("/api/user/favorites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type, label, data }),
     });
-    if (res.ok) { load(); return true; }
+    if (res.ok) {
+      load();
+      return true;
+    }
     return false;
   };
 

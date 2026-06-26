@@ -18,9 +18,7 @@ export function EcoInfo({
           <p className="text-[10px] font-bold text-success">
             {(prediction.total_distance_km * 0.21).toFixed(1)} kg
           </p>
-          <p className="text-[8px] text-success/70">
-            {t("route.co2Saved")}
-          </p>
+          <p className="text-[8px] text-success/70">{t("route.co2Saved")}</p>
         </div>
       </div>
       <div className="flex-1 flex items-center gap-2 px-2.5 py-2 rounded-lg bg-orange-500/10 border border-orange-500/20">
@@ -29,7 +27,9 @@ export function EcoInfo({
           <p className="text-[10px] font-bold text-orange-600">
             {Math.round(prediction.total_distance_km * 0.15 * 12 * 3.5)} cal
           </p>
-          <p className="text-[8px] text-orange-500/70">{t("route.caloriesBurned")}</p>
+          <p className="text-[8px] text-orange-500/70">
+            {t("route.caloriesBurned")}
+          </p>
         </div>
       </div>
     </div>
@@ -48,7 +48,9 @@ export function CongestionBar({
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-semibold">{t("route.predictedCongestion")}</span>
+        <span className="text-[10px] font-semibold">
+          {t("route.predictedCongestion")}
+        </span>
         <span className="text-[8px] text-default-400 flex items-center gap-1">
           <span className="w-1 h-1 rounded-full bg-success animate-pulse" />{" "}
           {t("route.updatedNow")}
@@ -80,13 +82,6 @@ export function WaitEstimation({
   const waitMin = prediction.estimated_wait_minutes ?? 5;
   const occupancy = Math.min(Math.round(waitMin * 8), 100);
   const filledBars = Math.round(occupancy / 20);
-
-
-
-
-
-
-
 
   return (
     <GlassCard>
@@ -126,20 +121,14 @@ export function WaitEstimation({
       <p className="text-[9px] text-default-400 mt-1.5 border-t border-divider/30 pt-1.5">
         {t("route.seatProbability")}{" "}
         <strong className="text-foreground">
-          {waitMin <= 4 ? t("route.high") : waitMin <= 8 ? t("route.medium") : t("route.low")}
+          {waitMin <= 4
+            ? t("route.high")
+            : waitMin <= 8
+              ? t("route.medium")
+              : t("route.low")}
         </strong>{" "}
-        — {t("route.standingTime")} ~{Math.round(prediction.total_time_minutes * 0.7)} min
-
-
-
-
-
-
-
-
-
-
-
+        — {t("route.standingTime")} ~
+        {Math.round(prediction.total_time_minutes * 0.7)} min
       </p>
     </GlassCard>
   );

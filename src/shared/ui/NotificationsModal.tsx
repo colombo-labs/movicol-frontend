@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { useNotifications, AppNotification } from "@shared/hooks/useNotifications";
+import {
+  useNotifications,
+  AppNotification,
+} from "@shared/hooks/useNotifications";
 import { useState, useRef, useEffect } from "react";
 import {
   X,
@@ -9,7 +12,6 @@ import {
   CheckCircle2,
   Maximize2,
 } from "lucide-react";
-
 
 function NotifIcon({ type }: { readonly type: string }) {
   if (type === "alert")
@@ -39,7 +41,9 @@ function NotifItem({ notif }: { readonly notif: AppNotification }) {
         <p className="text-[10px] text-default-500 mt-0.5 line-clamp-1">
           {notif.body}
         </p>
-        <p className="text-[9px] text-default-400 mt-0.5">{new Date(notif.createdAt).toLocaleString()}</p>
+        <p className="text-[9px] text-default-400 mt-0.5">
+          {new Date(notif.createdAt).toLocaleString()}
+        </p>
       </div>
     </div>
   );
@@ -111,7 +115,10 @@ export function NotificationsDropdown({
 
           {/* Footer */}
           <div className="px-4 py-2 border-t border-divider flex items-center justify-between">
-            <button onClick={markAllRead} className="text-[9px] text-primary font-medium hover:underline">
+            <button
+              onClick={markAllRead}
+              className="text-[9px] text-primary font-medium hover:underline"
+            >
               {t("notifications.markAllRead")}
             </button>
             <button
@@ -145,9 +152,7 @@ export function NotificationsModal({
   if (!isOpen) return null;
 
   const filtered =
-    tab === "unread"
-      ? notifications.filter((n) => !n.read)
-      : notifications;
+    tab === "unread" ? notifications.filter((n) => !n.read) : notifications;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
@@ -217,10 +222,16 @@ export function NotificationsModal({
 
         {/* Footer */}
         <div className="px-5 py-3 border-t border-divider flex items-center justify-between">
-          <button onClick={markAllRead} className="text-[10px] text-primary font-medium hover:underline">
+          <button
+            onClick={markAllRead}
+            className="text-[10px] text-primary font-medium hover:underline"
+          >
             {t("notifications.markAllRead")}
           </button>
-          <button onClick={clear} className="text-[10px] text-default-400 hover:text-danger">
+          <button
+            onClick={clear}
+            className="text-[10px] text-default-400 hover:text-danger"
+          >
             {t("notifications.clear")}
           </button>
         </div>

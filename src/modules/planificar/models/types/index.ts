@@ -4,7 +4,12 @@ import type {
 } from "@modules/predicciones/models";
 import type { TripPoint } from "@/app/Layout";
 
-export type TransportMode = "publico" | "vehiculo" | "moto" | "bicicleta" | "caminando";
+export type TransportMode =
+  | "publico"
+  | "vehiculo"
+  | "moto"
+  | "bicicleta"
+  | "caminando";
 export type DepartureType = "ahora" | "programar";
 
 /** Un tramo del viaje (caminar, TM, SITP) */

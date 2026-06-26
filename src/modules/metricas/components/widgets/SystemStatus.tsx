@@ -11,11 +11,23 @@ export function SystemStatus({ avgCongestion }: Props) {
 
   function getStatus(avg: number) {
     if (avg > 0.7)
-      return { label: t("metrics.critical"), color: "text-danger", bg: "bg-danger/20" };
+      return {
+        label: t("metrics.critical"),
+        color: "text-danger",
+        bg: "bg-danger/20",
+      };
     if (avg > 0.5)
-      return { label: "Congestionado", color: "text-orange-500", bg: "bg-orange-500/20" };
+      return {
+        label: "Congestionado",
+        color: "text-orange-500",
+        bg: "bg-orange-500/20",
+      };
     if (avg > 0.3)
-      return { label: t("metrics.moderate"), color: "text-warning", bg: "bg-warning/20" };
+      return {
+        label: t("metrics.moderate"),
+        color: "text-warning",
+        bg: "bg-warning/20",
+      };
     return { label: "Fluido", color: "text-success", bg: "bg-success/20" };
   }
 
@@ -47,7 +59,9 @@ export function SystemStatus({ avgCongestion }: Props) {
         </span>
       </div>
       <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-divider/30">
-        <p className="text-[9px] text-default-400">{t("metrics.vsYesterday")}</p>
+        <p className="text-[9px] text-default-400">
+          {t("metrics.vsYesterday")}
+        </p>
         <p
           className={`text-[9px] font-medium ${avgCongestion > 0.5 ? "text-danger" : "text-success"}`}
         >

@@ -19,7 +19,12 @@ export function ConfigModal({ isOpen, onClose }: Props) {
   };
 
   return (
-    <AppModal isOpen={isOpen} onClose={onClose} title={t("config.title")} size="md">
+    <AppModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t("config.title")}
+      size="md"
+    >
       <div className="space-y-3">
         <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">
           <div className="flex items-center gap-3">
@@ -57,7 +62,13 @@ export function ConfigModal({ isOpen, onClose }: Props) {
             onClick={toggleLang}
             className="px-3 py-1.5 rounded-lg bg-default-100 text-xs font-semibold hover:bg-default-200 transition-colors"
           >
-            {i18n.language === "es" ? "Español" : i18n.language === "en" ? "English" : i18n.language === "fr" ? "Français" : "Português"}
+            {i18n.language === "es"
+              ? "Español"
+              : i18n.language === "en"
+                ? "English"
+                : i18n.language === "fr"
+                  ? "Français"
+                  : "Português"}
           </button>
         </div>
 
@@ -71,7 +82,9 @@ export function ConfigModal({ isOpen, onClose }: Props) {
               </p>
             </div>
           </div>
-          <span className="text-xs text-success font-medium">{t("config.enabled")}</span>
+          <span className="text-xs text-success font-medium">
+            {t("config.enabled")}
+          </span>
         </div>
 
         <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">

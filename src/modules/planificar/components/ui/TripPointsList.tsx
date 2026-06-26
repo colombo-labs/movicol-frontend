@@ -36,7 +36,11 @@ function getDotStyle(isFirst: boolean, isLast: boolean) {
   return "border-blue-500 bg-blue-500/30";
 }
 
-function getPlaceholder(index: number, total: number, t: (k: string) => string) {
+function getPlaceholder(
+  index: number,
+  total: number,
+  t: (k: string) => string,
+) {
   if (index === 0) return t("planner.originPlaceholder");
   if (index === total - 1) return t("planner.destinationPlaceholder");
   return t("planner.stopPlaceholder");

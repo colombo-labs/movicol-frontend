@@ -1,5 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { Train, Car, ArrowRightLeft, Footprints, Bike, Motorbike } from "lucide-react";
+import {
+  Train,
+  Car,
+  ArrowRightLeft,
+  Footprints,
+  Bike,
+  Motorbike,
+} from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { TransportMode, RouteOption, RouteLeg } from "../../models/types";
 
@@ -21,13 +28,15 @@ export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
   const { t } = useTranslation();
   return (
     <div className="flex gap-1 overflow-x-auto scrollbar-hide">
-      {([
-        { id: "publico", icon: Train, label: "Bus" },
-        { id: "vehiculo", icon: Car, label: t("planner.vehicle") },
-        { id: "moto", icon: Motorbike, label: "Moto" },
-        { id: "bicicleta", icon: Bike, label: "Bici" },
-        { id: "caminando", icon: Footprints, label: t("planner.walking") },
-      ] as const).map((m) => (
+      {(
+        [
+          { id: "publico", icon: Train, label: "Bus" },
+          { id: "vehiculo", icon: Car, label: t("planner.vehicle") },
+          { id: "moto", icon: Motorbike, label: "Moto" },
+          { id: "bicicleta", icon: Bike, label: "Bici" },
+          { id: "caminando", icon: Footprints, label: t("planner.walking") },
+        ] as const
+      ).map((m) => (
         <button
           key={m.id}
           type="button"
@@ -37,7 +46,9 @@ export function ModeTabs({ mode, onModeChange, optionsCount }: ModeTabsProps) {
           <m.icon size={11} />
           {m.label}
           {optionsCount && mode === m.id ? (
-            <span className="text-[8px] px-1 py-0.5 rounded-full bg-primary/20">{optionsCount}</span>
+            <span className="text-[8px] px-1 py-0.5 rounded-full bg-primary/20">
+              {optionsCount}
+            </span>
           ) : null}
         </button>
       ))}
@@ -52,9 +63,18 @@ interface RouteOptionsListProps {
 }
 
 const TAG_LABELS: Record<string, { label: string; color: string }> = {
-  fastest: { label: "planner.fastest", color: "bg-primary text-primary-foreground" },
-  cheapest: { label: "planner.cheapest", color: "bg-success text-success-foreground" },
-  less_walking: { label: "planner.lessWalking", color: "bg-blue-500 text-white" },
+  fastest: {
+    label: "planner.fastest",
+    color: "bg-primary text-primary-foreground",
+  },
+  cheapest: {
+    label: "planner.cheapest",
+    color: "bg-success text-success-foreground",
+  },
+  less_walking: {
+    label: "planner.lessWalking",
+    color: "bg-blue-500 text-white",
+  },
 };
 
 function LegIcon({
@@ -76,9 +96,11 @@ function LegIcon({
       />
     );
   if (type === "drive") return <Car size={size} className="text-emerald-400" />;
-  if (type === "moto") return <Motorbike size={size} className="text-orange-400" />;
+  if (type === "moto")
+    return <Motorbike size={size} className="text-orange-400" />;
   if (type === "bike") return <Bike size={size} className="text-blue-400" />;
-  if (type === "foot") return <Footprints size={size} className="text-purple-400" />;
+  if (type === "foot")
+    return <Footprints size={size} className="text-purple-400" />;
   return (
     <img
       src="/icons/sitp-logo.svg"
@@ -109,7 +131,11 @@ function getDotColor(type: RouteLeg["type"]): string {
   return "bg-blue-500";
 }
 
-function getLegLabel(type: RouteLeg["type"], line: string | undefined, t: (k: string) => string): string {
+function getLegLabel(
+  type: RouteLeg["type"],
+  line: string | undefined,
+  t: (k: string) => string,
+): string {
   const labels: Record<string, string> = {
     walk: t("planner.walking"),
     transmilenio: "TransMilenio",
@@ -133,8 +159,6 @@ export function RouteOptionsList({
     <div className="space-y-1.5">
       <p className="text-[10px] text-default-400 font-medium">
         {t("route.optionsFound", { count: options.length })}
-
-
       </p>
       {options.map((opt) => {
         const isSelected = selectedId === opt.id;
@@ -284,8 +308,8 @@ export function SelectedRouteDetail({
         <div className="mt-2 flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-warning/10 border border-warning/20">
           <ArrowRightLeft size={10} className="text-warning" />
           <span className="text-[9px] text-warning font-medium">
-            {option.transfers} {t("planner.transfers")} —
-            Sigue las señales de conexión
+            {option.transfers} {t("planner.transfers")} — Sigue las señales de
+            conexión
           </span>
         </div>
       )}

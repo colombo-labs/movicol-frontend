@@ -17,7 +17,9 @@ export function usePreferences() {
     if (res.ok) setPrefs(await res.json());
   }, [isAuthenticated]);
 
-  useEffect(() => { fetch_(); }, [fetch_]);
+  useEffect(() => {
+    fetch_();
+  }, [fetch_]);
 
   const update = async (data: Partial<Preferences>) => {
     const res = await fetch("/api/preferences", {

@@ -274,7 +274,15 @@ function buildSimpleVehicleOptions(results: RoutePrediction[]): RouteOption[] {
     transfers: 0,
     legs: [
       {
-        type: ({"vehiculo":"drive","moto":"moto","bicicleta":"bike","caminando":"foot"} as Record<string,any>)[result.mode] || "drive",
+        type:
+          (
+            {
+              vehiculo: "drive",
+              moto: "moto",
+              bicicleta: "bike",
+              caminando: "foot",
+            } as Record<string, string>
+          )[result.mode] || "drive",
         from: result.stations[0] || "Origen",
         to: result.stations[result.stations.length - 1] || "Destino",
         duration_minutes: result.total_time_minutes,
@@ -326,7 +334,15 @@ function buildMultiWaypointOptions(
       transfers: 0,
       legs: [
         {
-          type: ({"vehiculo":"drive","moto":"moto","bicicleta":"bike","caminando":"foot"} as Record<string,any>)[legResults[0]?.mode] || "drive",
+          type:
+            (
+              {
+                vehiculo: "drive",
+                moto: "moto",
+                bicicleta: "bike",
+                caminando: "foot",
+              } as Record<string, string>
+            )[legResults[0]?.mode] || "drive",
           from: allStations[0] || "Origen",
           to: allStations[allStations.length - 1] || "Destino",
           duration_minutes: totalTime,
@@ -427,10 +443,11 @@ export function useRoutePredictMulti() {
     setError(null);
 
     try {
-      const opts =
-        ["vehiculo", "moto", "bicicleta", "caminando"].includes(params.mode)
-          ? await fetchVehicleRoute(params)
-          : await fetchTransitRoute(params);
+      const opts = ["vehiculo", "moto", "bicicleta", "caminando"].includes(
+        params.mode,
+      )
+        ? await fetchVehicleRoute(params)
+        : await fetchTransitRoute(params);
 
       if (!cancelledRef.current) {
         setOptions(opts);

@@ -14,7 +14,9 @@ export function GridStats({ stats }: { readonly stats: Stats | null }) {
         </p>
       </GlassCard>
       <GlassCard>
-        <p className="text-[9px] text-default-400">{t("metrics.connections")}</p>
+        <p className="text-[9px] text-default-400">
+          {t("metrics.connections")}
+        </p>
         <p className="text-xl font-bold">
           {stats?.edges?.toLocaleString() ?? "\u2014"}
         </p>
@@ -46,7 +48,9 @@ export function TopCongested({ items }: { readonly items: HeatmapItem[] }) {
     <GlassCard>
       <div className="flex items-center gap-2 mb-2">
         <TrendingUp size={14} className="text-danger" />
-        <span className="text-xs font-semibold">{t("metrics.topCongestion")}</span>
+        <span className="text-xs font-semibold">
+          {t("metrics.topCongestion")}
+        </span>
       </div>
       <div className="space-y-1.5">
         {items.map((s, i) => (
@@ -89,7 +93,9 @@ export function PeakHours() {
     <GlassCard>
       <div className="flex items-center gap-2 mb-2">
         <Activity size={14} className="text-primary" />
-        <span className="text-xs font-semibold">{t("metrics.peakHoursToday")}</span>
+        <span className="text-xs font-semibold">
+          {t("metrics.peakHoursToday")}
+        </span>
       </div>
       <div className="space-y-1.5">
         {peaks.map((h) => (

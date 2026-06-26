@@ -56,59 +56,34 @@ export function ActionButtons({
           {t("route.share")}
         </button>
         <button
-          onClick={() => requireAuth(async () => {
-            const origin = tripPoints[0];
-            const dest = tripPoints.slice(-1)[0];
-            if (!origin || !dest) return;
-            await saveRoute({
-              originLabel: origin.label || `${origin.lat.toFixed(4)}, ${origin.lng.toFixed(4)}`,
-              originLat: origin.lat,
-              originLng: origin.lng,
-              destLabel: dest.label || `${dest.lat.toFixed(4)}, ${dest.lng.toFixed(4)}`,
-              destLat: dest.lat,
-              destLng: dest.lng,
-              estimatedMinutes: Math.round(prediction.total_time_minutes),
-              mode: "publico",
-            });
-            const btn = document.activeElement as HTMLButtonElement;
-            if (btn) {
-              btn.textContent = "✓";
-              setTimeout(() => { btn.textContent = t("planner.save"); }, 1500);
-            }
-          })}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+          onClick={() =>
+            requireAuth(async () => {
+              const origin = tripPoints[0];
+              const dest = tripPoints.slice(-1)[0];
+              if (!origin || !dest) return;
+              await saveRoute({
+                originLabel:
+                  origin.label ||
+                  `${origin.lat.toFixed(4)}, ${origin.lng.toFixed(4)}`,
+                originLat: origin.lat,
+                originLng: origin.lng,
+                destLabel:
+                  dest.label ||
+                  `${dest.lat.toFixed(4)}, ${dest.lng.toFixed(4)}`,
+                destLat: dest.lat,
+                destLng: dest.lng,
+                estimatedMinutes: Math.round(prediction.total_time_minutes),
+                mode: "publico",
+              });
+              const btn = document.activeElement as HTMLButtonElement;
+              if (btn) {
+                btn.textContent = "✓";
+                setTimeout(() => {
+                  btn.textContent = t("planner.save");
+                }, 1500);
+              }
+            })
+          }
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
           {t("route.save")}
@@ -124,7 +99,11 @@ export function ActionButtons({
   );
 }
 
-export function QuickActions({ onFocusMap }: { readonly onFocusMap: () => void }) {
+export function QuickActions({
+  onFocusMap,
+}: {
+  readonly onFocusMap: () => void;
+}) {
   const { t } = useTranslation();
   const [alarmSet, setAlarmSet] = useState(false);
   const [reported, setReported] = useState(false);
@@ -139,11 +118,13 @@ export function QuickActions({ onFocusMap }: { readonly onFocusMap: () => void }
   const handleShareLive = async () => {
     const url = `${window.location.origin}/planificar?shared=true`;
     try {
-      if (navigator.share) await navigator.share({ title: "Mi viaje en MoviCol", url });
+      if (navigator.share)
+        await navigator.share({ title: "Mi viaje en MoviCol", url });
       else await navigator.clipboard.writeText(url);
-    } catch { /* user cancelled */ }
+    } catch {
+      /* user cancelled */
+    }
   };
-
 
   const handleReport = () => {
     setReported(true);
@@ -152,17 +133,38 @@ export function QuickActions({ onFocusMap }: { readonly onFocusMap: () => void }
 
   return (
     <div className="grid grid-cols-2 gap-1.5">
-      <button onClick={handleAlarm} className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${alarmSet ? "bg-primary/20 text-primary border-primary/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}>
-        <Bell size={12} className={alarmSet ? "text-primary" : "text-default-500"} /> {alarmSet ? "✓ Activa" : t("route.alarmStop")}
+      <button
+        onClick={handleAlarm}
+        className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${alarmSet ? "bg-primary/20 text-primary border-primary/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}
+      >
+        <Bell
+          size={12}
+          className={alarmSet ? "text-primary" : "text-default-500"}
+        />{" "}
+        {alarmSet ? "✓ Activa" : t("route.alarmStop")}
       </button>
-      <button onClick={handleShareLive} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
+      <button
+        onClick={handleShareLive}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all"
+      >
         <Share2 size={12} className="text-default-500" /> {t("route.shareLive")}
       </button>
-      <button onClick={handleReport} className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${reported ? "bg-success/20 text-success border-success/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}>
-        <AlertCircle size={12} className={reported ? "text-success" : "text-warning"} /> {reported ? "✓ Reportado" : t("route.reportIncident")}
+      <button
+        onClick={handleReport}
+        className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${reported ? "bg-success/20 text-success border-success/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}
+      >
+        <AlertCircle
+          size={12}
+          className={reported ? "text-success" : "text-warning"}
+        />{" "}
+        {reported ? "✓ Reportado" : t("route.reportIncident")}
       </button>
-      <button onClick={onFocusMap} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all">
-        <MapPinned size={12} className="text-default-500" /> {t("route.viewFullMap")}
+      <button
+        onClick={onFocusMap}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all"
+      >
+        <MapPinned size={12} className="text-default-500" />{" "}
+        {t("route.viewFullMap")}
       </button>
     </div>
   );
@@ -310,12 +312,9 @@ export function TravelTips({ mode }: { readonly mode: string }) {
   const [vote, setVote] = useState<"up" | "down" | null>(null);
   const hour = new Date().getHours();
   let tip: string;
-  if (hour < 10)
-    tip = t("route.tipMorning");
-  else if (hour < 16)
-    tip = t("route.tipMidday");
-  else
-    tip = t("route.tipEvening");
+  if (hour < 10) tip = t("route.tipMorning");
+  else if (hour < 16) tip = t("route.tipMidday");
+  else tip = t("route.tipEvening");
 
   return (
     <>
@@ -369,7 +368,11 @@ function TuLlaveCard() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-10 h-6 rounded overflow-hidden flex items-center justify-center">
-            <img src="/icons/tullave.svg" alt="TuLlave" className="w-full h-full object-cover" />
+            <img
+              src="/icons/tullave.svg"
+              alt="TuLlave"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
             <p className="text-[10px] font-semibold">{t("route.tullave")}</p>

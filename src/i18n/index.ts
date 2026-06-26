@@ -13,7 +13,9 @@ i18n.use(initReactI18next).init({
     fr: { translation: fr },
     pt: { translation: pt },
   },
-  lng: localStorage.getItem("lang") || (navigator.language.startsWith("en") ? "en" : "es"),
+  lng:
+    localStorage.getItem("lang") ||
+    (navigator.language.startsWith("en") ? "en" : "es"),
   fallbackLng: "es",
   interpolation: { escapeValue: false },
 });

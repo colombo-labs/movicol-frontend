@@ -5,7 +5,10 @@ import { useTheme } from "@shared/hooks/useTheme";
 import { ConfigModal } from "./ConfigModal";
 import { ProfileModal } from "./ProfileModal";
 import { AuthButton } from "./AuthButton";
-import { NotificationsDropdown, NotificationsModal } from "./NotificationsModal";
+import {
+  NotificationsDropdown,
+  NotificationsModal,
+} from "./NotificationsModal";
 
 export function Header() {
   const { t } = useTranslation();
@@ -40,11 +43,17 @@ export function Header() {
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           <NotificationsDropdown onExpand={() => setNotifsOpen(true)} />
-          <AuthButton onConfigOpen={() => setConfigOpen(true)} onProfileOpen={() => setProfileOpen(true)} />
+          <AuthButton
+            onConfigOpen={() => setConfigOpen(true)}
+            onProfileOpen={() => setProfileOpen(true)}
+          />
         </div>
       </header>
       <ConfigModal isOpen={configOpen} onClose={() => setConfigOpen(false)} />
-      <NotificationsModal isOpen={notifsOpen} onClose={() => setNotifsOpen(false)} />
+      <NotificationsModal
+        isOpen={notifsOpen}
+        onClose={() => setNotifsOpen(false)}
+      />
       <ProfileModal
         isOpen={profileOpen}
         onClose={() => setProfileOpen(false)}

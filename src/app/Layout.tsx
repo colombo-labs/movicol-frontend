@@ -58,7 +58,8 @@ export function Layout() {
   const location = useLocation();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const activePanel = (location.pathname.split("/")[1] || "planificar") as PanelId;
+  const activePanel = (location.pathname.split("/")[1] ||
+    "planificar") as PanelId;
   const setActivePanel = useCallback(
     (id: PanelId) => {
       navigate(id ? `/${id}` : "/planificar");
@@ -78,7 +79,11 @@ export function Layout() {
   const [routeFilter, setRouteFilter] = useState<"all" | "tm" | "sitp">("all");
   const [showCongestion] = useState(false);
   const [showSiniestros, setShowSiniestros] = useState(false);
-  const [streetView, setStreetView] = useState<{ lat: number; lng: number; title?: string } | null>(null);
+  const [streetView, setStreetView] = useState<{
+    lat: number;
+    lng: number;
+    title?: string;
+  } | null>(null);
   const { predictMulti, options, isLoading, error, clear } =
     useRoutePredictMulti();
   const [selectedRouteIdx, setSelectedRouteIdx] = useState(0);
@@ -307,90 +312,102 @@ export function Layout() {
               </div>
             ) : null}
 
-            {activePanel !== "admin" && <><MapView
-              selectedTroncal={selectedTroncal}
-              showTroncalesOnMap={showTroncales}
-              showEstacionesOnMap={showEstaciones}
-              showSitpOnMap={showSitpOnMap}
-              sitpRouteCoords={
-                activePanel === "rutas"
-                  ? sitpRouteCoords || undefined
-                  : undefined
-              }
-              onMapClick={handleMapClick}
-              predictionMode={
-                activePanel === "planificar" &&
-                (tripPoints.length < 2 || addingPoint)
-              }
-              prediction={
-                activePanel === "planificar"
-                  ? (options?.[selectedRouteIdx]?.prediction ??
-                    options?.[0]?.prediction ??
-                    null)
-                  : null
-              }
-              altPredictions={
-                activePanel === "planificar"
-                  ? (options
-                      ?.filter((_, i) => i !== selectedRouteIdx)
-                      .map((o) => o.prediction) ?? [])
-                  : []
-              }
-              onSelectAltRoute={(ai) => {
-                // ai = index in altPredictions (which skips selectedRouteIdx)
-                let realIdx = 0;
-                let count = 0;
-                for (let i = 0; i < (options?.length ?? 0); i++) {
-                  if (i === selectedRouteIdx) continue;
-                  if (count === ai) {
-                    realIdx = i;
-                    break;
+            {activePanel !== "admin" && (
+              <>
+                <MapView
+                  selectedTroncal={selectedTroncal}
+                  showTroncalesOnMap={showTroncales}
+                  showEstacionesOnMap={showEstaciones}
+                  showSitpOnMap={showSitpOnMap}
+                  sitpRouteCoords={
+                    activePanel === "rutas"
+                      ? sitpRouteCoords || undefined
+                      : undefined
                   }
-                  count++;
-                }
-                setSelectedRouteIdx(realIdx);
-              }}
-              tripPoints={activePanel === "planificar" ? tripPoints : []}
-              onMovePoint={handleMovePoint}
-              showCongestion={showCongestion}
-              showSiniestros={showSiniestros}
-              showRoutesOnMap={showRoutesOnMap}
-            />
+                  onMapClick={handleMapClick}
+                  predictionMode={
+                    activePanel === "planificar" &&
+                    (tripPoints.length < 2 || addingPoint)
+                  }
+                  prediction={
+                    activePanel === "planificar"
+                      ? (options?.[selectedRouteIdx]?.prediction ??
+                        options?.[0]?.prediction ??
+                        null)
+                      : null
+                  }
+                  altPredictions={
+                    activePanel === "planificar"
+                      ? (options
+                          ?.filter((_, i) => i !== selectedRouteIdx)
+                          .map((o) => o.prediction) ?? [])
+                      : []
+                  }
+                  onSelectAltRoute={(ai) => {
+                    // ai = index in altPredictions (which skips selectedRouteIdx)
+                    let realIdx = 0;
+                    let count = 0;
+                    for (let i = 0; i < (options?.length ?? 0); i++) {
+                      if (i === selectedRouteIdx) continue;
+                      if (count === ai) {
+                        realIdx = i;
+                        break;
+                      }
+                      count++;
+                    }
+                    setSelectedRouteIdx(realIdx);
+                  }}
+                  tripPoints={activePanel === "planificar" ? tripPoints : []}
+                  onMovePoint={handleMovePoint}
+                  showCongestion={showCongestion}
+                  showSiniestros={showSiniestros}
+                  showRoutesOnMap={showRoutesOnMap}
+                />
 
-            {/* Toggle siniestralidad */}
-            <button
-              onClick={() => setShowSiniestros((v) => !v)}
-              className={`absolute top-[90px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg transition-all duration-200 ${
-                showSiniestros
-                  ? "bg-danger text-white shadow-danger/30"
-                  : "bg-background/90 text-default-500 border border-divider hover:text-danger"
-              }`}
-              title={t("safety.riskZones")}
-            >
-              <AlertTriangle size={18} />
-            </button>
+                {/* Toggle siniestralidad */}
+                <button
+                  onClick={() => setShowSiniestros((v) => !v)}
+                  className={`absolute top-[90px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg transition-all duration-200 ${
+                    showSiniestros
+                      ? "bg-danger text-white shadow-danger/30"
+                      : "bg-background/90 text-default-500 border border-divider hover:text-danger"
+                  }`}
+                  title={t("safety.riskZones")}
+                >
+                  <AlertTriangle size={18} />
+                </button>
 
-            {/* Street View button */}
-            <button
-              onClick={() => {
-                const center = tripPoints.length > 0
-                  ? tripPoints[0]
-                  : { lat: 4.65, lng: -74.08 };
-                setStreetView({ lat: center.lat, lng: center.lng });
-              }}
-              className="absolute top-[130px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg bg-background border border-divider hover:bg-default-100 transition-all"
-              title="Vista de calle"
-            >
-              <Eye size={18} className="text-default-500" />
-            </button>
-            </>}
+                {/* Street View button */}
+                <button
+                  onClick={() => {
+                    const center =
+                      tripPoints.length > 0
+                        ? tripPoints[0]
+                        : { lat: 4.65, lng: -74.08 };
+                    setStreetView({ lat: center.lat, lng: center.lng });
+                  }}
+                  className="absolute top-[130px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg bg-background border border-divider hover:bg-default-100 transition-all"
+                  title="Vista de calle"
+                >
+                  <Eye size={18} className="text-default-500" />
+                </button>
+              </>
+            )}
           </main>
 
           <MobileNav activePanel={activePanel} onTogglePanel={togglePanel} />
         </div>
       </div>
-      <ChatWidget activeModule={activePanel === "admin" ? undefined : activePanel} />
-      <StreetViewModal isOpen={!!streetView} onClose={() => setStreetView(null)} lat={streetView?.lat ?? 4.65} lng={streetView?.lng ?? -74.08} title={streetView?.title} />
+      <ChatWidget
+        activeModule={activePanel === "admin" ? undefined : activePanel}
+      />
+      <StreetViewModal
+        isOpen={!!streetView}
+        onClose={() => setStreetView(null)}
+        lat={streetView?.lat ?? 4.65}
+        lng={streetView?.lng ?? -74.08}
+        title={streetView?.title}
+      />
     </>
   );
 }

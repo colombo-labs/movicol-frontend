@@ -1,5 +1,11 @@
 import { useTranslation } from "react-i18next";
-import { Navigation, Route, Accessibility, BarChart3, ShieldCheck } from "lucide-react";
+import {
+  Navigation,
+  Route,
+  Accessibility,
+  BarChart3,
+  ShieldCheck,
+} from "lucide-react";
 import type { PanelId } from "./Sidebar";
 import { useAuth } from "@/shared/hooks/useAuth";
 
@@ -25,7 +31,10 @@ export function MobileNav({ activePanel, onTogglePanel }: MobileNavProps) {
   const isAdmin = user?.role?.name === "admin";
 
   const visibleItems = isAdmin
-    ? [...items, { id: "admin" as const, icon: ShieldCheck, label: "nav.admin" }]
+    ? [
+        ...items,
+        { id: "admin" as const, icon: ShieldCheck, label: "nav.admin" },
+      ]
     : items;
 
   return (

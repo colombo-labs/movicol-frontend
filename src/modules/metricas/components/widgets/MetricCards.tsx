@@ -15,7 +15,9 @@ export function AlertsCard({
     <GlassCard>
       <div className="flex items-center gap-2 mb-2">
         <AlertTriangle size={14} className="text-warning" />
-        <span className="text-xs font-semibold">{t("metrics.systemStatus")}</span>
+        <span className="text-xs font-semibold">
+          {t("metrics.systemStatus")}
+        </span>
       </div>
       <div className="space-y-1">
         {critical > 0 && (
@@ -73,7 +75,9 @@ export function PassengersCard({
           <p className="text-2xl font-bold">{base.toLocaleString()}</p>
         </div>
         <div className="text-right">
-          <p className="text-[9px] text-default-400">{t("metrics.capacityUsed")}</p>
+          <p className="text-[9px] text-default-400">
+            {t("metrics.capacityUsed")}
+          </p>
           <p className="text-lg font-bold text-warning">
             {Math.round(avgCongestion * 100 + 15)}%
           </p>

@@ -19,7 +19,9 @@ let globalSocket: Socket | null = null;
 let fetchPromise: Promise<void> | null = null;
 const listeners = new Set<() => void>();
 
-function notify() { listeners.forEach((l) => l()); }
+function notify() {
+  listeners.forEach((l) => l());
+}
 
 async function doFetchMe() {
   try {
@@ -30,7 +32,10 @@ async function doFetchMe() {
       const refreshRes = await fetch("/api/auth/refresh", { method: "POST" });
       if (refreshRes.ok) {
         const retry = await fetch("/api/auth/me");
-        if (retry.ok) { globalUser = await retry.json(); return; }
+        if (retry.ok) {
+          globalUser = await retry.json();
+          return;
+        }
       }
       globalUser = null;
     } else {
@@ -59,7 +64,9 @@ export function useAuth() {
     const cb = () => forceRender((n) => n + 1);
     listeners.add(cb);
     initAuth();
-    return () => { listeners.delete(cb); };
+    return () => {
+      listeners.delete(cb);
+    };
   }, []);
 
   // WebSocket for real-time updates
@@ -107,7 +114,8 @@ export function useAuth() {
     notify();
   };
 
-  const can = (permission: string) => globalUser?.permissions?.includes(permission) ?? false;
+  const can = (permission: string) =>
+    globalUser?.permissions?.includes(permission) ?? false;
 
   const refetch = () => {
     fetchPromise = null;
