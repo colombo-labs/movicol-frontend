@@ -98,6 +98,10 @@ export function RolesTab({
   );
   const modules = [...new Set(allPerms.map((p) => p.module))];
 
+  const togglePerm = (id: number) =>
+    setDraftPerms((p) =>
+      p.includes(id) ? p.filter((x) => x !== id) : [...p, id],
+    );
   return (
     <>
       {/* Stats */}
@@ -309,14 +313,7 @@ export function RolesTab({
                             type="checkbox"
                             checked={draftPerms.includes(perm.id)}
                             disabled={!editing}
-                            onChange={() => {
-                              const id = perm.id;
-                              setDraftPerms((p) =>
-                                p.includes(id)
-                                  ? p.filter((x) => x !== id)
-                                  : [...p, id],
-                              );
-                            }}
+                            onChange={() => togglePerm(perm.id)}
                             className="w-3 h-3 rounded accent-primary"
                           />
                           {perm.description || perm.action}

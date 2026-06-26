@@ -144,6 +144,12 @@ export function UsersTab() {
     return true;
   });
 
+  const toggleExtraPerm = (id: number) => {
+    if (!editing) return;
+    setDraftExtraPerms((p) =>
+      p.includes(id) ? p.filter((x) => x !== id) : [...p, id],
+    );
+  };
   return (
     <>
       {/* Stats Cards */}
@@ -432,15 +438,7 @@ export function UsersTab() {
                             type="checkbox"
                             checked={fromRole || isExtra}
                             disabled={!editing || fromRole}
-                            onChange={() => {
-                              if (!editing) return;
-                              const id = perm.id;
-                              setDraftExtraPerms((p) =>
-                                p.includes(id)
-                                  ? p.filter((x) => x !== id)
-                                  : [...p, id],
-                              );
-                            }}
+                            onChange={() => toggleExtraPerm(perm.id)}
                             className="w-3 h-3 rounded accent-primary"
                           />
                           <span
