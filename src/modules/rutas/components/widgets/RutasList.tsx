@@ -436,6 +436,11 @@ export function RutasList(props: Props) {
             .map((r) => (
               <div
                 key={r.ruta}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") onSelectRuta(r);
+                }}
                 onClick={() => onSelectRuta(r)}
                 className="cursor-pointer w-full text-left"
               >
@@ -623,6 +628,11 @@ export function RutasList(props: Props) {
                   return (
                     <div
                       key={`tmr-${r.codigo}`}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleTmClick();
+                      }}
                       onClick={handleTmClick}
                       className="cursor-pointer w-full text-left"
                     >
