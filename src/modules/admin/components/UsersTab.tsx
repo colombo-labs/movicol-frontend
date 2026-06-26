@@ -144,6 +144,12 @@ export function UsersTab() {
     return true;
   });
 
+  const permLabelClass = (fromRole: boolean, isExtra: boolean) => {
+    if (fromRole) return "text-default-400";
+    if (isExtra) return "text-primary font-medium";
+    return "text-default-600";
+  };
+
   const toggleExtraPerm = (id: number) => {
     if (!editing) return;
     setDraftExtraPerms((p) =>
@@ -441,15 +447,7 @@ export function UsersTab() {
                             onChange={() => toggleExtraPerm(perm.id)}
                             className="w-3 h-3 rounded accent-primary"
                           />
-                          <span
-                            className={
-                              fromRole
-                                ? "text-default-400"
-                                : isExtra
-                                  ? "text-primary font-medium"
-                                  : "text-default-600"
-                            }
-                          >
+                          <span className={permLabelClass(fromRole, isExtra)}>
                             {perm.description || perm.key}
                           </span>
                           {fromRole && (
