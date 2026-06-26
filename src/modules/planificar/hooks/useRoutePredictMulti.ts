@@ -267,14 +267,22 @@ function buildCombinedOption(
 function buildSimpleVehicleOptions(results: RoutePrediction[]): RouteOption[] {
   return results.map((result, i) => ({
     id: `vehiculo-${i}`,
-    label: i === 0 ? "Más rápida" : `Alternativa ${i}`,
+    label: i === 0 ? "planner.fastest" : `planner.alternative${i}`,
     total_time_minutes: result.total_time_minutes,
     total_distance_km: result.total_distance_km,
     cost: result.cost,
     transfers: 0,
     legs: [
       {
-        type: "drive" as const,
+        type:
+          (
+            {
+              vehiculo: "drive",
+              moto: "moto",
+              bicicleta: "bike",
+              caminando: "foot",
+            } as Record<string, RouteLeg["type"]>
+          )[result.mode] || "drive",
         from: result.stations[0] || "Origen",
         to: result.stations[result.stations.length - 1] || "Destino",
         duration_minutes: result.total_time_minutes,
@@ -302,7 +310,7 @@ function buildMultiWaypointOptions(
     total_time_minutes: totalTime,
     total_distance_km: totalDist,
     cost,
-    mode: "vehiculo",
+    mode: legResults[0]?.mode || "vehiculo",
     risk_segments: allSegments,
     overall_risk: legResults[0]?.overall_risk || "low",
     safety_score: Math.round(
@@ -319,14 +327,22 @@ function buildMultiWaypointOptions(
   return [
     {
       id: "vehiculo",
-      label: "Vehículo particular",
+      label: "planner.privateVehicle",
       total_time_minutes: totalTime,
       total_distance_km: totalDist,
       cost,
       transfers: 0,
       legs: [
         {
-          type: "drive" as const,
+          type:
+            (
+              {
+                vehiculo: "drive",
+                moto: "moto",
+                bicicleta: "bike",
+                caminando: "foot",
+              } as Record<string, RouteLeg["type"]>
+            )[legResults[0]?.mode] || "drive",
           from: allStations[0] || "Origen",
           to: allStations[allStations.length - 1] || "Destino",
           duration_minutes: totalTime,
@@ -352,7 +368,7 @@ async function fetchVehicleRoute(
       origin: params.origin,
       destination: params.destination,
       departure_time: params.departureTime,
-      mode: "vehiculo",
+      mode: params.mode,
     });
     return buildSimpleVehicleOptions(results);
   }
@@ -363,7 +379,7 @@ async function fetchVehicleRoute(
       origin: points[i],
       destination: points[i + 1],
       departure_time: params.departureTime,
-      mode: "vehiculo",
+      mode: params.mode,
     });
     legResults.push(res);
   }
@@ -427,10 +443,11 @@ export function useRoutePredictMulti() {
     setError(null);
 
     try {
-      const opts =
-        params.mode === "vehiculo"
-          ? await fetchVehicleRoute(params)
-          : await fetchTransitRoute(params);
+      const opts = ["vehiculo", "moto", "bicicleta", "caminando"].includes(
+        params.mode,
+      )
+        ? await fetchVehicleRoute(params)
+        : await fetchTransitRoute(params);
 
       if (!cancelledRef.current) {
         setOptions(opts);

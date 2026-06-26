@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import { Footprints, MapPin } from "lucide-react";
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { RoutePrediction } from "@modules/predicciones/models";
 
@@ -10,15 +12,15 @@ interface Props {
 }
 
 export function NavigationSteps({ prediction, mode, getETA }: Props) {
+  const { t } = useTranslation();
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-2">
         <span className="text-[10px] font-semibold">
-          Indicaciones detalladas
+          {t("route.detailedDirections")}
         </span>
         <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-default-100 text-default-500">
-          {prediction.stations.length}{" "}
-          {mode === "transmilenio" ? "estaciones" : "paraderos"}
+          {prediction.stations.length} {t("route.stations")}
         </span>
       </div>
 
@@ -26,13 +28,15 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
       <div className="flex items-stretch gap-3 pl-1">
         <div className="flex flex-col items-center w-4 shrink-0">
           <div className="w-4 h-4 rounded-full bg-success/20 flex items-center justify-center shrink-0 mt-0.5">
-            <span className="text-[7px]">🚶</span>
+            <Footprints size={10} className="text-success" />
           </div>
           <div className="w-0.5 flex-1 bg-success/30 min-h-[8px]" />
         </div>
         <div className="flex-1 pb-1.5">
           <p className="text-[10px] text-foreground font-medium">
-            Camina {mode === "transmilenio" ? "a la estación" : "al paradero"}
+            {mode === "transmilenio"
+              ? t("route.walkToStation")
+              : t("route.walkToStop")}
           </p>
           <p className="text-[9px] text-default-400">
             ~{Math.round(prediction.total_distance_km * 0.15 * 12)} min ·{" "}
@@ -88,15 +92,15 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
         <div className="flex flex-col items-center w-4 shrink-0">
           <div className="w-0.5 h-2 bg-danger/30" />
           <div className="w-4 h-4 rounded-full bg-danger/20 flex items-center justify-center shrink-0">
-            <span className="text-[7px]">📍</span>
+            <MapPin size={10} className="text-danger" />
           </div>
         </div>
         <div className="flex-1 pt-1">
           <p className="text-[10px] text-foreground font-medium">
-            Llegaste a tu destino
+            {t("route.arrivedDestination")}
           </p>
           <p className="text-[9px] text-success font-medium">
-            Hora estimada: {getETA()}
+            {t("route.estimatedTime")} {getETA()}
           </p>
         </div>
       </div>
@@ -109,10 +113,11 @@ export function StationsList({
 }: {
   readonly prediction: RoutePrediction;
 }) {
+  const { t } = useTranslation();
   return (
     <GlassCard>
       <span className="text-[10px] font-semibold mb-1.5 block">
-        Recorrido ({prediction.stations.length} estaciones)
+        {t("route.route")} ({prediction.stations.length} {t("route.stations")})
       </span>
       <div className="max-h-32 overflow-y-auto pl-1">
         {prediction.stations.map((station, i) => {
@@ -163,18 +168,21 @@ export function VehicleNavSteps({
   }[];
   readonly getETA: () => string | null;
 }) {
+  const { t } = useTranslation();
   const maneuverIcon = (m: string) => {
     if (m.includes("left")) return "↰";
     if (m.includes("right")) return "↱";
     if (m === "depart") return "▶";
-    if (m === "arrive") return "📍";
+    if (m === "arrive") return "•";
     return "↑";
   };
 
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] font-semibold">Indicaciones de ruta</span>
+        <span className="text-[10px] font-semibold">
+          {t("route.detailedDirections")}
+        </span>
         <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-default-100 text-default-500">
           {steps.length} pasos
         </span>
@@ -188,7 +196,13 @@ export function VehicleNavSteps({
               className="flex items-stretch gap-2.5 py-1.5"
             >
               <div className="flex flex-col items-center w-5 shrink-0">
-                <span className="text-[11px]">{maneuverIcon(s.maneuver)}</span>
+                {s.maneuver === "arrive" ? (
+                  <MapPin size={11} className="text-danger" />
+                ) : (
+                  <span className="text-[11px]">
+                    {maneuverIcon(s.maneuver)}
+                  </span>
+                )}
                 {i < steps.length - 1 && (
                   <div className="w-0.5 flex-1 bg-primary/20 min-h-[8px]" />
                 )}
@@ -211,10 +225,10 @@ export function VehicleNavSteps({
           ))}
       </div>
       <div className="flex items-center gap-2 mt-2 pt-2 border-t border-divider/30">
-        <span className="text-[10px]">📍</span>
+        <MapPin size={12} className="text-danger" />
         <div>
           <p className="text-[10px] text-foreground font-medium">
-            Llegada estimada
+            {t("route.arrivedDestination")}
           </p>
           <p className="text-[9px] text-success font-medium">{getETA()}</p>
         </div>

@@ -43,7 +43,13 @@ export function RutaDetail({
       <GlassCard>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            {iconSrc && <img src={iconSrc} alt="" className="w-5 h-5" />}
+            {iconSrc && (
+              <img
+                src={iconSrc}
+                alt=""
+                className="w-5 h-5 bg-white rounded-full p-px"
+              />
+            )}
             {!iconSrc && Icon && <Icon size={16} className="text-primary" />}
             <span className="text-lg font-bold">{codigo}</span>
           </div>

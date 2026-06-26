@@ -1,3 +1,20 @@
+import { useTranslation } from "react-i18next";
+function formatTime(min: number): string {
+  const m = Math.round(min);
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  const r = m % 60;
+  return r === 0 ? `${h} h` : `${h} h ${r} min`;
+}
+function formatTimeLong(min: number): string {
+  const m = Math.round(min);
+  if (m < 60) return `${m} minutos`;
+  const h = Math.floor(m / 60);
+  const r = m % 60;
+  if (r === 0) return h === 1 ? "1 hora" : `${h} horas`;
+  const hLabel = h === 1 ? "1 hora" : h + " horas";
+  return `${hLabel} ${r} minutos`;
+}
 import {
   Clock,
   Train,
@@ -57,7 +74,7 @@ export function LiveTimeBanner({
       <div className="text-right">
         <p className="text-[10px] text-default-400">Duración estimada</p>
         <p className="text-base font-bold">
-          {Math.round(prediction.total_time_minutes)} min
+          {formatTime(prediction.total_time_minutes)}
         </p>
       </div>
       <div className="text-center">
@@ -87,8 +104,7 @@ export function RouteSummaryCard({
         <div className="text-center p-1.5 rounded-lg bg-default-100">
           <p className="text-[9px] text-default-400">Tiempo</p>
           <p className="text-base font-bold">
-            {Math.round(prediction.total_time_minutes)}
-            <span className="text-[9px] font-normal"> min</span>
+            {formatTimeLong(prediction.total_time_minutes)}
           </p>
         </div>
         <div className="text-center p-1.5 rounded-lg bg-default-100">
@@ -146,6 +162,7 @@ export function TripDetails({
   readonly prediction: RoutePrediction;
   readonly mode: LegacyMode;
 }) {
+  const { t } = useTranslation();
   if (mode === "vehiculo") {
     return (
       <div className="grid grid-cols-3 gap-1.5">
@@ -188,7 +205,7 @@ export function TripDetails({
         <p className="text-[10px] font-bold">
           {Math.round(prediction.total_distance_km * 0.15 * 12)} min
         </p>
-        <p className="text-[8px] text-default-400">Caminando</p>
+        <p className="text-[8px] text-default-400">{t("planner.walking")}</p>
       </div>
       <div className="flex flex-col items-center p-2 rounded-lg bg-default-100">
         <Shield size={14} className={getSafetyColor(prediction.safety_score)} />

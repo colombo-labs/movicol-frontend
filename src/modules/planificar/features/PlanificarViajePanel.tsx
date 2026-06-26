@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation, Clock, AlertCircle } from "lucide-react";
 import { useWeather } from "@shared/hooks/useWeather";
 import { RouteSkeleton } from "@shared/ui/Skeleton";
@@ -9,6 +10,7 @@ import type {
   RouteOption,
 } from "../models/types";
 import { TripPointsList } from "../components/ui/TripPointsList";
+import { EmptyState } from "../components/ui/EmptyState";
 import {
   ModeTabs,
   RouteOptionsList,
@@ -48,6 +50,7 @@ export function PlanificarViajePanel({
   onSelectRoute,
   selectedRouteIdx,
 }: PlanificarProps) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<TransportMode>("publico");
   const temp = useWeather();
   const [departureType, setDepartureType] = useState<DepartureType>("ahora");
@@ -77,7 +80,9 @@ export function PlanificarViajePanel({
     prevPointsRef.current = key;
     const dt =
       departureType === "programar" && departureTime
-        ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+        ? new Date(
+            `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+          ).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
@@ -87,7 +92,9 @@ export function PlanificarViajePanel({
     if (!origin || !destination) return;
     const dt =
       departureType === "programar" && departureTime
-        ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+        ? new Date(
+            `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+          ).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
@@ -99,7 +106,9 @@ export function PlanificarViajePanel({
     if (origin && destination) {
       const dt =
         departureType === "programar" && departureTime
-          ? new Date(`2026-06-12T${departureTime}:00`).toISOString()
+          ? new Date(
+              `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+            ).toISOString()
           : new Date().toISOString();
       onPredictMulti?.(origin, destination, newMode, dt);
     }
@@ -136,6 +145,12 @@ export function PlanificarViajePanel({
         onRequestAddPoint={onRequestAddPoint}
       />
 
+      <EmptyState
+        tripPoints={tripPoints}
+        onUseMyLocation={onUseMyLocation}
+        onAddPoint={onAddPoint}
+      />
+
       {/* Departure time */}
       <div className="flex items-center gap-2 flex-wrap">
         <Clock size={13} className="text-default-400 shrink-0" />
@@ -143,13 +158,13 @@ export function PlanificarViajePanel({
           onClick={() => setDepartureType("ahora")}
           className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "ahora" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
         >
-          Salir ahora
+          {t("planner.departNow")}
         </button>
         <button
           onClick={() => setDepartureType("programar")}
           className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "programar" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
         >
-          Programar
+          {t("planner.schedule")}
         </button>
         {departureType === "programar" && (
           <input
@@ -176,7 +191,7 @@ export function PlanificarViajePanel({
           onClick={handleSearch}
           className="w-full py-1.5 rounded-lg border border-primary/30 text-primary text-[10px] font-medium flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-all"
         >
-          <Navigation size={10} /> Recalcular
+          <Navigation size={10} /> {t("planner.recalculate")}
         </button>
       )}
 
@@ -217,7 +232,7 @@ export function PlanificarViajePanel({
         <div className="space-y-2.5">
           <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-default-100/50 text-[9px] text-default-400">
             <span>{temp ?? "..."}°C Bogotá</span>
-            <span>Datos en vivo</span>
+            <span>{t("metrics.liveData")}</span>
             <span>
               {new Date().toLocaleTimeString("es-CO", {
                 hour: "2-digit",
@@ -277,7 +292,7 @@ export function PlanificarViajePanel({
                 tripPoints={tripPoints}
                 onClear={onClear}
               />
-              <QuickActions />
+              <QuickActions onFocusMap={() => {}} />
               <TravelTips
                 mode={mode === "publico" ? "transmilenio" : "vehiculo"}
               />

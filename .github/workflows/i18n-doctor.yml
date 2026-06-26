@@ -1,0 +1,25 @@
+name: Better i18n Doctor
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  i18n-doctor:
+    name: i18n Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run i18n Doctor
+        run: npx @better-i18n/cli@latest doctor --report --ci

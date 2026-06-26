@@ -1,3 +1,4 @@
+import { useSavedRoutes } from "@shared/hooks/useSavedRoutes";
 import { Clock, ChevronRight, MapPin, LocateFixed } from "lucide-react";
 import type { TripPoint } from "@/app/Layout";
 
@@ -27,24 +28,6 @@ export function EmptyState({ tripPoints, onUseMyLocation, onAddPoint }: Props) {
 
       {tripPoints.length === 0 && <RecentRoutes onAddPoint={onAddPoint} />}
 
-      {tripPoints.length === 0 && (
-        <button
-          onClick={() => onUseMyLocation()}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 border border-primary/30 text-sm font-medium text-primary hover:bg-primary/20 transition-all active:scale-[0.98]"
-        >
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-            <LocateFixed size={16} className="text-primary animate-pulse" />
-          </div>
-          <div className="text-left">
-            <span className="block text-primary font-semibold text-sm">
-              Usar mi ubicación
-            </span>
-            <span className="block text-[10px] text-primary/60">
-              Toca para iniciar desde donde estás
-            </span>
-          </div>
-        </button>
-      )}
       {tripPoints.length === 1 && (
         <div className="flex gap-2">
           <button
@@ -89,9 +72,17 @@ function RecentRoutes({
 }: {
   readonly onAddPoint?: (lat: number, lng: number, label: string) => void;
 }) {
-  const saved = JSON.parse(
-    localStorage.getItem("movicol_saved_routes") || "[]",
-  );
+  const { routes: rawSaved } = useSavedRoutes();
+  const saved = rawSaved.map((r) => ({
+    origin: r.originLabel,
+    dest: r.destLabel,
+    originLat: r.originLat,
+    originLng: r.originLng,
+    destLat: r.destLat,
+    destLng: r.destLng,
+    time: r.estimatedMinutes || 0,
+    date: new Date(r.createdAt).toLocaleDateString(),
+  }));
   if (saved.length === 0) return null;
   return (
     <div className="space-y-1.5">

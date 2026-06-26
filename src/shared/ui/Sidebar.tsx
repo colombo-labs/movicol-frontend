@@ -1,12 +1,22 @@
-import { Bus, Navigation, Route, Accessibility, BarChart3 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import {
+  Bus,
+  Navigation,
+  Route,
+  Accessibility,
+  BarChart3,
+  ShieldCheck,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import type { LucideIcon } from "lucide-react";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 export type PanelId =
   | "planificar"
   | "rutas"
   | "accesibilidad"
   | "metricas"
+  | "admin"
   | null;
 
 interface PanelItem {
@@ -16,10 +26,10 @@ interface PanelItem {
 }
 
 const panels: PanelItem[] = [
-  { id: "planificar", icon: Navigation, label: "Planificar viaje" },
-  { id: "rutas", icon: Route, label: "Rutas" },
-  { id: "accesibilidad", icon: Accessibility, label: "Accesibilidad" },
-  { id: "metricas", icon: BarChart3, label: "Métricas" },
+  { id: "planificar", icon: Navigation, label: "nav.planificar" },
+  { id: "rutas", icon: Route, label: "nav.rutas" },
+  { id: "accesibilidad", icon: Accessibility, label: "nav.accesibilidad" },
+  { id: "metricas", icon: BarChart3, label: "nav.metricas" },
 ];
 
 interface SidebarProps {
@@ -28,7 +38,18 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
+  const { can } = useAuth();
+  const isAdmin =
+    can("admin.users") || can("admin.roles") || can("admin.permissions");
+
+  const visiblePanels = isAdmin
+    ? [
+        ...panels,
+        { id: "admin" as const, icon: ShieldCheck, label: "nav.admin" },
+      ]
+    : panels;
   const [time, setTime] = useState(
     new Date().toLocaleTimeString("es-CO", {
       hour: "2-digit",
@@ -72,7 +93,7 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
                   Movi<span className="text-[#2d8a5e]">Col</span>
                 </span>
                 <span className="text-[10px] text-default-400">
-                  Transporte inteligente
+                  {t("app.subtitle")}
                 </span>
               </div>
             )}
@@ -80,15 +101,15 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
         </div>
 
         <div className="flex-1 flex flex-col items-center gap-1.5 py-4">
-          {panels.map((p) => {
+          {visiblePanels.map((p) => {
             const isActive = activePanel === p.id;
             const Icon = p.icon;
             return (
               <button
                 key={p.id}
                 onClick={() => onTogglePanel(isActive ? null : p.id)}
-                title={p.label}
-                aria-label={`${isActive ? "Cerrar" : "Abrir"}: ${p.label}`}
+                title={t(p.label)}
+                aria-label={`${isActive ? "Cerrar" : "Abrir"}: ${t(p.label)}`}
                 className={`${expanded ? "w-[calc(100%-1rem)] px-3" : "w-10"} h-10 rounded-xl flex items-center gap-3 transition-all duration-200 ${
                   isActive
                     ? "bg-primary/20 ring-1 ring-primary/50 text-primary"
@@ -102,7 +123,7 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
                   )}
                 </div>
                 {expanded && (
-                  <span className="text-sm truncate">{p.label}</span>
+                  <span className="text-sm truncate">{t(p.label)}</span>
                 )}
               </button>
             );
@@ -118,7 +139,7 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
             {expanded && (
               <div>
                 <p className="text-[9px] text-success font-medium">
-                  Sistema operativo
+                  {t("app.systemOnline")}
                 </p>
                 <p className="text-[8px] text-default-400">{time} • v1.0</p>
               </div>
@@ -129,7 +150,7 @@ export function Sidebar({ activePanel, onTogglePanel }: SidebarProps) {
 
       {/* Mobile bottom navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[600] bg-background/95 backdrop-blur-xl border-t border-divider px-2 py-1.5 flex items-center justify-around safe-bottom">
-        {panels.map((p) => {
+        {visiblePanels.map((p) => {
           const isActive = activePanel === p.id;
           const Icon = p.icon;
           return (

@@ -1,17 +1,25 @@
-import { Moon, Sun, Settings, User, Bus } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Moon, Sun, Bus } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@shared/hooks/useTheme";
 import { ConfigModal } from "./ConfigModal";
 import { ProfileModal } from "./ProfileModal";
+import { AuthButton } from "./AuthButton";
+import {
+  NotificationsDropdown,
+  NotificationsModal,
+} from "./NotificationsModal";
 
 export function Header() {
+  const { t } = useTranslation();
   const { theme, toggle } = useTheme();
   const [configOpen, setConfigOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notifsOpen, setNotifsOpen] = useState(false);
 
   return (
     <>
-      <header className="h-12 md:h-14 flex items-center justify-between px-3 md:px-5 border-b border-divider bg-background backdrop-blur-xl">
+      <header className="h-12 md:h-14 flex items-center justify-between px-3 md:px-5 border-b border-divider bg-background backdrop-blur-xl relative z-[1100]">
         {/* Logo mobile */}
         <span className="flex items-center gap-2 md:hidden">
           <span className="w-9 h-9 rounded-xl bg-[#2d8a5e] flex items-center justify-center shadow-sm">
@@ -22,7 +30,7 @@ export function Header() {
               Movi<span className="text-[#2d8a5e]">Col</span>
             </span>
             <span className="text-[9px] text-default-400">
-              Transporte inteligente
+              {t("app.subtitle")}
             </span>
           </span>
         </span>
@@ -34,23 +42,18 @@ export function Header() {
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          <button
-            onClick={() => setConfigOpen(true)}
-            className="w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center hover:bg-default-100 transition-all duration-200 text-default-500 hover:text-foreground active:scale-90"
-            title="Configuración"
-          >
-            <Settings size={16} />
-          </button>
-          <button
-            onClick={() => setProfileOpen(true)}
-            className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/20 flex items-center justify-center hover:bg-primary/30 transition-all duration-200 active:scale-90"
-            title="Mi perfil"
-          >
-            <User size={14} className="text-primary" />
-          </button>
+          <NotificationsDropdown onExpand={() => setNotifsOpen(true)} />
+          <AuthButton
+            onConfigOpen={() => setConfigOpen(true)}
+            onProfileOpen={() => setProfileOpen(true)}
+          />
         </div>
       </header>
       <ConfigModal isOpen={configOpen} onClose={() => setConfigOpen(false)} />
+      <NotificationsModal
+        isOpen={notifsOpen}
+        onClose={() => setNotifsOpen(false)}
+      />
       <ProfileModal
         isOpen={profileOpen}
         onClose={() => setProfileOpen(false)}

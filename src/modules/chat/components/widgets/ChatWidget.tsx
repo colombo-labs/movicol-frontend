@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button, Input } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
 import { Bot, X, SendHorizontal, Wifi, WifiOff, Minus } from "lucide-react";
@@ -45,6 +46,7 @@ const SUGGESTIONS: Record<string, string[]> = {
 };
 
 export function ChatWidget({ activeModule }: ChatWidgetProps) {
+  const { t } = useTranslation();
   const [state, setState] = useState<"closed" | "minimized" | "open">("closed");
   const [input, setInput] = useState("");
   const { messages, sendMessage, isStreaming, isConnected, clearMessages } =
@@ -92,7 +94,7 @@ export function ChatWidget({ activeModule }: ChatWidgetProps) {
         <Bot size={16} className="text-primary shrink-0" />
         <span className="text-[10px] text-default-400 truncate">
           {isStreaming
-            ? "Pensando..."
+            ? t("chat.thinking")
             : lastMsg?.content.slice(0, 40) || "MoviBot"}
           {lastMsg && lastMsg.content.length > 40 ? "..." : ""}
         </span>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@heroui/react";
 import { useState } from "react";
 
@@ -28,6 +29,7 @@ export function RoutePredictFeature({
   onPredict,
   onClear,
 }: RoutePredictFeatureProps) {
+  const { t } = useTranslation();
   const originLng = origin?.lng ?? origin?.lon;
   const destinationLng = destination?.lng ?? destination?.lon;
   const [departureTime, setDepartureTime] = useState(() => {
@@ -108,7 +110,7 @@ export function RoutePredictFeature({
           Predecir Ruta
         </Button>
         <Button variant="flat" size="lg" onPress={onClear}>
-          Limpiar
+          {t("common.clear")}
         </Button>
       </div>
 

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import "leaflet/dist/leaflet.css";
@@ -85,6 +86,7 @@ export function MapView({
   showRoutesOnMap,
   showSiniestros,
 }: MapViewProps) {
+  const { t } = useTranslation();
   const center: [number, number] = [4.65, -74.1];
   const [showTroncalesLocal] = useState(false);
   const showTroncales = showTroncalesOnMap ?? showTroncalesLocal;
@@ -298,8 +300,9 @@ export function MapView({
       {/* Tap hint when prediction mode */}
       {predictionMode && tripPoints.length < 2 && (
         <div className="absolute top-12 md:top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-1.5 rounded-full bg-primary/90 text-primary-foreground text-[10px] md:text-[11px] font-medium shadow-lg shadow-primary/30 animate-bounce pointer-events-none">
-          Toca el mapa para{" "}
-          {tripPoints.length === 0 ? "elegir origen" : "elegir destino"}
+          {tripPoints.length === 0
+            ? t("map.tapOrigin")
+            : t("map.tapDestination")}
         </div>
       )}
 
@@ -309,7 +312,7 @@ export function MapView({
         <span className="w-px h-3 bg-divider" />
         <span className="flex items-center gap-1">
           <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />{" "}
-          Conectado
+          {t("app.connected")}
         </span>
         <span className="w-px h-3 bg-divider" />
         <span>
