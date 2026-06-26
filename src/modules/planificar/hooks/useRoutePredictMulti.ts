@@ -133,7 +133,7 @@ function buildOptions(
 
   if (sitp && sitp.stations.length > 0) {
     const sitpCode = deriveLineName(sitp);
-    const tmCode = tm ? deriveLineName(tm) : '';
+    const tmCode = tm ? deriveLineName(tm) : "";
     // Skip SITP if it's the same route as TM (AI returned same prediction)
     if (sitpCode !== tmCode) {
       options.push(

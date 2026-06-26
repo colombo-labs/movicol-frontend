@@ -438,7 +438,7 @@ export function RutasList(props: Props) {
               <div
                 key={r.ruta}
                 onClick={() => onSelectRuta(r)}
-                onKeyDown={(e) => e.key === 'Enter' && onSelectRuta(r)}
+                onKeyDown={(e) => e.key === "Enter" && onSelectRuta(r)}
                 role="button"
                 tabIndex={0}
                 className="cursor-pointer w-full text-left"
@@ -628,7 +628,7 @@ export function RutasList(props: Props) {
                     <div
                       key={`tmr-${idx}-${r.codigo}`}
                       onClick={handleTmClick}
-                      onKeyDown={(e) => e.key === 'Enter' && handleTmClick()}
+                      onKeyDown={(e) => e.key === "Enter" && handleTmClick()}
                       role="button"
                       tabIndex={0}
                       className="cursor-pointer w-full text-left"

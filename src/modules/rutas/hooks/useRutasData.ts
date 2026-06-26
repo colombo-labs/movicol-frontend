@@ -36,11 +36,11 @@ export function useRutasData() {
         });
         setTmTroncales(
           tData.features.map((f: any) => ({
-            id: f.properties.id_trazado || f.id || '',
-            nombre: f.properties.nombre_tra || f.properties.troncal || '',
-            troncal: f.properties.troncal || '',
-            origen: f.properties.origen_tra || '',
-            destino: f.properties.fin_trazad || '',
+            id: f.properties.id_trazado || f.id || "",
+            nombre: f.properties.nombre_tra || f.properties.troncal || "",
+            troncal: f.properties.troncal || "",
+            origen: f.properties.origen_tra || "",
+            destino: f.properties.fin_trazad || "",
             estaciones: stnsByTz[f.properties.troncal] || [],
           })),
         );

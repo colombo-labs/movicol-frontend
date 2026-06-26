@@ -26,7 +26,7 @@ function notify() {
 async function doFetchMe() {
   try {
     // Skip auth check if no session cookie exists
-    if (!document.cookie.includes('access_token')) {
+    if (!document.cookie.includes("access_token")) {
       globalUser = null;
       return;
     }
