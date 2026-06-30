@@ -17,6 +17,7 @@ import { TroncalesLayer } from "./TroncalesLayer";
 import { SitpLayer, CongestionLayer } from "./map-components/layers";
 import { SelectedTroncalLayer } from "./map-components/troncal-layer";
 import { SiniestroLayer } from "./map-components/siniestro-layer";
+import { CarrilPreferencialLayer } from "./CarrilPreferencialLayer";
 import { makeIcon } from "./map-components/make-icon";
 import {
   DraggableMarker,
@@ -128,6 +129,7 @@ export function MapView({
           showTroncales={showTroncales}
           showEstaciones={showEstaciones}
         />
+        <CarrilPreferencialLayer show={showTroncales} />
 
         {/* SITP paraderos */}
         {(showSitp || showSitpOnMap) && <SitpLayer />}
@@ -218,9 +220,9 @@ export function MapView({
         )}
 
         {/* Prediction route segments (selected — bold, colored) */}
-        {prediction?.risk_segments.map((segment) => (
+        {prediction?.risk_segments.map((segment, i) => (
           <Polyline
-            key={`pred-seg-${segment.from_station}-${segment.to_station}`}
+            key={`pred-seg-${i}-${segment.from_station}-${segment.to_station}`}
             positions={segment.coordinates.map(
               (c) => [c[0], c[1]] as [number, number],
             )}

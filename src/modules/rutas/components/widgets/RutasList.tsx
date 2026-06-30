@@ -25,6 +25,7 @@ import type {
 function getTmColor(tipoBus: string): string {
   if (tipoBus === "BIARTICULADO") return "#E3342F";
   if (tipoBus === "ARTICULADO") return "#F6993F";
+  if (tipoBus === "PADRON") return "#3B82F6";
   return "#38A169";
 }
 
@@ -434,9 +435,12 @@ export function RutasList(props: Props) {
           filteredSitp
             .slice(sitpPage * SITP_PAGE_SIZE, (sitpPage + 1) * SITP_PAGE_SIZE)
             .map((r) => (
-              <button
+              <div
                 key={r.ruta}
                 onClick={() => onSelectRuta(r)}
+                onKeyDown={(e) => e.key === "Enter" && onSelectRuta(r)}
+                role="button"
+                tabIndex={0}
                 className="cursor-pointer w-full text-left"
               >
                 <GlassCard
@@ -495,7 +499,7 @@ export function RutasList(props: Props) {
                     </p>
                   )}
                 </GlassCard>
-              </button>
+              </div>
             ))}
         {tab === "sitp" &&
           (() => {
@@ -609,7 +613,7 @@ export function RutasList(props: Props) {
                   {filtered.length} {t("routes.found")}
                 </p>
 
-                {paged.map((r) => {
+                {paged.map((r, idx) => {
                   const tmColor = getTmColor(r.tipo_bus);
                   const handleTmClick = () => {
                     if (r.coords.length > 0) {
@@ -621,9 +625,12 @@ export function RutasList(props: Props) {
                     props.onSelectTmRuta?.(r);
                   };
                   return (
-                    <button
-                      key={`tmr-${r.codigo}`}
+                    <div
+                      key={`tmr-${idx}-${r.codigo}`}
                       onClick={handleTmClick}
+                      onKeyDown={(e) => e.key === "Enter" && handleTmClick()}
+                      role="button"
+                      tabIndex={0}
                       className="cursor-pointer w-full text-left"
                     >
                       <GlassCard
@@ -678,7 +685,7 @@ export function RutasList(props: Props) {
                           {r.estado}
                         </p>
                       </GlassCard>
-                    </button>
+                    </div>
                   );
                 })}
                 {totalPages > 1 && (

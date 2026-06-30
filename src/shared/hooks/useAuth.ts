@@ -25,19 +25,14 @@ function notify() {
 
 async function doFetchMe() {
   try {
+    // Skip auth check if no session cookie exists
+    if (!document.cookie.includes("access_token")) {
+      globalUser = null;
+      return;
+    }
     const res = await fetch("/api/auth/me");
     if (res.ok) {
       globalUser = await res.json();
-    } else if (res.status === 401) {
-      const refreshRes = await fetch("/api/auth/refresh", { method: "POST" });
-      if (refreshRes.ok) {
-        const retry = await fetch("/api/auth/me");
-        if (retry.ok) {
-          globalUser = await retry.json();
-          return;
-        }
-      }
-      globalUser = null;
     } else {
       globalUser = null;
     }
