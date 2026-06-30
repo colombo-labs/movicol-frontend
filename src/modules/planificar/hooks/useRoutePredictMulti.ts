@@ -88,6 +88,54 @@ function predictionToOption(
   };
 }
 
+function addAlternatives(
+  options: RouteOption[],
+  prediction: RoutePrediction,
+  prefix: string,
+  idPrefix: string,
+  dist: number,
+): void {
+  if (!prediction.alternatives || prediction.alternatives.length === 0) return;
+  prediction.alternatives.forEach((alt: RoutePrediction, i: number) => {
+    const altCode = alt.route_code || deriveLineName(alt);
+    options.push(
+      predictionToOption(
+        alt,
+        `${idPrefix}-alt-${i}`,
+        altCode ? `${prefix} ${altCode}` : `${prefix} Alt ${i + 1}`,
+        dist,
+      ),
+    );
+  });
+}
+
+function addTmOptions(
+  options: RouteOption[],
+  tm: RoutePrediction,
+  dist: number,
+): void {
+  const tmCode = deriveLineName(tm);
+  options.push(
+    predictionToOption(tm, "tm-direct", tmCode ? `TM ${tmCode}` : "TransMilenio", dist, "fastest"),
+  );
+  addAlternatives(options, tm, "TM", "tm", dist);
+}
+
+function addSitpOptions(
+  options: RouteOption[],
+  sitp: RoutePrediction,
+  tm: RoutePrediction | null,
+  dist: number,
+): void {
+  const sitpCode = deriveLineName(sitp);
+  const tmCode = tm ? deriveLineName(tm) : "";
+  if (sitpCode === tmCode) return;
+  options.push(
+    predictionToOption(sitp, "sitp-direct", sitpCode ? `SITP ${sitpCode}` : "SITP", dist, "less_walking"),
+  );
+  addAlternatives(options, sitp, "SITP", "sitp", dist);
+}
+
 function buildOptions(
   tm: RoutePrediction | null,
   sitp: RoutePrediction | null,
@@ -104,63 +152,11 @@ function buildOptions(
   const walkTime = Math.round(dist * 0.15 * 12);
 
   if (tm && tm.stations.length > 0) {
-    const tmCode = deriveLineName(tm);
-    options.push(
-      predictionToOption(
-        tm,
-        "tm-direct",
-        tmCode ? `TM ${tmCode}` : "TransMilenio",
-        dist,
-        "fastest",
-      ),
-    );
-
-    // Add AI-provided alternatives for TM
-    if (tm.alternatives && tm.alternatives.length > 0) {
-      tm.alternatives.forEach((alt, i) => {
-        const altCode = alt.route_code || deriveLineName(alt);
-        options.push(
-          predictionToOption(
-            alt,
-            `tm-alt-${i}`,
-            altCode ? `TM ${altCode}` : `TM Alt ${i + 1}`,
-            dist,
-          ),
-        );
-      });
-    }
+    addTmOptions(options, tm, dist);
   }
 
   if (sitp && sitp.stations.length > 0) {
-    const sitpCode = deriveLineName(sitp);
-    const tmCode = tm ? deriveLineName(tm) : "";
-    // Skip SITP if it's the same route as TM (AI returned same prediction)
-    if (sitpCode !== tmCode) {
-      options.push(
-        predictionToOption(
-          sitp,
-          "sitp-direct",
-          sitpCode ? `SITP ${sitpCode}` : "SITP",
-          dist,
-          "less_walking",
-        ),
-      );
-
-      // Add AI-provided alternatives for SITP
-      if (sitp.alternatives && sitp.alternatives.length > 0) {
-        sitp.alternatives.forEach((alt, i) => {
-          const altCode = alt.route_code || deriveLineName(alt);
-          options.push(
-            predictionToOption(
-              alt,
-              `sitp-alt-${i}`,
-              altCode ? `SITP ${altCode}` : `SITP Alt ${i + 1}`,
-              dist,
-            ),
-          );
-        });
-      }
-    }
+    addSitpOptions(options, sitp, tm, dist);
   }
 
   if (tm && sitp && tm.stations.length > 1 && sitp.stations.length > 1) {
