@@ -116,7 +116,13 @@ function addTmOptions(
 ): void {
   const tmCode = deriveLineName(tm);
   options.push(
-    predictionToOption(tm, "tm-direct", tmCode ? `TM ${tmCode}` : "TransMilenio", dist, "fastest"),
+    predictionToOption(
+      tm,
+      "tm-direct",
+      tmCode ? `TM ${tmCode}` : "TransMilenio",
+      dist,
+      "fastest",
+    ),
   );
   addAlternatives(options, tm, "TM", "tm", dist);
 }
@@ -131,7 +137,13 @@ function addSitpOptions(
   const tmCode = tm ? deriveLineName(tm) : "";
   if (sitpCode === tmCode) return;
   options.push(
-    predictionToOption(sitp, "sitp-direct", sitpCode ? `SITP ${sitpCode}` : "SITP", dist, "less_walking"),
+    predictionToOption(
+      sitp,
+      "sitp-direct",
+      sitpCode ? `SITP ${sitpCode}` : "SITP",
+      dist,
+      "less_walking",
+    ),
   );
   addAlternatives(options, sitp, "SITP", "sitp", dist);
 }
