@@ -1,4 +1,4 @@
-const NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse";
+const NOMINATIM_URL = "/nominatim/reverse";
 
 export async function reverseGeocode(
   lat: number,

@@ -21,7 +21,7 @@ export function ProfileModal({ isOpen, onClose }: Props) {
         try {
           const { latitude, longitude } = pos.coords;
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`,
+            `/nominatim/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`,
           );
           const data = await res.json();
           const loc =

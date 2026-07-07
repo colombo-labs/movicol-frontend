@@ -46,13 +46,13 @@ export function estimateTrip(
   const speed = speeds[mode] || 20;
   const time = Math.round((roadDist / speed) * 60);
   const costs: Record<string, string> = {
-    transmilenio: "$3,550",
-    sitp: "$3,550",
+    transmilenio: "$3.550",
+    sitp: "$3.550",
     vehiculo: `~$${Math.round(roadDist * 1200).toLocaleString()}`,
   };
   return {
     distance: Math.round(roadDist * 10) / 10,
     time,
-    cost: costs[mode] || "$3,550",
+    cost: costs[mode] || "$3.550",
   };
 }

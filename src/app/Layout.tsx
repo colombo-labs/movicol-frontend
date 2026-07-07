@@ -20,6 +20,7 @@ import { useRoutePredictMulti } from "@modules/planificar/hooks/useRoutePredictM
 import type { Coordinates } from "@modules/predicciones/models";
 import type { TransportMode } from "@modules/planificar/models/types";
 import { reverseGeocode } from "@shared/utils/reverseGeocode";
+import { useChatAction } from "./useChatAction";
 
 export type TripPoint = { lat: number; lng: number; label?: string };
 
@@ -111,6 +112,8 @@ export function Layout() {
     },
     [clear],
   );
+
+  const handleChatAction = useChatAction({ setTripPoints, togglePanel });
 
   // Click on map => add point with reverse geocoding
   const handleMapClick = useCallback(
@@ -377,20 +380,19 @@ export function Layout() {
                   <AlertTriangle size={18} />
                 </button>
 
-                {/* Street View button */}
-                <button
-                  onClick={() => {
-                    const center =
-                      tripPoints.length > 0
-                        ? tripPoints[0]
-                        : { lat: 4.65, lng: -74.08 };
-                    setStreetView({ lat: center.lat, lng: center.lng });
-                  }}
-                  className="absolute top-[130px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg bg-background border border-divider hover:bg-default-100 transition-all"
-                  title="Vista de calle"
-                >
-                  <Eye size={18} className="text-default-500" />
-                </button>
+                {/* Street View button — only shows when there's a point */}
+                {tripPoints.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const center = tripPoints[0];
+                      setStreetView({ lat: center.lat, lng: center.lng });
+                    }}
+                    className="absolute top-[130px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg bg-background border border-divider hover:bg-default-100 transition-all"
+                    title="Vista de calle"
+                  >
+                    <Eye size={18} className="text-default-500" />
+                  </button>
+                )}
               </>
             )}
           </main>
@@ -400,6 +402,13 @@ export function Layout() {
       </div>
       <ChatWidget
         activeModule={activePanel === "admin" ? undefined : activePanel}
+        tripPoints={tripPoints.map((p) => ({
+          lat: p.lat,
+          lon: p.lng,
+          label: p.label ?? "",
+        }))}
+        transportMode={routeFilter === "all" ? undefined : routeFilter}
+        onAction={handleChatAction}
       />
       <StreetViewModal
         isOpen={!!streetView}

@@ -61,6 +61,9 @@ export function NotificationsDropdown({
   const ref = useRef<HTMLDivElement>(null);
   const unread = unreadCount;
 
+  // Check auth
+  const isAuthenticated = !!document.cookie.includes("access_token");
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node))
@@ -106,31 +109,54 @@ export function NotificationsDropdown({
             </div>
           </div>
 
-          {/* List (max 3) */}
-          <div className="max-h-[280px] overflow-y-auto">
-            {notifications.slice(0, 3).map((n) => (
-              <NotifItem key={n.id} notif={n} />
-            ))}
-          </div>
+          {/* Content */}
+          {!isAuthenticated && (
+            <div className="px-4 py-6 text-center">
+              <Bell size={24} className="mx-auto text-default-300 mb-2" />
+              <p className="text-[11px] text-default-400">
+                {t("chat.loginRequired")}
+              </p>
+            </div>
+          )}
+          {isAuthenticated && notifications.length === 0 && (
+            <div className="px-4 py-6 text-center">
+              <Bell size={24} className="mx-auto text-default-300 mb-2" />
+              <p className="text-[11px] text-default-400">
+                {t("chat.noNotifications")}
+              </p>
+            </div>
+          )}
+          {isAuthenticated && notifications.length > 0 && (
+            <>
+              {/* List (max 3) */}
+              <div className="max-h-[280px] overflow-y-auto">
+                {notifications.slice(0, 3).map((n) => (
+                  <NotifItem key={n.id} notif={n} />
+                ))}
+              </div>
 
-          {/* Footer */}
-          <div className="px-4 py-2 border-t border-divider flex items-center justify-between">
-            <button
-              onClick={markAllRead}
-              className="text-[9px] text-primary font-medium hover:underline"
-            >
-              {t("notifications.markAllRead")}
-            </button>
-            <button
-              onClick={() => {
-                setOpen(false);
-                onExpand();
-              }}
-              className="text-[9px] text-default-400 hover:text-foreground"
-            >
-              {t("notifications.viewAll")} →
-            </button>
-          </div>
+              {/* Footer — only if there are notifications */}
+              <div className="px-4 py-2 border-t border-divider flex items-center justify-between">
+                {unread > 0 && (
+                  <button
+                    onClick={markAllRead}
+                    className="text-[9px] text-primary font-medium hover:underline"
+                  >
+                    {t("notifications.markAllRead")}
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    onExpand();
+                  }}
+                  className="text-[9px] text-default-400 hover:text-foreground ml-auto"
+                >
+                  {t("notifications.viewAll")} →
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -148,6 +174,8 @@ export function NotificationsModal({
   const { t } = useTranslation();
   const { notifications, unreadCount, markAllRead, clear } = useNotifications();
   const [tab, setTab] = useState<"all" | "unread">("all");
+
+  const isAuthenticated = !!document.cookie.includes("access_token");
 
   if (!isOpen) return null;
 
@@ -182,59 +210,75 @@ export function NotificationsModal({
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex border-b border-divider">
-          <button
-            onClick={() => setTab("all")}
-            className={`flex-1 py-2.5 text-[11px] font-medium transition-all ${
-              tab === "all"
-                ? "text-primary border-b-2 border-primary"
-                : "text-default-400"
-            }`}
-          >
-            {t("notifications.all")} ({notifications.length})
-          </button>
-          <button
-            onClick={() => setTab("unread")}
-            className={`flex-1 py-2.5 text-[11px] font-medium transition-all ${
-              tab === "unread"
-                ? "text-primary border-b-2 border-primary"
-                : "text-default-400"
-            }`}
-          >
-            {t("notifications.unread")} ({unreadCount})
-          </button>
-        </div>
-
-        {/* List */}
-        <div className="max-h-[50vh] overflow-y-auto">
-          {filtered.length === 0 ? (
-            <div className="py-10 text-center">
-              <Bell size={24} className="mx-auto text-default-300 mb-2" />
-              <p className="text-[11px] text-default-400">
-                No hay notificaciones
-              </p>
+        {!isAuthenticated ? (
+          /* Not authenticated */
+          <div className="py-12 text-center">
+            <Bell size={32} className="mx-auto text-default-300 mb-3" />
+            <p className="text-xs text-default-400">
+              {t("chat.loginRequired")}
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Tabs */}
+            <div className="flex border-b border-divider">
+              <button
+                onClick={() => setTab("all")}
+                className={`flex-1 py-2.5 text-[11px] font-medium transition-all ${
+                  tab === "all"
+                    ? "text-primary border-b-2 border-primary"
+                    : "text-default-400"
+                }`}
+              >
+                {t("notifications.all")} ({notifications.length})
+              </button>
+              <button
+                onClick={() => setTab("unread")}
+                className={`flex-1 py-2.5 text-[11px] font-medium transition-all ${
+                  tab === "unread"
+                    ? "text-primary border-b-2 border-primary"
+                    : "text-default-400"
+                }`}
+              >
+                {t("notifications.unread")} ({unreadCount})
+              </button>
             </div>
-          ) : (
-            filtered.map((n) => <NotifItem key={n.id} notif={n} />)
-          )}
-        </div>
 
-        {/* Footer */}
-        <div className="px-5 py-3 border-t border-divider flex items-center justify-between">
-          <button
-            onClick={markAllRead}
-            className="text-[10px] text-primary font-medium hover:underline"
-          >
-            {t("notifications.markAllRead")}
-          </button>
-          <button
-            onClick={clear}
-            className="text-[10px] text-default-400 hover:text-danger"
-          >
-            {t("notifications.clear")}
-          </button>
-        </div>
+            {/* List */}
+            <div className="max-h-[50vh] overflow-y-auto">
+              {filtered.length === 0 ? (
+                <div className="py-10 text-center">
+                  <Bell size={24} className="mx-auto text-default-300 mb-2" />
+                  <p className="text-[11px] text-default-400">
+                    {t("chat.noNotifications")}
+                  </p>
+                </div>
+              ) : (
+                filtered.map((n) => <NotifItem key={n.id} notif={n} />)
+              )}
+            </div>
+
+            {/* Footer — only when there are notifications */}
+            {notifications.length > 0 && (
+              <div className="px-5 py-3 border-t border-divider flex items-center justify-between">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllRead}
+                    className="text-[10px] text-primary font-medium hover:underline"
+                  >
+                    {t("notifications.markAllRead")}
+                  </button>
+                )}
+                <button
+                  onClick={clear}
+                  className="text-[10px] text-default-400 hover:text-danger ml-auto"
+                >
+                  {t("notifications.clear")}
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

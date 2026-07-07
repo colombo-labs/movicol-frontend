@@ -80,6 +80,8 @@ export function TraficoHeatmapPage() {
             Hora de predicción
           </label>
           <input
+            id="traficoheatmappage-input-1"
+            name="traficoheatmappage-input-1"
             type="range"
             min={0}
             max={23}

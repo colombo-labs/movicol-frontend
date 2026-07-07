@@ -1,0 +1,7 @@
+# Test results
+e2e/results/
+e2e/report/
+tests/performance/results/
+coverage/
+*.lcov
+e2e/report/
