@@ -69,22 +69,20 @@ export function TripPointsList({
     setQuery(value);
     setEditingIdx(idx);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (value.length < 3) {
+    if (value.length < 2) {
       setResults([]);
       return;
     }
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value + " Bogotá")}&limit=5&countrycodes=co`,
-        );
-        const data = await res.json();
+        const { geocodeAddress } = await import("@shared/utils/geocode");
+        const geoResults = await geocodeAddress(value);
         setResults(
-          data.map((r: { lat: string; lon: string; display_name: string }) => ({
-            lat: Number.parseFloat(r.lat),
-            lng: Number.parseFloat(r.lon),
-            label: r.display_name.split(",").slice(0, 3).join(","),
+          geoResults.map((r) => ({
+            lat: r.lat,
+            lng: r.lng,
+            label: r.label,
           })),
         );
       } catch {
@@ -92,7 +90,7 @@ export function TripPointsList({
       } finally {
         setSearching(false);
       }
-    }, 300);
+    }, 200);
   };
 
   const handleSelect = (r: SearchResult, idx: number) => {

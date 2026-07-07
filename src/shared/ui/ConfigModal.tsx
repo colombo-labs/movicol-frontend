@@ -1,7 +1,8 @@
-import { Moon, Sun, Globe, Bell, Info } from "lucide-react";
+import { Moon, Sun, Globe, Bell, Info, LogIn } from "lucide-react";
 import { AppModal } from "@shared/ui/AppModal";
 import { useTheme } from "@shared/hooks/useTheme";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 interface Props {
   isOpen: boolean;
@@ -11,6 +12,12 @@ interface Props {
 export function ConfigModal({ isOpen, onClose }: Props) {
   const { theme, toggle } = useTheme();
   const { t, i18n } = useTranslation();
+  const { isAuthenticated, login } = useAuth();
+
+  const handleLogin = () => {
+    onClose();
+    setTimeout(() => login(), 200);
+  };
 
   const toggleLang = () => {
     const langs = ["es", "en", "fr", "pt"];
@@ -66,7 +73,7 @@ export function ConfigModal({ isOpen, onClose }: Props) {
               es: "Español",
               en: "English",
               fr: "Français",
-              "pt-pt": "Português",
+              pt: "Português",
             }[i18n.language] ?? "Español"}
           </button>
         </div>
@@ -77,13 +84,25 @@ export function ConfigModal({ isOpen, onClose }: Props) {
             <div>
               <p className="text-sm font-medium">{t("config.notifications")}</p>
               <p className="text-[10px] text-default-400">
-                {t("config.notificationsDesc")}
+                {isAuthenticated
+                  ? t("config.notificationsDesc")
+                  : t("chat.loginForNotifications")}
               </p>
             </div>
           </div>
-          <span className="text-xs text-success font-medium">
-            {t("config.enabled")}
-          </span>
+          {isAuthenticated ? (
+            <span className="text-xs text-success font-medium">
+              {t("config.enabled")}
+            </span>
+          ) : (
+            <button
+              onClick={handleLogin}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-primary/10 text-[10px] text-primary font-medium hover:bg-primary/20 transition-colors"
+            >
+              <LogIn size={12} />
+              Iniciar sesión
+            </button>
+          )}
         </div>
 
         <div className="flex items-center justify-between p-2 rounded-lg hover:bg-default-100 transition-colors">

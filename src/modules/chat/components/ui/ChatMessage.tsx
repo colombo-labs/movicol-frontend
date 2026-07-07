@@ -5,7 +5,7 @@ interface ChatMessageProps {
 
 /**
  * UI: Burbuja de mensaje individual del chat.
- * Soporta saltos de línea y bullets (•) del bot.
+ * Soporta saltos de línea y bullets del bot.
  */
 export function ChatMessage({ role, content }: ChatMessageProps) {
   if (role === "user") {
@@ -18,12 +18,11 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
     );
   }
 
-  // Renderizar respuesta del asistente con formato
   const lines = content.split("\n").filter((l) => l.trim() !== "");
 
   return (
     <div className="text-xs text-left">
-      <span className="inline-block px-3 py-2 rounded-xl rounded-bl-sm max-w-[90%] bg-white/5 text-foreground space-y-1">
+      <span className="inline-block px-3 py-2 rounded-xl rounded-bl-sm max-w-[90%] bg-default-100 dark:bg-white/5 text-foreground space-y-1">
         {lines.map((line, i) => {
           const isBullet =
             line.trim().startsWith("•") || line.trim().startsWith("-");
@@ -33,7 +32,7 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
             return (
               <p
                 key={`bullet-${line.slice(0, 20)}`}
-                className="pl-2 text-default-300"
+                className="pl-2 text-foreground/80"
               >
                 {line.trim()}
               </p>
@@ -44,8 +43,8 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
             const [label, ...rest] = line.split(":");
             return (
               <p key={`label-${label}`}>
-                <span className="text-primary/80 font-medium">{label}:</span>
-                <span className="text-default-300">{rest.join(":")}</span>
+                <span className="text-primary font-medium">{label}:</span>
+                <span className="text-foreground/80">{rest.join(":")}</span>
               </p>
             );
           }
@@ -53,7 +52,7 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
           return (
             <p
               key={`line-${line.slice(0, 20)}-${i}`}
-              className="text-default-300"
+              className="text-foreground"
             >
               {line}
             </p>

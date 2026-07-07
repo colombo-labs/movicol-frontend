@@ -144,8 +144,18 @@
   },
   "chat": {
     "title": "AI Chat",
-    "placeholder": "Type your message...",
-    "thinking": "Thinking..."
+    "placeholder": "Ask something...",
+    "thinking": "Thinking...",
+    "listening": "Listening...",
+    "clean": "Clear",
+    "askModule": "Ask me about {module}",
+    "askGeneral": "Ask me about mobility in Bogotá",
+    "myLocation": "My location",
+    "remove": "Remove",
+    "swap": "Swap",
+    "loginForNotifications": "Sign in to enable notifications",
+    "noNotifications": "No notifications yet.",
+    "loginRequired": "Sign in to enable notifications."
   },
   "common": {
     "loading": "Loading...",

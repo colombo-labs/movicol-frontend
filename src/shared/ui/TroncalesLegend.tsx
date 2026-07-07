@@ -63,7 +63,7 @@ export function TroncalesLegend({
 
         <div className="flex flex-col gap-1 mb-1.5 pb-1.5 border-b border-white/20">
           <label className="flex items-center gap-1.5 cursor-pointer">
-            <input
+            <input id="troncaleslegend-input-1" name="troncaleslegend-input-1"
               type="checkbox"
               checked={showTroncales}
               onChange={onToggleTroncales}
@@ -72,7 +72,7 @@ export function TroncalesLegend({
             <span className="text-white/80">Troncales</span>
           </label>
           <label className="flex items-center gap-1.5 cursor-pointer">
-            <input
+            <input id="troncaleslegend-input-2" name="troncaleslegend-input-2"
               type="checkbox"
               checked={showEstaciones}
               onChange={onToggleEstaciones}

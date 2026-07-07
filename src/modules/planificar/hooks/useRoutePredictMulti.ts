@@ -80,7 +80,7 @@ function predictionToOption(
     label,
     total_time_minutes: prediction.total_time_minutes,
     total_distance_km: prediction.total_distance_km,
-    cost: prediction.cost || "$3,550",
+    cost: prediction.cost || "$3.550",
     transfers: prediction.transfers ?? 0,
     legs,
     prediction,
@@ -206,7 +206,7 @@ function buildCombinedOption(
     route_id: `combined-${tm.route_id}-${sitp.route_id}`,
     total_time_minutes: combinedTime,
     total_distance_km: combinedDist,
-    cost: "$3,550",
+    cost: "$3.550",
     mode: "combined",
     risk_segments: [
       ...tm.risk_segments.slice(0, tmSegHalf),
@@ -232,7 +232,7 @@ function buildCombinedOption(
       "TM" + (tmC ? " " + tmC : "") + " + SITP" + (sitpC ? " " + sitpC : ""),
     total_time_minutes: combinedTime,
     total_distance_km: combinedDist,
-    cost: "$3,550",
+    cost: "$3.550",
     transfers: 1,
     legs: [
       {

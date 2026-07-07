@@ -377,20 +377,19 @@ export function Layout() {
                   <AlertTriangle size={18} />
                 </button>
 
-                {/* Street View button */}
-                <button
-                  onClick={() => {
-                    const center =
-                      tripPoints.length > 0
-                        ? tripPoints[0]
-                        : { lat: 4.65, lng: -74.08 };
-                    setStreetView({ lat: center.lat, lng: center.lng });
-                  }}
-                  className="absolute top-[130px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg bg-background border border-divider hover:bg-default-100 transition-all"
-                  title="Vista de calle"
-                >
-                  <Eye size={18} className="text-default-500" />
-                </button>
+                {/* Street View button — only shows when there's a point */}
+                {tripPoints.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const center = tripPoints[0];
+                      setStreetView({ lat: center.lat, lng: center.lng });
+                    }}
+                    className="absolute top-[130px] right-[10px] z-[400] w-[34px] h-[34px] rounded-md flex items-center justify-center shadow-lg bg-background border border-divider hover:bg-default-100 transition-all"
+                    title="Vista de calle"
+                  >
+                    <Eye size={18} className="text-default-500" />
+                  </button>
+                )}
               </>
             )}
           </main>
@@ -400,6 +399,94 @@ export function Layout() {
       </div>
       <ChatWidget
         activeModule={activePanel === "admin" ? undefined : activePanel}
+        tripPoints={tripPoints.map((p) => ({
+          lat: p.lat,
+          lon: p.lng,
+          label: p.label ?? "",
+        }))}
+        transportMode={routeFilter === "all" ? undefined : routeFilter}
+        onAction={async (action) => {
+          if (action.type === "plan_route") {
+            const { origin, destination } = action.data as {
+              origin?: string;
+              destination?: string;
+            };
+            if (destination) {
+              const { geocodeAddress } = await import("@shared/utils/geocode");
+              // Append "Bogotá" for better geocoding accuracy
+              const destQuery = destination.toLowerCase().includes("bogot")
+                ? destination
+                : `${destination} Bogotá`;
+              const destResults = await geocodeAddress(destQuery);
+              if (destResults.length > 0) {
+                const dest = destResults[0];
+                // If origin is "tu ubicacion", use geolocation
+                if (!origin || origin === "tu ubicacion") {
+                  navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                      const { latitude, longitude } = pos.coords;
+                      setTripPoints([
+                        { lat: latitude, lng: longitude, label: "Mi ubicación" },
+                        { lat: dest.lat, lng: dest.lng, label: dest.label },
+                      ]);
+                      togglePanel("planificar");
+                      // Update label with real address
+                      import("@shared/utils/reverseGeocode").then(({ reverseGeocode }) => {
+                        reverseGeocode(latitude, longitude).then((addr) => {
+                          setTripPoints((prev) =>
+                            prev.map((p, i) => i === 0 ? { ...p, label: addr } : p)
+                          );
+                        });
+                      });
+                    },
+                    () => {
+                      // Fallback: solo destino
+                      setTripPoints([
+                        { lat: dest.lat, lng: dest.lng, label: dest.label },
+                      ]);
+                      togglePanel("planificar");
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 },
+                  );
+                } else {
+                  // Geocode origin too
+                  const origQuery = origin.toLowerCase().includes("bogot")
+                    ? origin
+                    : `${origin} Bogotá`;
+                  const origResults = await geocodeAddress(origQuery);
+                  togglePanel("planificar");
+                  // Small delay to ensure panel mounts before setting points
+                  await new Promise((r) => setTimeout(r, 100));
+                  if (origResults.length > 0) {
+                    const orig = origResults[0];
+                    setTripPoints([
+                      { lat: orig.lat, lng: orig.lng, label: orig.label },
+                      { lat: dest.lat, lng: dest.lng, label: dest.label },
+                    ]);
+                  } else {
+                    setTripPoints([
+                      { lat: dest.lat, lng: dest.lng, label: dest.label },
+                    ]);
+                  }
+                }
+              } else {
+                togglePanel("planificar");
+              }
+            }
+          } else if (action.type === "show_station") {
+            const { lat, lon, name } = action.data as {
+              lat?: number;
+              lon?: number;
+              name?: string;
+            };
+            if (lat && lon) {
+              setTripPoints([{ lat, lng: lon, label: name || "Estación" }]);
+            }
+            togglePanel("rutas");
+          } else if (action.type === "show_congestion") {
+            togglePanel("metricas");
+          }
+        }}
       />
       <StreetViewModal
         isOpen={!!streetView}

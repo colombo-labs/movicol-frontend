@@ -144,8 +144,18 @@
   },
   "chat": {
     "title": "Chat IA",
-    "placeholder": "Tapez votre message...",
-    "thinking": "Réflexion..."
+    "placeholder": "Posez une question...",
+    "thinking": "Réflexion...",
+    "listening": "Écoute...",
+    "clean": "Effacer",
+    "askModule": "Demandez-moi à propos de {module}",
+    "askGeneral": "Demandez-moi sur la mobilité à Bogotá",
+    "myLocation": "Ma position",
+    "remove": "Supprimer",
+    "swap": "Échanger",
+    "loginForNotifications": "Connectez-vous pour activer les notifications",
+    "noNotifications": "Pas de notifications pour le moment.",
+    "loginRequired": "Connectez-vous pour activer les notifications."
   },
   "common": {
     "loading": "Chargement...",
