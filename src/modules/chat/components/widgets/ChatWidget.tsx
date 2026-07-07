@@ -16,6 +16,7 @@ import { useChatWs } from "../../hooks/useChatWs";
 import { useVoice } from "../../hooks/useVoice";
 import { ChatMessage } from "../ui/ChatMessage";
 import type { AppContext, ChatAction } from "../../hooks/useChatWs";
+import type { ChatMessage as ChatMessageType } from "../../models";
 
 type ModuleId = "planificar" | "rutas" | "accesibilidad" | "metricas" | null;
 
@@ -109,6 +110,58 @@ function getSuggestions(
   }
 }
 
+function ChatClosed({ onOpen }: { readonly onOpen: () => void }) {
+  return (
+    <button
+      onClick={onOpen}
+      className="fixed bottom-28 md:bottom-6 right-4 md:right-[10px] w-12 h-12 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center hover:scale-110 transition-transform z-[600] shadow-lg shadow-primary/20"
+      title="Chat con MoviBot"
+    >
+      <Bot size={22} className="text-primary" />
+    </button>
+  );
+}
+
+function ChatMinimized({
+  messages,
+  isStreaming,
+  onOpen,
+  onClose,
+  t,
+}: {
+  readonly messages: ChatMessageType[];
+  readonly isStreaming: boolean;
+  readonly onOpen: () => void;
+  readonly onClose: () => void;
+  readonly t: (key: string) => string;
+}) {
+  const lastMsg = [...messages].reverse().find((m) => m.role === "assistant");
+  const truncated = lastMsg?.content.slice(0, 40) ?? "MoviBot";
+  const suffix = lastMsg && lastMsg.content.length > 40 ? "..." : "";
+  const preview = isStreaming ? t("chat.thinking") : truncated + suffix;
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="fixed bottom-28 md:bottom-6 right-4 md:right-[10px] z-[600] flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-divider shadow-xl cursor-pointer hover:border-primary/50 transition-all max-w-[240px]"
+    >
+      <Bot size={16} className="text-primary shrink-0" />
+      <span className="text-[10px] text-default-400 truncate">{preview}</span>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        className="text-default-400 hover:text-foreground shrink-0 cursor-pointer bg-transparent border-none p-0"
+        aria-label="Close chat"
+      >
+        <X size={12} />
+      </button>
+    </button>
+  );
+}
+
 export function ChatWidget({
   activeModule,
   tripPoints,
@@ -198,45 +251,19 @@ export function ChatWidget({
     currentHour,
   );
 
-  // Closed state
   if (state === "closed") {
-    return (
-      <button
-        onClick={() => setState("open")}
-        className="fixed bottom-28 md:bottom-6 right-4 md:right-[10px] w-12 h-12 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center hover:scale-110 transition-transform z-[600] shadow-lg shadow-primary/20"
-        title="Chat con MoviBot"
-      >
-        <Bot size={22} className="text-primary" />
-      </button>
-    );
+    return <ChatClosed onOpen={() => setState("open")} />;
   }
 
-  // Minimized state
   if (state === "minimized") {
-    const lastMsg = [...messages].reverse().find((m) => m.role === "assistant");
-    const truncated = lastMsg?.content.slice(0, 40) ?? "MoviBot";
-    const suffix = lastMsg && lastMsg.content.length > 40 ? "..." : "";
-    const preview = isStreaming ? t("chat.thinking") : truncated + suffix;
     return (
-      <button
-        type="button"
-        onClick={() => setState("open")}
-        className="fixed bottom-28 md:bottom-6 right-4 md:right-[10px] z-[600] flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-divider shadow-xl cursor-pointer hover:border-primary/50 transition-all max-w-[240px]"
-      >
-        <Bot size={16} className="text-primary shrink-0" />
-        <span className="text-[10px] text-default-400 truncate">{preview}</span>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setState("closed");
-          }}
-          className="text-default-400 hover:text-foreground shrink-0 cursor-pointer bg-transparent border-none p-0"
-          aria-label="Close chat"
-        >
-          <X size={12} />
-        </button>
-      </button>
+      <ChatMinimized
+        messages={messages}
+        isStreaming={isStreaming}
+        onOpen={() => setState("open")}
+        onClose={() => setState("closed")}
+        t={t}
+      />
     );
   }
 

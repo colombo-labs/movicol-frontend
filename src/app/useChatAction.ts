@@ -19,17 +19,15 @@ async function geocodeQuery(query: string) {
   return geocodeAddress(normalized);
 }
 
-function updateOriginLabel(
+async function updateOriginLabel(
   setTripPoints: SetTripPoints,
   lat: number,
   lng: number,
-) {
-  import("@shared/utils/reverseGeocode").then(({ reverseGeocode }) =>
-    reverseGeocode(lat, lng).then((addr) =>
-      setTripPoints((prev) =>
-        prev.map((p, i) => (i === 0 ? { ...p, label: addr } : p)),
-      ),
-    ),
+): Promise<void> {
+  const { reverseGeocode } = await import("@shared/utils/reverseGeocode");
+  const addr = await reverseGeocode(lat, lng);
+  setTripPoints((prev) =>
+    prev.map((p, i) => (i === 0 ? { ...p, label: addr } : p)),
   );
 }
 
