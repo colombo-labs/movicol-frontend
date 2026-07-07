@@ -121,16 +121,14 @@ export function ChatWidget({
   // Build app context for the AI
   const appContext: AppContext = useMemo(() => {
     const origin = tripPoints?.[0];
-    const destination = tripPoints?.[tripPoints.length - 1];
+    const hasMultiplePoints = (tripPoints?.length ?? 0) >= 2;
+    const destination = hasMultiplePoints ? tripPoints?.[tripPoints!.length - 1] : undefined;
     return {
       module: activeModule,
       origin: origin?.label ?? null,
-      destination: tripPoints && tripPoints.length >= 2 ? destination?.label ?? null : null,
+      destination: destination?.label ?? null,
       originCoords: origin ? [origin.lat, origin.lon] : null,
-      destinationCoords:
-        destination && tripPoints && tripPoints.length >= 2
-          ? [destination.lat, destination.lon]
-          : null,
+      destinationCoords: destination ? [destination.lat, destination.lon] : null,
       transportMode: transportMode ?? null,
     };
   }, [activeModule, tripPoints, transportMode]);
@@ -182,13 +180,15 @@ export function ChatWidget({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isStreaming]);
 
-  const handleSend = (text?: string) => {
-    const msg = (text ?? input).trim();
-    if (msg && !isStreaming) {
+  const handleSend = useCallback(
+    (text?: string) => {
+      const msg = (text ?? input).trim();
+      if (!msg || isStreaming) return;
       sendMessage(msg, appContext);
       if (!text) setInput("");
-    }
-  };
+    },
+    [input, isStreaming, sendMessage, appContext],
+  );
 
   const currentHour = new Date().getHours();
   const suggestions = getSuggestions(activeModule ?? null, tripPoints, currentHour);

@@ -20,6 +20,7 @@ import { useRoutePredictMulti } from "@modules/planificar/hooks/useRoutePredictM
 import type { Coordinates } from "@modules/predicciones/models";
 import type { TransportMode } from "@modules/planificar/models/types";
 import { reverseGeocode } from "@shared/utils/reverseGeocode";
+import { useChatAction } from "./useChatAction";
 
 export type TripPoint = { lat: number; lng: number; label?: string };
 
@@ -111,6 +112,8 @@ export function Layout() {
     },
     [clear],
   );
+
+  const handleChatAction = useChatAction({ setTripPoints, togglePanel });
 
   // Click on map => add point with reverse geocoding
   const handleMapClick = useCallback(
@@ -405,88 +408,7 @@ export function Layout() {
           label: p.label ?? "",
         }))}
         transportMode={routeFilter === "all" ? undefined : routeFilter}
-        onAction={async (action) => {
-          if (action.type === "plan_route") {
-            const { origin, destination } = action.data as {
-              origin?: string;
-              destination?: string;
-            };
-            if (destination) {
-              const { geocodeAddress } = await import("@shared/utils/geocode");
-              // Append "Bogotá" for better geocoding accuracy
-              const destQuery = destination.toLowerCase().includes("bogot")
-                ? destination
-                : `${destination} Bogotá`;
-              const destResults = await geocodeAddress(destQuery);
-              if (destResults.length > 0) {
-                const dest = destResults[0];
-                // If origin is "tu ubicacion", use geolocation
-                if (!origin || origin === "tu ubicacion") {
-                  navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                      const { latitude, longitude } = pos.coords;
-                      setTripPoints([
-                        { lat: latitude, lng: longitude, label: "Mi ubicación" },
-                        { lat: dest.lat, lng: dest.lng, label: dest.label },
-                      ]);
-                      togglePanel("planificar");
-                      // Update label with real address
-                      import("@shared/utils/reverseGeocode").then(({ reverseGeocode }) => {
-                        reverseGeocode(latitude, longitude).then((addr) => {
-                          setTripPoints((prev) =>
-                            prev.map((p, i) => i === 0 ? { ...p, label: addr } : p)
-                          );
-                        });
-                      });
-                    },
-                    () => {
-                      // Fallback: solo destino
-                      setTripPoints([
-                        { lat: dest.lat, lng: dest.lng, label: dest.label },
-                      ]);
-                      togglePanel("planificar");
-                    },
-                    { enableHighAccuracy: true, timeout: 10000 },
-                  );
-                } else {
-                  // Geocode origin too
-                  const origQuery = origin.toLowerCase().includes("bogot")
-                    ? origin
-                    : `${origin} Bogotá`;
-                  const origResults = await geocodeAddress(origQuery);
-                  togglePanel("planificar");
-                  // Small delay to ensure panel mounts before setting points
-                  await new Promise((r) => setTimeout(r, 100));
-                  if (origResults.length > 0) {
-                    const orig = origResults[0];
-                    setTripPoints([
-                      { lat: orig.lat, lng: orig.lng, label: orig.label },
-                      { lat: dest.lat, lng: dest.lng, label: dest.label },
-                    ]);
-                  } else {
-                    setTripPoints([
-                      { lat: dest.lat, lng: dest.lng, label: dest.label },
-                    ]);
-                  }
-                }
-              } else {
-                togglePanel("planificar");
-              }
-            }
-          } else if (action.type === "show_station") {
-            const { lat, lon, name } = action.data as {
-              lat?: number;
-              lon?: number;
-              name?: string;
-            };
-            if (lat && lon) {
-              setTripPoints([{ lat, lng: lon, label: name || "Estación" }]);
-            }
-            togglePanel("rutas");
-          } else if (action.type === "show_congestion") {
-            togglePanel("metricas");
-          }
-        }}
+        onAction={handleChatAction}
       />
       <StreetViewModal
         isOpen={!!streetView}
