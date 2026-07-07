@@ -34,13 +34,12 @@ export function AuthButton({
   return (
     <>
       {open && (
-        <div
-          className="fixed inset-0 z-[9990]"
+        <button
+          type="button"
+          className="fixed inset-0 z-[9990] w-full h-full bg-transparent border-none cursor-default"
           onClick={() => setOpen(false)}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") setOpen(false);
-          }}
-          role="presentation"
+          aria-label="Close menu"
+          tabIndex={-1}
         />
       )}
 

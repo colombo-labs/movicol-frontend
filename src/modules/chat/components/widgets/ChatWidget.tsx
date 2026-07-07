@@ -170,11 +170,10 @@ export function ChatWidget({
 
   // Auto-TTS on new assistant messages
   useEffect(() => {
-    if (!ttsEnabled || messages.length === 0) return;
     const lastMsg = messages[messages.length - 1];
-    if (lastMsg.role === "assistant" && !isStreaming) {
-      speak(lastMsg.content);
-    }
+    const shouldSpeak =
+      ttsEnabled && lastMsg?.role === "assistant" && !isStreaming;
+    if (shouldSpeak) speak(lastMsg.content);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length, isStreaming]);
 
