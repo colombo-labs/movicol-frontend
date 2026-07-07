@@ -141,9 +141,7 @@ export function ChatWidget({
 
   // Action handler
   const handleAction = useCallback(
-    (action: ChatAction) => {
-      if (onAction) onAction(action);
-    },
+    (action: ChatAction) => onAction?.(action),
     [onAction],
   );
 
@@ -153,10 +151,8 @@ export function ChatWidget({
   // Voice hooks
   const handleVoiceResult = useCallback(
     (transcript: string) => {
-      // Each detected phrase gets sent automatically
-      if (transcript.trim()) {
-        sendMessage(transcript, appContext);
-      }
+      const trimmed = transcript.trim();
+      if (trimmed) sendMessage(trimmed, appContext);
     },
     [sendMessage, appContext],
   );
@@ -219,10 +215,9 @@ export function ChatWidget({
   // Minimized state
   if (state === "minimized") {
     const lastMsg = [...messages].reverse().find((m) => m.role === "assistant");
-    const preview = isStreaming
-      ? t("chat.thinking")
-      : (lastMsg?.content.slice(0, 40) ?? "MoviBot") +
-        (lastMsg && lastMsg.content.length > 40 ? "..." : "");
+    const truncated = lastMsg?.content.slice(0, 40) ?? "MoviBot";
+    const suffix = lastMsg && lastMsg.content.length > 40 ? "..." : "";
+    const preview = isStreaming ? t("chat.thinking") : truncated + suffix;
     return (
       <button
         type="button"

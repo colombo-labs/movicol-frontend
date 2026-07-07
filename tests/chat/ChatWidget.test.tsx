@@ -65,16 +65,7 @@ describe("ChatWidget — full coverage", () => {
     },
   );
 
-  it("shows suggestions for active route", async () => {
-    const { ChatWidget } =
-      await import("@modules/chat/components/widgets/ChatWidget");
-    render(<ChatWidget activeModule="planificar" />);
-    fireEvent.click(screen.getByTitle("Chat con MoviBot"));
-    const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThan(3);
-  });
-
-  it("shows suggestions for active route", async () => {
+  it("shows contextual suggestions when trip points are set", async () => {
     const { ChatWidget } =
       await import("@modules/chat/components/widgets/ChatWidget");
     render(

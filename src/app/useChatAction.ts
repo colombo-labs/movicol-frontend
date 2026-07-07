@@ -1,10 +1,14 @@
 import { useCallback } from "react";
 import type { ChatAction } from "@modules/chat/hooks/useChatWs";
 import type { TripPoint } from "./Layout";
+import type { PanelId } from "@shared/ui/Sidebar";
+
+type SetTripPoints = React.Dispatch<React.SetStateAction<TripPoint[]>>;
+type TogglePanel = (id: PanelId) => void;
 
 interface UseChatActionOptions {
-  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>;
-  togglePanel: (id: string) => void;
+  setTripPoints: SetTripPoints;
+  togglePanel: TogglePanel;
 }
 
 async function geocodeQuery(query: string) {
@@ -16,24 +20,24 @@ async function geocodeQuery(query: string) {
 }
 
 function updateOriginLabel(
-  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
+  setTripPoints: SetTripPoints,
   lat: number,
   lng: number,
 ) {
-  import("@shared/utils/reverseGeocode").then(({ reverseGeocode }) => {
-    reverseGeocode(lat, lng).then((addr) => {
+  import("@shared/utils/reverseGeocode").then(({ reverseGeocode }) =>
+    reverseGeocode(lat, lng).then((addr) =>
       setTripPoints((prev) =>
         prev.map((p, i) => (i === 0 ? { ...p, label: addr } : p)),
-      );
-    });
-  });
+      ),
+    ),
+  );
 }
 
 function onGeoSuccess(
   pos: GeolocationPosition,
   dest: { lat: number; lng: number; label: string },
-  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
-  togglePanel: (id: string) => void,
+  setTripPoints: SetTripPoints,
+  togglePanel: TogglePanel,
 ) {
   const { latitude, longitude } = pos.coords;
   setTripPoints([
@@ -44,31 +48,25 @@ function onGeoSuccess(
   updateOriginLabel(setTripPoints, latitude, longitude);
 }
 
-function onGeoError(
-  dest: { lat: number; lng: number; label: string },
-  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
-  togglePanel: (id: string) => void,
-) {
-  setTripPoints([{ lat: dest.lat, lng: dest.lng, label: dest.label }]);
-  togglePanel("planificar");
-}
-
 function requestGeolocationRoute(
   dest: { lat: number; lng: number; label: string },
-  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
-  togglePanel: (id: string) => void,
+  setTripPoints: SetTripPoints,
+  togglePanel: TogglePanel,
 ) {
   navigator.geolocation.getCurrentPosition(
     (pos) => onGeoSuccess(pos, dest, setTripPoints, togglePanel),
-    () => onGeoError(dest, setTripPoints, togglePanel),
+    () => {
+      setTripPoints([{ lat: dest.lat, lng: dest.lng, label: dest.label }]);
+      togglePanel("planificar");
+    },
     { enableHighAccuracy: true, timeout: 10000 },
   );
 }
 
 async function handlePlanRoute(
   action: ChatAction,
-  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
-  togglePanel: (id: string) => void,
+  setTripPoints: SetTripPoints,
+  togglePanel: TogglePanel,
 ) {
   const { origin, destination } = action.data as {
     origin?: string;
@@ -107,8 +105,8 @@ async function handlePlanRoute(
 
 function handleShowStation(
   action: ChatAction,
-  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
-  togglePanel: (id: string) => void,
+  setTripPoints: SetTripPoints,
+  togglePanel: TogglePanel,
 ) {
   const { lat, lon, name } = action.data as {
     lat?: number;
