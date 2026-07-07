@@ -136,12 +136,12 @@ async function searchPhoton(query: string): Promise<GeoResult[]> {
 
     // Sort: prioritize localities/districts over POIs
     // osm_value: "suburb", "city_district", "residential" > "yes", "attraction", etc.
-    const priorityTypes = ["suburb", "city_district", "residential", "neighbourhood", "district"];
+    const priorityTypes = new Set(["suburb", "city_district", "residential", "neighbourhood", "district"]);
     filtered.sort((a: any, b: any) => {
       const aType = a.properties?.osm_value || "";
       const bType = b.properties?.osm_value || "";
-      const aPriority = priorityTypes.includes(aType) ? 0 : 1;
-      const bPriority = priorityTypes.includes(bType) ? 0 : 1;
+      const aPriority = priorityTypes.has(aType) ? 0 : 1;
+      const bPriority = priorityTypes.has(bType) ? 0 : 1;
       return aPriority - bPriority;
     });
 

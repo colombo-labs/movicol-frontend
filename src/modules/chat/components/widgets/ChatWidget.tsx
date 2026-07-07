@@ -210,11 +210,10 @@ export function ChatWidget({
   if (state === "minimized") {
     const lastMsg = [...messages].reverse().find((m) => m.role === "assistant");
     return (
-      <div
+      <button
+        type="button"
         onClick={() => setState("open")}
         className="fixed bottom-28 md:bottom-6 right-4 md:right-[10px] z-[600] flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-divider shadow-xl cursor-pointer hover:border-primary/50 transition-all max-w-[240px]"
-        role="button"
-        tabIndex={0}
       >
         <Bot size={16} className="text-primary shrink-0" />
         <span className="text-[10px] text-default-400 truncate">
@@ -223,18 +222,18 @@ export function ChatWidget({
             : lastMsg?.content.slice(0, 40) || "MoviBot"}
           {lastMsg && lastMsg.content.length > 40 ? "..." : ""}
         </span>
-        <span
+        <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             setState("closed");
           }}
-          className="text-default-400 hover:text-foreground shrink-0 cursor-pointer"
-          role="button"
-          tabIndex={0}
+          className="text-default-400 hover:text-foreground shrink-0 cursor-pointer bg-transparent border-none p-0"
+          aria-label="Close chat"
         >
           <X size={12} />
-        </span>
-      </div>
+        </button>
+      </button>
     );
   }
 

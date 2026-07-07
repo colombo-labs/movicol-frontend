@@ -27,7 +27,6 @@ test.describe("Planificar Viaje", () => {
 
   test("should show transport mode options", async ({ page }) => {
     await mapPage.openPanel("planificar");
-    // Should have mode selector (TM, SITP, vehicle)
     const panel = page.locator("[class*='panel'], [class*='side']");
     await expect(panel).toBeVisible();
   });
@@ -39,10 +38,8 @@ test.describe("Planificar Viaje", () => {
 
   test("should add point on map click", async ({ page }) => {
     await mapPage.openPanel("planificar");
-    // Click on map
     await mapPage.clickOnMap(300, 300);
-    await page.waitForTimeout(1000);
-    // Should have at least one input with a value
+    await page.waitForLoadState("domcontentloaded");
     const inputs = await page.locator("input").all();
     const values = await Promise.all(inputs.map((i) => i.inputValue()));
     const hasValue = values.some((v) => v.length > 0);

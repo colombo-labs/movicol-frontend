@@ -36,6 +36,8 @@ export function AuthButton({
         <div
           className="fixed inset-0 z-[9990]"
           onClick={() => setOpen(false)}
+          onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+          role="presentation"
         />
       )}
 

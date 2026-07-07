@@ -53,25 +53,31 @@ describe("Security — Input Validation", () => {
     expect(longMessage.length).toBeGreaterThan(maxLength);
     // Our schema enforces max_length=2000
     const truncated = longMessage.slice(0, maxLength);
-    expect(truncated.length).toBe(maxLength);
+    expect(truncated).toHaveLength(maxLength);
   });
 
   it("should not allow empty messages", () => {
     const empty = "";
-    expect(empty.trim().length).toBe(0);
+    expect(empty.trim()).toHaveLength(0);
     // Our schema enforces min_length=1
   });
 
   it("should handle special characters safely", () => {
     const special = '"; DROP TABLE users; --';
-    // Should be treated as plain text, not SQL
-    expect(typeof special).toBe("string");
-    // Our backend uses parameterized queries / ORMs
+    // Should be treated as plain text, not SQL - verify no SQL keywords are stripped
+    expect(special).toContain("DROP TABLE");
+    // Our backend uses parameterized queries, so this string is never interpreted as SQL
+    expect(special.length).toBeGreaterThan(0);
   });
 
   it("should sanitize geocode queries", () => {
     const malicious = "usaquen<script>alert(1)</script>";
-    const safe = malicious.replace(/<[^>]*>/g, "");
+    let safe = malicious;
+    let previous: string;
+    do {
+      previous = safe;
+      safe = safe.replace(/<[^>]*>/g, "");
+    } while (safe !== previous);
     expect(safe).toBe("usaquenalert(1)");
     expect(safe).not.toContain("<script>");
   });

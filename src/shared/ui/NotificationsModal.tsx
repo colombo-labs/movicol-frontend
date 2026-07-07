@@ -110,21 +110,23 @@ export function NotificationsDropdown({
           </div>
 
           {/* Content */}
-          {!isAuthenticated ? (
+          {!isAuthenticated && (
             <div className="px-4 py-6 text-center">
               <Bell size={24} className="mx-auto text-default-300 mb-2" />
               <p className="text-[11px] text-default-400">
                 {t("chat.loginRequired")}
               </p>
             </div>
-          ) : notifications.length === 0 ? (
+          )}
+          {isAuthenticated && notifications.length === 0 && (
             <div className="px-4 py-6 text-center">
               <Bell size={24} className="mx-auto text-default-300 mb-2" />
               <p className="text-[11px] text-default-400">
                 {t("chat.noNotifications")}
               </p>
             </div>
-          ) : (
+          )}
+          {isAuthenticated && notifications.length > 0 && (
             <>
               {/* List (max 3) */}
               <div className="max-h-[280px] overflow-y-auto">

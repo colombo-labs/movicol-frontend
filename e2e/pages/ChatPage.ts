@@ -22,7 +22,7 @@ export class ChatPage {
     this.messages = page.locator(".text-xs.text-left, .text-xs.text-right");
     this.clearButton = page.getByText(/limpiar|clear/i);
     this.micButton = page.locator('[title*="ablar"], [title*="etener"]');
-    this.closeButton = page.locator(".z-\\[600\\] button:has(svg)").last();
+    this.closeButton = page.locator(String.raw`.z-\[600\] button:has(svg)`).last();
     this.minimizeButton = page.locator('[title="Minimizar"]');
   }
 
@@ -45,7 +45,7 @@ export class ChatPage {
   }
 
   async getSuggestions(): Promise<string[]> {
-    const buttons = await this.page.locator(".bg-primary\\/10.text-primary").all();
+    const buttons = await this.page.locator(String.raw`.bg-primary\/10.text-primary`).all();
     return Promise.all(buttons.map((b) => b.textContent().then((t) => t || "")));
   }
 
