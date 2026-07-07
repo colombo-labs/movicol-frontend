@@ -68,7 +68,9 @@ describe("useChatWs", () => {
       response: "Planificando ruta",
       sources: [],
       sessionId: "test",
-      actions: [{ type: "plan_route", data: { origin: "a", destination: "b" } }],
+      actions: [
+        { type: "plan_route", data: { origin: "a", destination: "b" } },
+      ],
     });
 
     const { result } = renderHook(() => useChatWs(onAction));
@@ -123,9 +125,12 @@ describe("useChatWs", () => {
       await result.current.sendMessage("hola", context);
     });
 
-    expect(mockPost).toHaveBeenCalledWith("/chat", expect.objectContaining({
-      message: "hola",
-      context: { module: "planificar", origin: "Usaquén" },
-    }));
+    expect(mockPost).toHaveBeenCalledWith(
+      "/chat",
+      expect.objectContaining({
+        message: "hola",
+        context: { module: "planificar", origin: "Usaquén" },
+      }),
+    );
   });
 });

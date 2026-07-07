@@ -11,14 +11,18 @@ describe("useTheme — full", () => {
     const { useTheme } = await import("@shared/hooks/useTheme");
     const { result } = renderHook(() => useTheme());
     const initial = result.current.theme;
-    act(() => { result.current.toggle(); });
+    act(() => {
+      result.current.toggle();
+    });
     expect(result.current.theme).not.toBe(initial);
   });
 
   it("should persist to localStorage", async () => {
     const { useTheme } = await import("@shared/hooks/useTheme");
     const { result } = renderHook(() => useTheme());
-    act(() => { result.current.toggle(); });
+    act(() => {
+      result.current.toggle();
+    });
     const stored = localStorage.getItem("theme");
     expect(stored).toBeDefined();
   });
@@ -43,7 +47,8 @@ describe("usePlanRoute — lines 23-47", () => {
       departure_time: "2026-07-06T08:00:00",
     });
 
-    const { usePlanRoute } = await import("@modules/planificar/hooks/usePlanRoute");
+    const { usePlanRoute } =
+      await import("@modules/planificar/hooks/usePlanRoute");
     const { result } = renderHook(() => usePlanRoute());
 
     await act(async () => {
@@ -62,7 +67,8 @@ describe("usePlanRoute — lines 23-47", () => {
     const { api } = await import("@shared/api/http-client");
     (api.post as any).mockRejectedValue(new Error("fail"));
 
-    const { usePlanRoute } = await import("@modules/planificar/hooks/usePlanRoute");
+    const { usePlanRoute } =
+      await import("@modules/planificar/hooks/usePlanRoute");
     const { result } = renderHook(() => usePlanRoute());
 
     await act(async () => {
@@ -98,14 +104,16 @@ describe("NotificationsModal — tabs and actions", () => {
   });
 
   it("should show tabs when authenticated", async () => {
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     render(<NotificationsModal isOpen={true} onClose={vi.fn()} />);
     expect(screen.getByText(/notifications.all/)).toBeInTheDocument();
     expect(screen.getByText(/notifications.unread/)).toBeInTheDocument();
   });
 
   it("should switch to unread tab", async () => {
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     render(<NotificationsModal isOpen={true} onClose={vi.fn()} />);
     const unreadTab = screen.getByText(/notifications.unread/);
     fireEvent.click(unreadTab);
@@ -114,14 +122,16 @@ describe("NotificationsModal — tabs and actions", () => {
   });
 
   it("should show empty state in both tabs", async () => {
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     render(<NotificationsModal isOpen={true} onClose={vi.fn()} />);
     expect(screen.getByText("chat.noNotifications")).toBeInTheDocument();
   });
 
   it("should call onClose on backdrop", async () => {
     const onClose = vi.fn();
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     render(<NotificationsModal isOpen={true} onClose={onClose} />);
     const backdrop = screen.getByLabelText("Cerrar");
     fireEvent.click(backdrop);
@@ -137,7 +147,8 @@ describe("ConfigModal — remaining branches", () => {
     fireEvent.click(langBtn);
     // Should cycle to next language
     await waitFor(() => {
-      const btn = screen.queryByText("English") || screen.queryByText("Español");
+      const btn =
+        screen.queryByText("English") || screen.queryByText("Español");
       expect(btn).toBeInTheDocument();
     });
   });

@@ -60,6 +60,8 @@ test.describe("Chat — MoviBot", () => {
     await chatPage.open();
     await chatPage.minimizeButton.click();
     // Should show minimized bar
-    await expect(page.locator('[role="button"]').filter({ hasText: "MoviBot" })).toBeVisible();
+    await expect(
+      page.locator('[role="button"]').filter({ hasText: "MoviBot" }),
+    ).toBeVisible();
   });
 });

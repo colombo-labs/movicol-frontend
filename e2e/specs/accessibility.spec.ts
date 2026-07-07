@@ -31,7 +31,10 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
     await page.waitForLoadState("networkidle");
 
     await page.locator('[title="Chat con MoviBot"]').click();
-    await page.locator('[title="Chat con MoviBot"]').waitFor({ state: "hidden" }).catch(() => {});
+    await page
+      .locator('[title="Chat con MoviBot"]')
+      .waitFor({ state: "hidden" })
+      .catch(() => {});
     await page.waitForLoadState("domcontentloaded");
 
     const results = await new AxeBuilder({ page })
@@ -58,9 +61,7 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
       .exclude(".leaflet-container")
       .analyze();
 
-    const critical = results.violations.filter(
-      (v) => v.impact === "critical",
-    );
+    const critical = results.violations.filter((v) => v.impact === "critical");
 
     expect(critical).toHaveLength(0);
   });
@@ -110,7 +111,9 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
     }
 
     // Verify analysis ran successfully
-    expect(results.passes.length + results.violations.length).toBeGreaterThanOrEqual(0);
+    expect(
+      results.passes.length + results.violations.length,
+    ).toBeGreaterThanOrEqual(0);
   });
 
   test("forms should have labels", async ({ page }) => {
@@ -124,9 +127,7 @@ test.describe("Accessibility (WCAG 2.1 AA)", () => {
       .withRules(["label"])
       .analyze();
 
-    const critical = results.violations.filter(
-      (v) => v.impact === "critical",
-    );
+    const critical = results.violations.filter((v) => v.impact === "critical");
 
     expect(critical).toHaveLength(0);
   });

@@ -14,21 +14,22 @@ export function AuthButton({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  const avatarElement = isAuthenticated && user ? (
-    <img
-      src={
-        user.avatarUrl ||
-        `https://ui-avatars.com/api/?name=${user.name}&size=28&background=random`
-      }
-      alt={user.name}
-      referrerPolicy="no-referrer"
-      className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-divider object-cover"
-    />
-  ) : (
-    <div className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-divider bg-default-100 flex items-center justify-center">
-      <User size={16} className="text-default-400" />
-    </div>
-  );
+  const avatarElement =
+    isAuthenticated && user ? (
+      <img
+        src={
+          user.avatarUrl ||
+          `https://ui-avatars.com/api/?name=${user.name}&size=28&background=random`
+        }
+        alt={user.name}
+        referrerPolicy="no-referrer"
+        className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-divider object-cover"
+      />
+    ) : (
+      <div className="w-8 h-8 md:w-9 md:h-9 rounded-full border border-divider bg-default-100 flex items-center justify-center">
+        <User size={16} className="text-default-400" />
+      </div>
+    );
 
   return (
     <>
@@ -36,7 +37,9 @@ export function AuthButton({
         <div
           className="fixed inset-0 z-[9990]"
           onClick={() => setOpen(false)}
-          onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") setOpen(false);
+          }}
           role="presentation"
         />
       )}

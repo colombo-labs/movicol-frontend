@@ -52,7 +52,9 @@ test.describe("Navigation & Layout", () => {
     await expect(mapPage.avatar).toBeVisible();
   });
 
-  test("should not show street view button without points", async ({ page }) => {
+  test("should not show street view button without points", async ({
+    page,
+  }) => {
     const mapPage = new MapPage(page);
     await mapPage.goto();
     const eyeButton = page.locator('[title="Vista de calle"]');
@@ -64,6 +66,8 @@ test.describe("Navigation & Layout", () => {
     await mapPage.goto();
     await mapPage.avatar.click();
     await page.getByText(/configuración|settings/i).click();
-    await expect(page.getByText(/config.title|Configuración/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/config.title|Configuración/i).first(),
+    ).toBeVisible();
   });
 });

@@ -178,9 +178,13 @@ describe("ConfigModal — full coverage", () => {
     mockIsAuthenticated = false;
     render(<ConfigModal isOpen={true} onClose={onClose} />);
     // The login button in notifications
-    const loginBtn = screen.getAllByRole("button").find(
-      (b) => b.textContent?.includes("Iniciar") || b.textContent?.includes("login"),
-    );
+    const loginBtn = screen
+      .getAllByRole("button")
+      .find(
+        (b) =>
+          b.textContent?.includes("Iniciar") ||
+          b.textContent?.includes("login"),
+      );
     if (loginBtn) {
       fireEvent.click(loginBtn);
       // Should call onClose
@@ -191,7 +195,8 @@ describe("ConfigModal — full coverage", () => {
 
 describe("NotificationsModal — full coverage", () => {
   it("renders nothing when closed", async () => {
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     const { container } = render(
       <NotificationsModal isOpen={false} onClose={vi.fn()} />,
     );
@@ -199,7 +204,8 @@ describe("NotificationsModal — full coverage", () => {
   });
 
   it("shows login message when not authenticated", async () => {
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     // Remove cookie to simulate no auth
     document.cookie = "access_token=; Max-Age=0; path=/";
     render(<NotificationsModal isOpen={true} onClose={vi.fn()} />);
@@ -207,7 +213,8 @@ describe("NotificationsModal — full coverage", () => {
   });
 
   it("shows empty state with auth cookie", async () => {
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     document.cookie = "access_token=test; path=/";
     render(<NotificationsModal isOpen={true} onClose={vi.fn()} />);
     expect(screen.getByText("chat.noNotifications")).toBeInTheDocument();
@@ -215,18 +222,22 @@ describe("NotificationsModal — full coverage", () => {
   });
 
   it("shows title", async () => {
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     render(<NotificationsModal isOpen={true} onClose={vi.fn()} />);
     expect(screen.getByText("notifications.title")).toBeInTheDocument();
   });
 
   it("close button calls onClose", async () => {
     const onClose = vi.fn();
-    const { NotificationsModal } = await import("@shared/ui/NotificationsModal");
+    const { NotificationsModal } =
+      await import("@shared/ui/NotificationsModal");
     render(<NotificationsModal isOpen={true} onClose={onClose} />);
     // Find X button
     const buttons = screen.getAllByRole("button");
-    const closeBtn = buttons.find((b) => b.getAttribute("aria-label") === "Cerrar");
+    const closeBtn = buttons.find(
+      (b) => b.getAttribute("aria-label") === "Cerrar",
+    );
     if (closeBtn) {
       fireEvent.click(closeBtn);
       expect(onClose).toHaveBeenCalled();

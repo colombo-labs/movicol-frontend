@@ -22,7 +22,7 @@ describe("Security — XSS Prevention", () => {
   });
 
   it("should not allow HTML injection in user input", () => {
-    const input = '<img src=x onerror=alert(1)>';
+    const input = "<img src=x onerror=alert(1)>";
     const sanitized = input.replace(/[<>]/g, "");
     expect(sanitized).not.toContain("<");
     expect(sanitized).not.toContain(">");

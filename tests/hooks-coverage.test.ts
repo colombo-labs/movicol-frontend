@@ -34,7 +34,7 @@ describe("useChat (legacy hook)", () => {
     });
 
     await waitFor(() => {
-      expect(result.current.messages.length).toBe(2);
+      expect(result.current.messages).toHaveLength(2);
     });
   });
 
@@ -50,7 +50,7 @@ describe("useChat (legacy hook)", () => {
     });
 
     await waitFor(() => {
-      expect(result.current.messages.length).toBe(2);
+      expect(result.current.messages).toHaveLength(2);
       expect(result.current.messages[1].content).toContain("Error");
     });
   });
@@ -60,18 +60,16 @@ describe("useAddressSearch", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("should initialize empty", async () => {
-    const { useAddressSearch } = await import(
-      "@modules/planificar/hooks/useAddressSearch"
-    );
+    const { useAddressSearch } =
+      await import("@modules/planificar/hooks/useAddressSearch");
     const { result } = renderHook(() => useAddressSearch());
     expect(result.current.searchResults).toEqual([]);
     expect(result.current.searching).toBe(false);
   });
 
   it("should not search with short query", async () => {
-    const { useAddressSearch } = await import(
-      "@modules/planificar/hooks/useAddressSearch"
-    );
+    const { useAddressSearch } =
+      await import("@modules/planificar/hooks/useAddressSearch");
     const { result } = renderHook(() => useAddressSearch());
 
     act(() => {
@@ -87,9 +85,8 @@ describe("useAddressSearch", () => {
       json: async () => ({ features: [] }),
     } as Response);
 
-    const { useAddressSearch } = await import(
-      "@modules/planificar/hooks/useAddressSearch"
-    );
+    const { useAddressSearch } =
+      await import("@modules/planificar/hooks/useAddressSearch");
     const { result } = renderHook(() => useAddressSearch());
 
     act(() => {
@@ -106,9 +103,8 @@ describe("useAddressSearch", () => {
   });
 
   it("should clear search", async () => {
-    const { useAddressSearch } = await import(
-      "@modules/planificar/hooks/useAddressSearch"
-    );
+    const { useAddressSearch } =
+      await import("@modules/planificar/hooks/useAddressSearch");
     const { result } = renderHook(() => useAddressSearch());
 
     act(() => {
@@ -123,20 +119,17 @@ describe("usePlanRoute", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("should initialize with no prediction", async () => {
-    const { usePlanRoute } = await import(
-      "@modules/planificar/hooks/usePlanRoute"
-    );
+    const { usePlanRoute } =
+      await import("@modules/planificar/hooks/usePlanRoute");
     const { result } = renderHook(() => usePlanRoute());
     expect(result.current.prediction).toBeNull();
     expect(result.current.isLoading).toBe(false);
   });
 
   it("should have planRoute function", async () => {
-    const { usePlanRoute } = await import(
-      "@modules/planificar/hooks/usePlanRoute"
-    );
+    const { usePlanRoute } =
+      await import("@modules/planificar/hooks/usePlanRoute");
     const { result } = renderHook(() => usePlanRoute());
     expect(result.current.planRoute).toBeDefined();
   });
 });
-

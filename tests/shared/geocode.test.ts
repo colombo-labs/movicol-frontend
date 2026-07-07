@@ -6,25 +6,19 @@ describe("geocodeAddress", () => {
     vi.mocked(global.fetch).mockReset();
   });
 
-  it("should return local zone for known locations", async () => {
-    const results = await geocodeAddress("usaquen");
-    expect(results.length).toBeGreaterThan(0);
-    expect(results[0].label).toContain("Usaquén");
-    expect(results[0].lat).toBeCloseTo(4.6957, 2);
-  });
-
-  it("should return local zone for 'centro'", async () => {
-    const results = await geocodeAddress("centro");
-    expect(results.length).toBeGreaterThan(0);
-    expect(results[0].label).toContain("Centro");
-    expect(results[0].lat).toBeCloseTo(4.598, 1);
-  });
-
-  it("should return local zone for 'soacha'", async () => {
-    const results = await geocodeAddress("soacha");
-    expect(results.length).toBeGreaterThan(0);
-    expect(results[0].label).toContain("Soacha");
-  });
+  it.each([
+    ["usaquen", "Usaquén", 4.6957],
+    ["centro", "Centro", 4.598],
+    ["soacha", "Soacha", 4.58],
+  ])(
+    "should return local zone for '%s'",
+    async (query, expectedLabel, expectedLat) => {
+      const results = await geocodeAddress(query);
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].label).toContain(expectedLabel);
+      expect(results[0].lat).toBeCloseTo(expectedLat, 1);
+    },
+  );
 
   it("should return local zone for 'adl'", async () => {
     const results = await geocodeAddress("adl");
@@ -50,7 +44,11 @@ describe("geocodeAddress", () => {
         features: [
           {
             geometry: { coordinates: [-74.07, 4.65] },
-            properties: { name: "Test Place", city: "Bogotá", osm_value: "suburb" },
+            properties: {
+              name: "Test Place",
+              city: "Bogotá",
+              osm_value: "suburb",
+            },
           },
         ],
       }),

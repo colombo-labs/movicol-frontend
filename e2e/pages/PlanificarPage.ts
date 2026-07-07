@@ -17,7 +17,9 @@ export class PlanificarPage {
     this.originInput = page.locator("input").first();
     this.destinationInput = page.locator("input").nth(1);
     this.useMyLocationButton = page.getByText(/mi ubicación|my location/i);
-    this.searchResults = page.locator("[class*='search-result'], [class*='bg-default']");
+    this.searchResults = page.locator(
+      "[class*='search-result'], [class*='bg-default']",
+    );
     this.modeButtons = page.locator("[class*='mode-tab'], [role='tab']");
     this.routeOptions = page.locator("[class*='route-option']");
   }

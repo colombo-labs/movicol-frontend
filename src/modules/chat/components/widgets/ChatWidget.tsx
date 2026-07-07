@@ -37,7 +37,9 @@ function getSuggestions(
   tripPoints?: TripPoint[],
   hour?: number,
 ): string[] {
-  const isPeak = hour !== undefined && ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19));
+  const isPeak =
+    hour !== undefined &&
+    ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19));
   const hasOrigin = tripPoints && tripPoints.length >= 1;
   const hasRoute = tripPoints && tripPoints.length >= 2;
 
@@ -122,13 +124,17 @@ export function ChatWidget({
   const appContext: AppContext = useMemo(() => {
     const origin = tripPoints?.[0];
     const hasMultiplePoints = (tripPoints?.length ?? 0) >= 2;
-    const destination = hasMultiplePoints ? tripPoints?.[tripPoints!.length - 1] : undefined;
+    const destination = hasMultiplePoints
+      ? tripPoints?.[tripPoints!.length - 1]
+      : undefined;
     return {
       module: activeModule,
       origin: origin?.label ?? null,
       destination: destination?.label ?? null,
       originCoords: origin ? [origin.lat, origin.lon] : null,
-      destinationCoords: destination ? [destination.lat, destination.lon] : null,
+      destinationCoords: destination
+        ? [destination.lat, destination.lon]
+        : null,
       transportMode: transportMode ?? null,
     };
   }, [activeModule, tripPoints, transportMode]);
@@ -191,7 +197,11 @@ export function ChatWidget({
   );
 
   const currentHour = new Date().getHours();
-  const suggestions = getSuggestions(activeModule ?? null, tripPoints, currentHour);
+  const suggestions = getSuggestions(
+    activeModule ?? null,
+    tripPoints,
+    currentHour,
+  );
 
   // Closed state
   if (state === "closed") {
@@ -209,6 +219,10 @@ export function ChatWidget({
   // Minimized state
   if (state === "minimized") {
     const lastMsg = [...messages].reverse().find((m) => m.role === "assistant");
+    const preview = isStreaming
+      ? t("chat.thinking")
+      : (lastMsg?.content.slice(0, 40) ?? "MoviBot") +
+        (lastMsg && lastMsg.content.length > 40 ? "..." : "");
     return (
       <button
         type="button"
@@ -216,12 +230,7 @@ export function ChatWidget({
         className="fixed bottom-28 md:bottom-6 right-4 md:right-[10px] z-[600] flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-divider shadow-xl cursor-pointer hover:border-primary/50 transition-all max-w-[240px]"
       >
         <Bot size={16} className="text-primary shrink-0" />
-        <span className="text-[10px] text-default-400 truncate">
-          {isStreaming
-            ? t("chat.thinking")
-            : lastMsg?.content.slice(0, 40) || "MoviBot"}
-          {lastMsg && lastMsg.content.length > 40 ? "..." : ""}
-        </span>
+        <span className="text-[10px] text-default-400 truncate">{preview}</span>
         <button
           type="button"
           onClick={(e) => {
@@ -318,7 +327,7 @@ export function ChatWidget({
               className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"
               style={{ animationDelay: "0.2s" }}
             />
-            Pensando...
+            <span className="ml-1">Pensando...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
@@ -335,38 +344,40 @@ export function ChatWidget({
           </p>
         )}
         <div className="flex gap-1">
-        {voiceSupported && (
+          {voiceSupported && (
+            <Button
+              size="sm"
+              variant={isListening ? "solid" : "light"}
+              color={isListening ? "danger" : "default"}
+              isIconOnly
+              onPress={isListening ? stopListening : startListening}
+              title={isListening ? "Detener" : "Hablar"}
+            >
+              {isListening ? <MicOff size={14} /> : <Mic size={14} />}
+            </Button>
+          )}
+          <Input
+            id="chat-input"
+            name="chat-input"
+            size="sm"
+            autoComplete="off"
+            placeholder={
+              isListening ? t("chat.listening") : t("chat.placeholder")
+            }
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            isDisabled={isListening}
+          />
           <Button
             size="sm"
-            variant={isListening ? "solid" : "light"}
-            color={isListening ? "danger" : "default"}
+            color="primary"
             isIconOnly
-            onPress={isListening ? stopListening : startListening}
-            title={isListening ? "Detener" : "Hablar"}
+            onPress={() => handleSend()}
+            isDisabled={isStreaming || !input.trim()}
           >
-            {isListening ? <MicOff size={14} /> : <Mic size={14} />}
+            <SendHorizontal size={14} />
           </Button>
-        )}
-        <Input
-          id="chat-input"
-          name="chat-input"
-          size="sm"
-          autoComplete="off"
-          placeholder={isListening ? t("chat.listening") : t("chat.placeholder")}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          isDisabled={isListening}
-        />
-        <Button
-          size="sm"
-          color="primary"
-          isIconOnly
-          onPress={() => handleSend()}
-          isDisabled={isStreaming || !input.trim()}
-        >
-          <SendHorizontal size={14} />
-        </Button>
         </div>
       </div>
     </div>

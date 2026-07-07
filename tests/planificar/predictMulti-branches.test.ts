@@ -42,9 +42,8 @@ describe("useRoutePredictMulti — transit paths", () => {
       mode: "transmilenio",
     });
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {
@@ -65,12 +64,19 @@ describe("useRoutePredictMulti — transit paths", () => {
   it("should handle TM success + SITP success", async () => {
     const { routePredictionApi } = await import("@modules/predicciones/api");
     (routePredictionApi.predict as any)
-      .mockResolvedValueOnce({ ...basePrediction, mode: "transmilenio", route_code: "J74" })
-      .mockResolvedValueOnce({ ...basePrediction, mode: "sitp", route_code: "C26" });
+      .mockResolvedValueOnce({
+        ...basePrediction,
+        mode: "transmilenio",
+        route_code: "J74",
+      })
+      .mockResolvedValueOnce({
+        ...basePrediction,
+        mode: "sitp",
+        route_code: "C26",
+      });
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {
@@ -90,16 +96,24 @@ describe("useRoutePredictMulti — transit paths", () => {
 
   it("should handle SITP without route_code — uses cercanas", async () => {
     const { routePredictionApi } = await import("@modules/predicciones/api");
-    const { fetchRutasCercanas } = await import("@modules/planificar/api/planificarApi");
+    const { fetchRutasCercanas } =
+      await import("@modules/planificar/api/planificarApi");
 
     (routePredictionApi.predict as any)
-      .mockResolvedValueOnce({ ...basePrediction, mode: "transmilenio", route_code: "J74" })
-      .mockResolvedValueOnce({ ...basePrediction, mode: "sitp", route_code: "" });
+      .mockResolvedValueOnce({
+        ...basePrediction,
+        mode: "transmilenio",
+        route_code: "J74",
+      })
+      .mockResolvedValueOnce({
+        ...basePrediction,
+        mode: "sitp",
+        route_code: "",
+      });
     (fetchRutasCercanas as any).mockResolvedValue([{ ruta: "C26" }]);
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {
@@ -120,9 +134,8 @@ describe("useRoutePredictMulti — transit paths", () => {
     const { routePredictionApi } = await import("@modules/predicciones/api");
     (routePredictionApi.predict as any).mockRejectedValue(new Error("fail"));
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {
@@ -150,9 +163,8 @@ describe("useRoutePredictMulti — vehicle paths", () => {
       { ...basePrediction, mode: "vehiculo", cost: "$20.000" },
     ]);
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {
@@ -178,9 +190,8 @@ describe("useRoutePredictMulti — vehicle paths", () => {
       cost: "$15.000",
     });
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {
@@ -206,9 +217,8 @@ describe("useRoutePredictMulti — vehicle paths", () => {
       { ...basePrediction, mode: "moto", cost: "$8.000" },
     ]);
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {

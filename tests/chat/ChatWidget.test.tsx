@@ -29,26 +29,23 @@ describe("ChatWidget — full coverage", () => {
   });
 
   it("renders closed state with bot button", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
+    const { ChatWidget } =
+      await import("@modules/chat/components/widgets/ChatWidget");
     render(<ChatWidget />);
     expect(screen.getByTitle("Chat con MoviBot")).toBeInTheDocument();
   });
 
   it("opens on button click", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
+    const { ChatWidget } =
+      await import("@modules/chat/components/widgets/ChatWidget");
     render(<ChatWidget />);
     fireEvent.click(screen.getByTitle("Chat con MoviBot"));
     expect(screen.getByText("MoviBot")).toBeInTheDocument();
   });
 
   it("shows suggestions when empty", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
+    const { ChatWidget } =
+      await import("@modules/chat/components/widgets/ChatWidget");
     render(<ChatWidget />);
     fireEvent.click(screen.getByTitle("Chat con MoviBot"));
     // Should have suggestion buttons
@@ -56,40 +53,30 @@ describe("ChatWidget — full coverage", () => {
     expect(buttons.length).toBeGreaterThan(3);
   });
 
-  it("shows different suggestions for planificar module", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
+  it.each(["planificar", "rutas", "metricas"])(
+    "shows different suggestions for %s module",
+    async (module) => {
+      const { ChatWidget } =
+        await import("@modules/chat/components/widgets/ChatWidget");
+      render(<ChatWidget activeModule={module} />);
+      fireEvent.click(screen.getByTitle("Chat con MoviBot"));
+      const buttons = screen.getAllByRole("button");
+      expect(buttons.length).toBeGreaterThan(3);
+    },
+  );
+
+  it("shows suggestions for active route", async () => {
+    const { ChatWidget } =
+      await import("@modules/chat/components/widgets/ChatWidget");
     render(<ChatWidget activeModule="planificar" />);
     fireEvent.click(screen.getByTitle("Chat con MoviBot"));
     const buttons = screen.getAllByRole("button");
     expect(buttons.length).toBeGreaterThan(3);
   });
 
-  it("shows different suggestions for rutas module", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
-    render(<ChatWidget activeModule="rutas" />);
-    fireEvent.click(screen.getByTitle("Chat con MoviBot"));
-    const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThan(3);
-  });
-
-  it("shows different suggestions for metricas module", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
-    render(<ChatWidget activeModule="metricas" />);
-    fireEvent.click(screen.getByTitle("Chat con MoviBot"));
-    const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThan(3);
-  });
-
   it("shows suggestions for active route", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
+    const { ChatWidget } =
+      await import("@modules/chat/components/widgets/ChatWidget");
     render(
       <ChatWidget
         tripPoints={[
@@ -103,16 +90,9 @@ describe("ChatWidget — full coverage", () => {
     expect(buttons.length).toBeGreaterThan(3);
   });
 
-  
-
-  
-
-  
-
   it("minimizes to bar", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
+    const { ChatWidget } =
+      await import("@modules/chat/components/widgets/ChatWidget");
     render(<ChatWidget />);
     fireEvent.click(screen.getByTitle("Chat con MoviBot"));
     const minimizeBtn = screen.getByTitle("Minimizar");
@@ -122,9 +102,8 @@ describe("ChatWidget — full coverage", () => {
   });
 
   it("has mic button", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
+    const { ChatWidget } =
+      await import("@modules/chat/components/widgets/ChatWidget");
     render(<ChatWidget />);
     fireEvent.click(screen.getByTitle("Chat con MoviBot"));
     // Mic button presence depends on browser support
@@ -136,17 +115,12 @@ describe("ChatWidget — full coverage", () => {
   });
 
   it("has TTS toggle", async () => {
-    const { ChatWidget } = await import(
-      "@modules/chat/components/widgets/ChatWidget"
-    );
+    const { ChatWidget } =
+      await import("@modules/chat/components/widgets/ChatWidget");
     render(<ChatWidget />);
     fireEvent.click(screen.getByTitle("Chat con MoviBot"));
     // Volume button should exist
     const header = screen.getByText("MoviBot");
     expect(header).toBeInTheDocument();
   });
-
-  
-
-  
 });

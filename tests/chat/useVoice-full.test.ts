@@ -50,7 +50,12 @@ describe("useVoice — full coverage", () => {
     expect(result.current.error).toContain("iniciar");
   });
 
-  it("should handle not-allowed error", async () => {
+  it.each([
+    ["not-allowed", "Micrófono bloqueado"],
+    ["network", "red"],
+    ["audio-capture", "micrófono"],
+    ["something-weird", "something-weird"],
+  ])("should handle %s error", async (errorType, expectedMsg) => {
     let errorHandler: any;
     // @ts-ignore
     window.SpeechRecognition = vi.fn().mockImplementation(() => ({
@@ -60,38 +65,12 @@ describe("useVoice — full coverage", () => {
       maxAlternatives: 1,
       onresult: null,
       onend: null,
-      set onerror(fn: any) { errorHandler = fn; },
-      get onerror() { return errorHandler; },
-      start: vi.fn(),
-      stop: vi.fn(),
-    }));
-
-    const { result } = renderHook(() => useVoice());
-
-    await act(async () => {
-      await result.current.startListening();
-    });
-
-    // Simulate not-allowed error
-    act(() => {
-      if (errorHandler) errorHandler({ error: "not-allowed" });
-    });
-
-    expect(result.current.error).toContain("Micrófono bloqueado");
-  });
-
-  it("should handle network error", async () => {
-    let errorHandler: any;
-    // @ts-ignore
-    window.SpeechRecognition = vi.fn().mockImplementation(() => ({
-      lang: "",
-      continuous: false,
-      interimResults: false,
-      maxAlternatives: 1,
-      onresult: null,
-      onend: null,
-      set onerror(fn: any) { errorHandler = fn; },
-      get onerror() { return errorHandler; },
+      set onerror(fn: any) {
+        errorHandler = fn;
+      },
+      get onerror() {
+        return errorHandler;
+      },
       start: vi.fn(),
       stop: vi.fn(),
     }));
@@ -103,68 +82,10 @@ describe("useVoice — full coverage", () => {
     });
 
     act(() => {
-      if (errorHandler) errorHandler({ error: "network" });
+      if (errorHandler) errorHandler({ error: errorType });
     });
 
-    expect(result.current.error).toContain("red");
-  });
-
-  it("should handle audio-capture error", async () => {
-    let errorHandler: any;
-    // @ts-ignore
-    window.SpeechRecognition = vi.fn().mockImplementation(() => ({
-      lang: "",
-      continuous: false,
-      interimResults: false,
-      maxAlternatives: 1,
-      onresult: null,
-      onend: null,
-      set onerror(fn: any) { errorHandler = fn; },
-      get onerror() { return errorHandler; },
-      start: vi.fn(),
-      stop: vi.fn(),
-    }));
-
-    const { result } = renderHook(() => useVoice());
-
-    await act(async () => {
-      await result.current.startListening();
-    });
-
-    act(() => {
-      if (errorHandler) errorHandler({ error: "audio-capture" });
-    });
-
-    expect(result.current.error).toContain("micrófono");
-  });
-
-  it("should handle unknown error", async () => {
-    let errorHandler: any;
-    // @ts-ignore
-    window.SpeechRecognition = vi.fn().mockImplementation(() => ({
-      lang: "",
-      continuous: false,
-      interimResults: false,
-      maxAlternatives: 1,
-      onresult: null,
-      onend: null,
-      set onerror(fn: any) { errorHandler = fn; },
-      get onerror() { return errorHandler; },
-      start: vi.fn(),
-      stop: vi.fn(),
-    }));
-
-    const { result } = renderHook(() => useVoice());
-
-    await act(async () => {
-      await result.current.startListening();
-    });
-
-    act(() => {
-      if (errorHandler) errorHandler({ error: "something-weird" });
-    });
-
-    expect(result.current.error).toContain("something-weird");
+    expect(result.current.error).toContain(expectedMsg);
   });
 
   it("should call onResult when speech detected", async () => {
@@ -176,8 +97,12 @@ describe("useVoice — full coverage", () => {
       continuous: false,
       interimResults: false,
       maxAlternatives: 1,
-      set onresult(fn: any) { resultHandler = fn; },
-      get onresult() { return resultHandler; },
+      set onresult(fn: any) {
+        resultHandler = fn;
+      },
+      get onresult() {
+        return resultHandler;
+      },
       onend: null,
       onerror: null,
       start: vi.fn(),
@@ -205,15 +130,23 @@ describe("useVoice — full coverage", () => {
 
   it("should not speak empty text", () => {
     const { result } = renderHook(() => useVoice());
-    act(() => { result.current.toggleTts(); });
-    act(() => { result.current.speak(""); });
+    act(() => {
+      result.current.toggleTts();
+    });
+    act(() => {
+      result.current.speak("");
+    });
     expect(window.speechSynthesis.speak).not.toHaveBeenCalled();
   });
 
   it("should clean emojis from TTS text", () => {
     const { result } = renderHook(() => useVoice());
-    act(() => { result.current.toggleTts(); });
-    act(() => { result.current.speak("Hola 🚌 mundo"); });
+    act(() => {
+      result.current.toggleTts();
+    });
+    act(() => {
+      result.current.speak("Hola 🚌 mundo");
+    });
     expect(window.speechSynthesis.speak).toHaveBeenCalled();
   });
 });

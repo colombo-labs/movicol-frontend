@@ -18,9 +18,8 @@ describe("useRutasCercanas", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("should return empty when no origin", async () => {
-    const { useRutasCercanas } = await import(
-      "@modules/planificar/hooks/useRutasCercanas"
-    );
+    const { useRutasCercanas } =
+      await import("@modules/planificar/hooks/useRutasCercanas");
     const { result } = renderHook(() =>
       useRutasCercanas(null, null, "transmilenio"),
     );
@@ -28,9 +27,8 @@ describe("useRutasCercanas", () => {
   });
 
   it("should return empty for vehiculo mode", async () => {
-    const { useRutasCercanas } = await import(
-      "@modules/planificar/hooks/useRutasCercanas"
-    );
+    const { useRutasCercanas } =
+      await import("@modules/planificar/hooks/useRutasCercanas");
     const { result } = renderHook(() =>
       useRutasCercanas(
         { lat: 4.65, lng: -74.08 },
@@ -42,9 +40,8 @@ describe("useRutasCercanas", () => {
   });
 
   it("should fetch and find common rutas", async () => {
-    const { fetchRutasCercanas } = await import(
-      "@modules/planificar/api/planificarApi"
-    );
+    const { fetchRutasCercanas } =
+      await import("@modules/planificar/api/planificarApi");
     (fetchRutasCercanas as any)
       .mockResolvedValueOnce([
         { ruta: "J74", nombre: "Portal Norte" },
@@ -55,9 +52,8 @@ describe("useRutasCercanas", () => {
         { ruta: "G43", nombre: "Kennedy" },
       ]);
 
-    const { useRutasCercanas } = await import(
-      "@modules/planificar/hooks/useRutasCercanas"
-    );
+    const { useRutasCercanas } =
+      await import("@modules/planificar/hooks/useRutasCercanas");
     const { result } = renderHook(() =>
       useRutasCercanas(
         { lat: 4.65, lng: -74.08 },
@@ -67,20 +63,18 @@ describe("useRutasCercanas", () => {
     );
 
     await waitFor(() => {
-      expect(result.current.length).toBe(1);
+      expect(result.current).toHaveLength(1);
       expect(result.current[0].ruta).toBe("J74");
     });
   });
 
   it("should handle fetch error", async () => {
-    const { fetchRutasCercanas } = await import(
-      "@modules/planificar/api/planificarApi"
-    );
+    const { fetchRutasCercanas } =
+      await import("@modules/planificar/api/planificarApi");
     (fetchRutasCercanas as any).mockRejectedValue(new Error("network"));
 
-    const { useRutasCercanas } = await import(
-      "@modules/planificar/hooks/useRutasCercanas"
-    );
+    const { useRutasCercanas } =
+      await import("@modules/planificar/hooks/useRutasCercanas");
     const { result } = renderHook(() =>
       useRutasCercanas(
         { lat: 4.65, lng: -74.08 },
@@ -95,16 +89,14 @@ describe("useRutasCercanas", () => {
   });
 
   it("should return empty when no common rutas", async () => {
-    const { fetchRutasCercanas } = await import(
-      "@modules/planificar/api/planificarApi"
-    );
+    const { fetchRutasCercanas } =
+      await import("@modules/planificar/api/planificarApi");
     (fetchRutasCercanas as any)
       .mockResolvedValueOnce([{ ruta: "A1", nombre: "R1" }])
       .mockResolvedValueOnce([{ ruta: "B2", nombre: "R2" }]);
 
-    const { useRutasCercanas } = await import(
-      "@modules/planificar/hooks/useRutasCercanas"
-    );
+    const { useRutasCercanas } =
+      await import("@modules/planificar/hooks/useRutasCercanas");
     const { result } = renderHook(() =>
       useRutasCercanas(
         { lat: 4.65, lng: -74.08 },
@@ -142,9 +134,8 @@ describe("useRoutePredictMulti — more branches", () => {
       estimated_wait_minutes: 5,
     });
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await result.current.predictMulti(
@@ -165,9 +156,8 @@ describe("useRoutePredictMulti — more branches", () => {
       new Error("No routes"),
     );
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await result.current.predictMulti(
@@ -200,13 +190,16 @@ describe("useRoutePredictMulti — more branches", () => {
       stations: [],
       departure_time: "2026-07-06T08:00:00",
       navigation_steps: [
-        { instruction: "Gira derecha en Calle 80", distance: 500, duration: 60 },
+        {
+          instruction: "Gira derecha en Calle 80",
+          distance: 500,
+          duration: 60,
+        },
       ],
     });
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await result.current.predictMulti(

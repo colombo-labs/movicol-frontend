@@ -63,7 +63,7 @@ describe("useRoutePredictMulti", () => {
 
     await waitFor(() => {
       expect(result.current.options).not.toBeNull();
-      expect(result.current.options!.length).toBe(1);
+      expect(result.current.options!).toHaveLength(1);
       expect(result.current.options![0].id).toBe("vehiculo-0");
     });
   });

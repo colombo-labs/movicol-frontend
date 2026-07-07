@@ -13,18 +13,16 @@ describe("useRoutePredictMulti — full coverage", () => {
   });
 
   it("should initialize with no options", async () => {
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
     expect(result.current.options).toBeNull();
     expect(result.current.isLoading).toBe(false);
   });
 
   it("should have predictMulti function", async () => {
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
     expect(result.current.predictMulti).toBeDefined();
     expect(typeof result.current.predictMulti).toBe("function");
@@ -36,9 +34,8 @@ describe("useRoutePredictMulti — full coverage", () => {
       () => new Promise((resolve) => setTimeout(resolve, 100)),
     );
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     act(() => {
@@ -73,9 +70,8 @@ describe("useRoutePredictMulti — full coverage", () => {
       estimated_wait_minutes: 5,
     });
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {
@@ -96,9 +92,8 @@ describe("useRoutePredictMulti — full coverage", () => {
     const { api } = await import("@shared/api/http-client");
     (api.post as any).mockRejectedValue(new Error("Network error"));
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {
@@ -134,9 +129,8 @@ describe("useRoutePredictMulti — full coverage", () => {
       ],
     });
 
-    const { useRoutePredictMulti } = await import(
-      "@modules/planificar/hooks/useRoutePredictMulti"
-    );
+    const { useRoutePredictMulti } =
+      await import("@modules/planificar/hooks/useRoutePredictMulti");
     const { result } = renderHook(() => useRoutePredictMulti());
 
     await act(async () => {

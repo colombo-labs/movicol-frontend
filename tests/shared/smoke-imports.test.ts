@@ -66,7 +66,8 @@ describe("Module imports — smoke tests", () => {
 
 describe("planificarApi functions", () => {
   it("calcDistance should calculate between two points", async () => {
-    const { calcDistance } = await import("@modules/planificar/api/planificarApi");
+    const { calcDistance } =
+      await import("@modules/planificar/api/planificarApi");
     const dist = calcDistance(4.695, -74.031, 4.598, -74.076);
     expect(dist).toBeGreaterThan(5);
     expect(dist).toBeLessThan(20);
@@ -78,7 +79,8 @@ describe("planificarApi functions", () => {
       json: async () => ({ features: [] }),
     } as Response);
 
-    const { fetchRutasCercanas } = await import("@modules/planificar/api/planificarApi");
+    const { fetchRutasCercanas } =
+      await import("@modules/planificar/api/planificarApi");
     const results = await fetchRutasCercanas(4.65, -74.08);
     expect(Array.isArray(results)).toBe(true);
   });

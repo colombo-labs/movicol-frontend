@@ -19,7 +19,9 @@ test.describe("Auth — No session", () => {
     const mapPage = new MapPage(page);
     await mapPage.goto();
     await mapPage.avatar.click();
-    await expect(page.getByText(/configuración|settings/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/configuración|settings/i).first(),
+    ).toBeVisible();
   });
 });
 
@@ -28,7 +30,9 @@ test.describe("Notifications — No session", () => {
     const mapPage = new MapPage(page);
     await mapPage.goto();
     await mapPage.notificationBell.click();
-    await expect(page.getByText(/notificaciones|notifications/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/notificaciones|notifications/i).first(),
+    ).toBeVisible();
   });
 
   test("should show login message when not authenticated", async ({ page }) => {
@@ -46,7 +50,10 @@ test.describe("Config Modal", () => {
     const mapPage = new MapPage(page);
     await mapPage.goto();
     await mapPage.avatar.click();
-    await page.getByText(/configuración|settings/i).first().click();
+    await page
+      .getByText(/configuración|settings/i)
+      .first()
+      .click();
     await expect(page.getByText(/tema|theme/i).first()).toBeVisible();
     await expect(page.getByText(/idioma|language/i).first()).toBeVisible();
   });
@@ -55,8 +62,13 @@ test.describe("Config Modal", () => {
     const mapPage = new MapPage(page);
     await mapPage.goto();
     await mapPage.avatar.click();
-    await page.getByText(/configuración|settings/i).first().click();
-    const langButton = page.getByText(/español|english|français|português/i).first();
+    await page
+      .getByText(/configuración|settings/i)
+      .first()
+      .click();
+    const langButton = page
+      .getByText(/español|english|français|português/i)
+      .first();
     await expect(langButton).toBeVisible();
     await langButton.click();
     const newLang = await langButton.textContent();

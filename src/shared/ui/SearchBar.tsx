@@ -11,7 +11,9 @@ export function SearchBar() {
       {!showRoute ? (
         <div className="flex items-center gap-2 px-4 py-3 rounded-full bg-background/95 backdrop-blur-xl border border-divider shadow-lg">
           <Search size={18} className="text-default-400 shrink-0" />
-          <input id="searchbar-input-1" name="searchbar-input-1"
+          <input
+            id="searchbar-input-1"
+            name="searchbar-input-1"
             type="text"
             placeholder="¿A dónde quieres ir?"
             className="flex-1 bg-transparent text-sm outline-none text-foreground placeholder:text-default-400"
@@ -50,14 +52,18 @@ export function SearchBar() {
               <div className="w-3 h-3 rounded-full border-2 border-danger bg-danger/20" />
             </div>
             <div className="flex-1 space-y-2">
-              <input id="searchbar-input-2" name="searchbar-input-2"
+              <input
+                id="searchbar-input-2"
+                name="searchbar-input-2"
                 type="text"
                 placeholder="Origen (ej. Portal Norte)"
                 value={origin}
                 onChange={(e) => setOrigin(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg bg-default-100 border border-divider text-sm outline-none text-foreground placeholder:text-default-400 focus:border-primary/50"
               />
-              <input id="searchbar-input-3" name="searchbar-input-3"
+              <input
+                id="searchbar-input-3"
+                name="searchbar-input-3"
                 type="text"
                 placeholder="Destino (ej. Universidades)"
                 value={destination}

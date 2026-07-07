@@ -79,7 +79,9 @@ export function TraficoHeatmapPage() {
           <label className="text-xs text-default-400 block mb-2">
             Hora de predicción
           </label>
-          <input id="traficoheatmappage-input-1" name="traficoheatmappage-input-1"
+          <input
+            id="traficoheatmappage-input-1"
+            name="traficoheatmappage-input-1"
             type="range"
             min={0}
             max={23}

@@ -31,14 +31,18 @@ vi.mock("socket.io-client", () => ({
 
 describe("Components render — Chat", () => {
   it("ChatMessage user", async () => {
-    const { ChatMessage } = await import("@modules/chat/components/ui/ChatMessage");
+    const { ChatMessage } =
+      await import("@modules/chat/components/ui/ChatMessage");
     const { container } = render(<ChatMessage role="user" content="test" />);
     expect(container).toBeInTheDocument();
   });
 
   it("ChatMessage assistant", async () => {
-    const { ChatMessage } = await import("@modules/chat/components/ui/ChatMessage");
-    const { container } = render(<ChatMessage role="assistant" content="line1\nline2\n• bullet" />);
+    const { ChatMessage } =
+      await import("@modules/chat/components/ui/ChatMessage");
+    const { container } = render(
+      <ChatMessage role="assistant" content="line1\nline2\n• bullet" />,
+    );
     expect(container).toBeInTheDocument();
   });
 });
@@ -58,20 +62,25 @@ describe("Components render — Shared UI", () => {
 
   it("ConfigModal closed", async () => {
     const { ConfigModal } = await import("@shared/ui/ConfigModal");
-    const { container } = render(<ConfigModal isOpen={false} onClose={vi.fn()} />);
+    const { container } = render(
+      <ConfigModal isOpen={false} onClose={vi.fn()} />,
+    );
     expect(container).toBeInTheDocument();
   });
 
   it("ConfigModal open", async () => {
     const { ConfigModal } = await import("@shared/ui/ConfigModal");
-    const { container } = render(<ConfigModal isOpen={true} onClose={vi.fn()} />);
+    const { container } = render(
+      <ConfigModal isOpen={true} onClose={vi.fn()} />,
+    );
     expect(container).toBeInTheDocument();
   });
 });
 
 describe("Components render — Planificar", () => {
   it("TripPointsList empty", async () => {
-    const { TripPointsList } = await import("@modules/planificar/components/ui/TripPointsList");
+    const { TripPointsList } =
+      await import("@modules/planificar/components/ui/TripPointsList");
     const { container } = render(
       <TripPointsList
         tripPoints={[]}
@@ -88,7 +97,8 @@ describe("Components render — Planificar", () => {
   });
 
   it("TripPointsList with points", async () => {
-    const { TripPointsList } = await import("@modules/planificar/components/ui/TripPointsList");
+    const { TripPointsList } =
+      await import("@modules/planificar/components/ui/TripPointsList");
     const { container } = render(
       <TripPointsList
         tripPoints={[

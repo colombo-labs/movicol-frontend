@@ -45,7 +45,7 @@ describe("reverseGeocode", () => {
     } as Response);
 
     const result = await reverseGeocode(4.65, -74.08);
-    expect(result.split(",").length).toBe(3);
+    expect(result.split(",")).toHaveLength(3);
   });
 
   it("should call nominatim proxy endpoint", async () => {

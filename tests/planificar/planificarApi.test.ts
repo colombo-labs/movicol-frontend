@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { calcDistance, fetchRutasCercanas } from "@modules/planificar/api/planificarApi";
+import {
+  calcDistance,
+  fetchRutasCercanas,
+} from "@modules/planificar/api/planificarApi";
 
 describe("planificarApi — full coverage", () => {
   beforeEach(() => {
@@ -13,7 +16,7 @@ describe("planificarApi — full coverage", () => {
 
     it("calculates short distance", () => {
       // ~1km between these points
-      const dist = calcDistance(4.650, -74.080, 4.659, -74.080);
+      const dist = calcDistance(4.65, -74.08, 4.659, -74.08);
       expect(dist).toBeGreaterThan(0.5);
       expect(dist).toBeLessThan(2);
     });
@@ -52,7 +55,9 @@ describe("planificarApi — full coverage", () => {
     it("throws on non-ok response", async () => {
       vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
-        json: async () => { throw new Error("invalid json"); },
+        json: async () => {
+          throw new Error("invalid json");
+        },
       } as Response);
       await expect(fetchRutasCercanas(4.65, -74.08)).rejects.toThrow();
     });

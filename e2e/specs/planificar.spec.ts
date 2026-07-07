@@ -33,7 +33,9 @@ test.describe("Planificar Viaje", () => {
 
   test("should show departure time options", async ({ page }) => {
     await mapPage.openPanel("planificar");
-    await expect(page.getByText(/salir ahora|programar/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/salir ahora|programar/i).first(),
+    ).toBeVisible();
   });
 
   test("should add point on map click", async ({ page }) => {

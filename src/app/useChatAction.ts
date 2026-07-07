@@ -15,31 +15,52 @@ async function geocodeQuery(query: string) {
   return geocodeAddress(normalized);
 }
 
-function setPointsWithGeolocation(
+function updateOriginLabel(
+  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
+  lat: number,
+  lng: number,
+) {
+  import("@shared/utils/reverseGeocode").then(({ reverseGeocode }) => {
+    reverseGeocode(lat, lng).then((addr) => {
+      setTripPoints((prev) =>
+        prev.map((p, i) => (i === 0 ? { ...p, label: addr } : p)),
+      );
+    });
+  });
+}
+
+function onGeoSuccess(
+  pos: GeolocationPosition,
+  dest: { lat: number; lng: number; label: string },
+  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
+  togglePanel: (id: string) => void,
+) {
+  const { latitude, longitude } = pos.coords;
+  setTripPoints([
+    { lat: latitude, lng: longitude, label: "Mi ubicación" },
+    { lat: dest.lat, lng: dest.lng, label: dest.label },
+  ]);
+  togglePanel("planificar");
+  updateOriginLabel(setTripPoints, latitude, longitude);
+}
+
+function onGeoError(
+  dest: { lat: number; lng: number; label: string },
+  setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
+  togglePanel: (id: string) => void,
+) {
+  setTripPoints([{ lat: dest.lat, lng: dest.lng, label: dest.label }]);
+  togglePanel("planificar");
+}
+
+function requestGeolocationRoute(
   dest: { lat: number; lng: number; label: string },
   setTripPoints: React.Dispatch<React.SetStateAction<TripPoint[]>>,
   togglePanel: (id: string) => void,
 ) {
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const { latitude, longitude } = pos.coords;
-      setTripPoints([
-        { lat: latitude, lng: longitude, label: "Mi ubicación" },
-        { lat: dest.lat, lng: dest.lng, label: dest.label },
-      ]);
-      togglePanel("planificar");
-      import("@shared/utils/reverseGeocode").then(({ reverseGeocode }) => {
-        reverseGeocode(latitude, longitude).then((addr) => {
-          setTripPoints((prev) =>
-            prev.map((p, i) => (i === 0 ? { ...p, label: addr } : p)),
-          );
-        });
-      });
-    },
-    () => {
-      setTripPoints([{ lat: dest.lat, lng: dest.lng, label: dest.label }]);
-      togglePanel("planificar");
-    },
+    (pos) => onGeoSuccess(pos, dest, setTripPoints, togglePanel),
+    () => onGeoError(dest, setTripPoints, togglePanel),
     { enableHighAccuracy: true, timeout: 10000 },
   );
 }
@@ -65,24 +86,23 @@ async function handlePlanRoute(
   const dest = destResults[0];
 
   if (!origin || origin === "tu ubicacion") {
-    setPointsWithGeolocation(dest, setTripPoints, togglePanel);
+    requestGeolocationRoute(dest, setTripPoints, togglePanel);
     return;
   }
 
-  // Geocode both origin and destination
   const origResults = await geocodeQuery(origin);
   togglePanel("planificar");
   await new Promise((r) => setTimeout(r, 100));
 
-  if (origResults.length > 0) {
-    const orig = origResults[0];
-    setTripPoints([
-      { lat: orig.lat, lng: orig.lng, label: orig.label },
-      { lat: dest.lat, lng: dest.lng, label: dest.label },
-    ]);
-  } else {
-    setTripPoints([{ lat: dest.lat, lng: dest.lng, label: dest.label }]);
-  }
+  const orig = origResults.length > 0 ? origResults[0] : null;
+  const points: TripPoint[] = orig
+    ? [
+        { lat: orig.lat, lng: orig.lng, label: orig.label },
+        { lat: dest.lat, lng: dest.lng, label: dest.label },
+      ]
+    : [{ lat: dest.lat, lng: dest.lng, label: dest.label }];
+
+  setTripPoints(points);
 }
 
 function handleShowStation(
@@ -101,7 +121,10 @@ function handleShowStation(
   togglePanel("rutas");
 }
 
-export function useChatAction({ setTripPoints, togglePanel }: UseChatActionOptions) {
+export function useChatAction({
+  setTripPoints,
+  togglePanel,
+}: UseChatActionOptions) {
   return useCallback(
     async (action: ChatAction) => {
       switch (action.type) {

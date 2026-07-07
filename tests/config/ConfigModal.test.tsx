@@ -28,29 +28,15 @@ describe("ConfigModal", () => {
     expect(container.innerHTML).toBe("");
   });
 
-  it("should render title when open", () => {
+  it.each([
+    ["title", "config.title"],
+    ["theme option", "config.theme"],
+    ["language option", "config.language"],
+    ["notifications option", "config.notifications"],
+    ["login message for notifications", "chat.loginForNotifications"],
+  ])("should show %s when open", (_, text) => {
     render(<ConfigModal isOpen={true} onClose={onClose} />);
-    expect(screen.getByText("config.title")).toBeInTheDocument();
-  });
-
-  it("should show theme option", () => {
-    render(<ConfigModal isOpen={true} onClose={onClose} />);
-    expect(screen.getByText("config.theme")).toBeInTheDocument();
-  });
-
-  it("should show language option", () => {
-    render(<ConfigModal isOpen={true} onClose={onClose} />);
-    expect(screen.getByText("config.language")).toBeInTheDocument();
-  });
-
-  it("should show notifications option", () => {
-    render(<ConfigModal isOpen={true} onClose={onClose} />);
-    expect(screen.getByText("config.notifications")).toBeInTheDocument();
-  });
-
-  it("should show login message for notifications when not authenticated", () => {
-    render(<ConfigModal isOpen={true} onClose={onClose} />);
-    expect(screen.getByText("chat.loginForNotifications")).toBeInTheDocument();
+    expect(screen.getByText(text)).toBeInTheDocument();
   });
 
   it("should show version info", () => {

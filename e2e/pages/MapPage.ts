@@ -18,7 +18,9 @@ export class MapPage {
     this.page = page;
     this.panelPlanificar = page.getByRole("button", { name: /planificar/i });
     this.panelRutas = page.getByRole("button", { name: /rutas/i });
-    this.panelMetricas = page.getByRole("button", { name: /métricas|metricas/i });
+    this.panelMetricas = page.getByRole("button", {
+      name: /métricas|metricas/i,
+    });
     this.chatButton = page.locator('[title="Chat con MoviBot"]');
     this.avatar = page.locator(".rounded-full").first();
     this.notificationBell = page.locator('[title*="otificaci"]');

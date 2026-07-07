@@ -50,10 +50,14 @@ describe("Geocode — edge cases", () => {
         features: [
           {
             geometry: { coordinates: [-74.08, 4.65] },
-            properties: { name: "POI", city: "Bogotá", osm_value: "attraction" },
+            properties: {
+              name: "POI",
+              city: "Bogotá",
+              osm_value: "attraction",
+            },
           },
           {
-            geometry: { coordinates: [-74.07, 4.60] },
+            geometry: { coordinates: [-74.07, 4.6] },
             properties: { name: "Barrio", city: "Bogotá", osm_value: "suburb" },
           },
         ],

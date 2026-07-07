@@ -33,7 +33,9 @@ describe("Contract — POST /chat", () => {
       selectedHour: 8,
       transportMode: "tm",
     };
-    expect(context.module).toMatch(/^(planificar|rutas|metricas|accesibilidad)$/);
+    expect(context.module).toMatch(
+      /^(planificar|rutas|metricas|accesibilidad)$/,
+    );
     expect(context.originCoords).toHaveLength(2);
     expect(context.selectedHour).toBeGreaterThanOrEqual(0);
     expect(context.selectedHour).toBeLessThanOrEqual(23);
@@ -79,7 +81,11 @@ describe("Contract — POST /chat", () => {
 
 describe("Contract — GET /health", () => {
   it("response should have status field", () => {
-    const response = { status: "ok", service: "movicol-backend", version: "0.1.0" };
+    const response = {
+      status: "ok",
+      service: "movicol-backend",
+      version: "0.1.0",
+    };
     expect(response.status).toBe("ok");
     expect(response.service).toBeDefined();
     expect(response.version).toMatch(/^\d+\.\d+\.\d+$/);
@@ -104,8 +110,17 @@ describe("Contract — Route Prediction Response", () => {
     expect(route.total_time_minutes).toBeGreaterThan(0);
     expect(route.total_distance_km).toBeGreaterThan(0);
     expect(route.cost).toContain("3.550");
-    expect(["transmilenio", "sitp", "vehiculo", "moto", "bicicleta", "caminando"]).toContain(route.mode);
-    expect(["low", "medium", "moderate", "high", "critical"]).toContain(route.overall_risk);
+    expect([
+      "transmilenio",
+      "sitp",
+      "vehiculo",
+      "moto",
+      "bicicleta",
+      "caminando",
+    ]).toContain(route.mode);
+    expect(["low", "medium", "moderate", "high", "critical"]).toContain(
+      route.overall_risk,
+    );
     expect(route.safety_score).toBeGreaterThanOrEqual(0);
     expect(route.safety_score).toBeLessThanOrEqual(100);
     expect(Array.isArray(route.stations)).toBe(true);

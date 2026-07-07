@@ -80,13 +80,19 @@ export function useVoice({
         // Silence detected — not really an error, just no input
         setError("No detecté voz. Toca el micrófono y habla.");
       } else if (errorCode === "not-allowed") {
-        setError("Micrófono bloqueado. Ve a Configuración del sitio en Chrome y permite el micrófono.");
+        setError(
+          "Micrófono bloqueado. Ve a Configuración del sitio en Chrome y permite el micrófono.",
+        );
       } else if (errorCode === "aborted") {
         // User cancelled — ignore
       } else if (errorCode === "network") {
-        setError("Error de red. Chrome necesita conexión para el reconocimiento de voz.");
+        setError(
+          "Error de red. Chrome necesita conexión para el reconocimiento de voz.",
+        );
       } else if (errorCode === "audio-capture") {
-        setError("No se detectó micrófono. Verifica que tu dispositivo tenga uno conectado.");
+        setError(
+          "No se detectó micrófono. Verifica que tu dispositivo tenga uno conectado.",
+        );
       } else {
         setError(`Error: ${errorCode}. Intenta de nuevo.`);
       }
@@ -124,10 +130,7 @@ export function useVoice({
 
       const cleanText = text
         .replace(/ACTION:.*/g, "")
-        .replace(
-          /\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu,
-          "",
-        )
+        .replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, "")
         .replace(/[\u2022\u2190-\u21FF-]/g, ",")
         .replace(/\*+/g, "")
         .replace(/\s{2,}/g, " ")
