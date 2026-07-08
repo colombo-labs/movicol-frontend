@@ -1,4 +1,4 @@
-import { API_URL } from "@/shared/config";
+import { authFetch } from "@/shared/api/auth-fetch";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -18,7 +18,7 @@ export function useNotifications() {
 
   const fetchAll = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch(`${API_URL}/notifications`);
+    const res = await authFetch("/notifications");
     if (res.ok) {
       const data = await res.json();
       setNotifications(data);

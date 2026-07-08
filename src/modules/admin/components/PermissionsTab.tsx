@@ -1,4 +1,4 @@
-import { API_URL } from "@/shared/config";
+import { authFetch } from "@/shared/api/auth-fetch";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { Key, Search, X } from "lucide-react";
@@ -37,7 +37,7 @@ export function PermissionsTab({
   useEscClose(showCreate, onCloseCreate);
 
   const load = () => {
-    fetch(`${API_URL}/admin/permissions`)
+    authFetch("/admin/permissions")
       .then((r) => (r.ok ? r.json() : []))
       .then(setPermissions);
   };
@@ -48,7 +48,7 @@ export function PermissionsTab({
 
   const create = async () => {
     if (!module.trim() || !action.trim()) return;
-    await fetch(`${API_URL}/admin/permissions`, {
+    await authFetch("/admin/permissions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -1,4 +1,4 @@
-import { API_URL } from "@/shared/config";
+import { authFetch } from "@/shared/api/auth-fetch";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -14,7 +14,7 @@ export function usePreferences() {
 
   const fetch_ = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch(`${API_URL}/preferences`);
+    const res = await authFetch("/preferences");
     if (res.ok) setPrefs(await res.json());
   }, [isAuthenticated]);
 

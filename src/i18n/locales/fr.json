@@ -28,7 +28,8 @@
     "city": "Ville",
     "trips": "Trajets",
     "favorites": "Favoris",
-    "reports": "Rapports"
+    "reports": "Rapports",
+    "install": "Installer l'app"
   },
   "admin": {
     "title": "Administration",

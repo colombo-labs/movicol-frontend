@@ -33,29 +33,31 @@ export function SiniestroLayer() {
 
   return (
     <>
-      {points.map((p) => {
-        const norm = p.intensity / maxIntensity;
-        return (
-          <CircleMarker
-            key={`${p.lat}-${p.lon}`}
-            center={[p.lat, p.lon]}
-            radius={4 + norm * 8}
-            pathOptions={{
-              color: "transparent",
-              fillColor: getHeatColor(norm),
-              fillOpacity: 0.3 + norm * 0.4,
-            }}
-          >
-            <Tooltip>
-              <div className="text-xs">
-                <p className="font-semibold">{p.paradero}</p>
-                <p>{p.localidad}</p>
-                <p>Intensidad: {(p.intensity ?? 0).toFixed(0)} siniestros</p>
-              </div>
-            </Tooltip>
-          </CircleMarker>
-        );
-      })}
+      {points
+        .filter((p) => p.lat != null && p.lon != null)
+        .map((p) => {
+          const norm = p.intensity / maxIntensity;
+          return (
+            <CircleMarker
+              key={`${p.lat}-${p.lon}`}
+              center={[p.lat, p.lon]}
+              radius={4 + norm * 8}
+              pathOptions={{
+                color: "transparent",
+                fillColor: getHeatColor(norm),
+                fillOpacity: 0.3 + norm * 0.4,
+              }}
+            >
+              <Tooltip>
+                <div className="text-xs">
+                  <p className="font-semibold">{p.paradero}</p>
+                  <p>{p.localidad}</p>
+                  <p>Intensidad: {(p.intensity ?? 0).toFixed(0)} siniestros</p>
+                </div>
+              </Tooltip>
+            </CircleMarker>
+          );
+        })}
     </>
   );
 }

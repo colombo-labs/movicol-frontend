@@ -1,4 +1,4 @@
-import { API_URL } from "@/shared/config";
+import { authFetch } from "@/shared/api/auth-fetch";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -16,7 +16,7 @@ export function useFavorites() {
 
   const load = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch(`${API_URL}/user/favorites`);
+    const res = await authFetch("/user/favorites");
     if (res.ok) setFavorites(await res.json());
   }, [isAuthenticated]);
 
@@ -43,7 +43,7 @@ export function useFavorites() {
   };
 
   const removeFavorite = async (id: string) => {
-    await fetch(`/api/user/favorites/${id}`, { method: "DELETE" });
+    await authFetch("/user/favorites/${id}", { method: "DELETE" });
     load();
   };
 
