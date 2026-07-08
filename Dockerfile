@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
 COPY . .
-ENV VITE_API_URL=${VITE_API_URL:-""}
+ENV VITE_API_URL=https://movicol-backend-develop.up.railway.app
 RUN npm run build
 
 FROM nginx:alpine
