@@ -42,7 +42,10 @@ async function doFetchMe() {
       globalUser = null;
       return;
     }
-    const res = await fetch(`${API_URL}/auth/me`, { credentials: "include" });
+    const token = document.cookie.match(/access_token=([^;]+)/)?.[1];
+    const res = await fetch(`${API_URL}/auth/me`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
     if (res.ok) {
       globalUser = await res.json();
     } else {
