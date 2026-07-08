@@ -1,3 +1,4 @@
+import { API_URL } from "@/shared/config";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -20,7 +21,7 @@ export function useSavedRoutes() {
 
   const fetch_ = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch("/api/saved-routes");
+    const res = await fetch(`${API_URL}/saved-routes`);
     if (res.ok) {
       const data = await res.json();
       setRoutes(
@@ -40,7 +41,7 @@ export function useSavedRoutes() {
   }, [fetch_]);
 
   const save = async (data: Omit<SavedRoute, "id" | "createdAt">) => {
-    const res = await fetch("/api/saved-routes", {
+    const res = await fetch(`${API_URL}/saved-routes`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
