@@ -192,7 +192,10 @@
     "criticalStations": "stations en état critique",
     "highCongestion": "stations à forte congestion",
     "systemStatus": "État du système",
-    "vsYesterday": "vs hier à cette heure"
+    "vsYesterday": "vs hier à cette heure",
+    "fluid": "Fluide",
+    "veryHigh": "Très haute",
+    "high": "Haute"
   },
   "accessibility": {
     "loading": "Chargement des données...",

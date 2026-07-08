@@ -50,7 +50,7 @@ export function SiniestroLayer() {
               <div className="text-xs">
                 <p className="font-semibold">{p.paradero}</p>
                 <p>{p.localidad}</p>
-                <p>Intensidad: {p.intensity.toFixed(0)} siniestros</p>
+                <p>Intensidad: {(p.intensity ?? 0).toFixed(0)} siniestros</p>
               </div>
             </Tooltip>
           </CircleMarker>

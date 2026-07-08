@@ -84,9 +84,9 @@ function getPeakColor(level: number) {
 export function PeakHours() {
   const { t } = useTranslation();
   const peaks = [
-    { range: "6:00 - 8:30", level: 92, label: "Muy alta" },
-    { range: "11:30 - 13:00", level: 65, label: "Moderada" },
-    { range: "17:00 - 19:30", level: 88, label: "Alta" },
+    { range: "6:00 - 8:30", level: 92, label: t("metrics.veryHigh") },
+    { range: "11:30 - 13:00", level: 65, label: t("metrics.moderate") },
+    { range: "17:00 - 19:30", level: 88, label: t("metrics.high") },
   ];
 
   return (

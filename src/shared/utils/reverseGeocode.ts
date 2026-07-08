@@ -1,4 +1,4 @@
-const NOMINATIM_URL = "/nominatim/reverse";
+const NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse";
 
 export async function reverseGeocode(
   lat: number,
@@ -14,7 +14,6 @@ export async function reverseGeocode(
     if (!res.ok) return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     const data = await res.json();
     if (data.display_name) {
-      // Acortar: tomar solo las primeras 2-3 partes
       const parts = data.display_name.split(",");
       return parts.slice(0, 3).join(",").trim();
     }
