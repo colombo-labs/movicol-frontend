@@ -28,7 +28,11 @@ export function SystemStatus({ avgCongestion }: Props) {
         color: "text-warning",
         bg: "bg-warning/20",
       };
-    return { label: "Fluido", color: "text-success", bg: "bg-success/20" };
+    return {
+      label: t("metrics.fluid"),
+      color: "text-success",
+      bg: "bg-success/20",
+    };
   }
 
   const { label, color, bg } = getStatus(avgCongestion);

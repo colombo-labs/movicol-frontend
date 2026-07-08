@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useAuth } from "@/shared/hooks/useAuth";
-import { LogIn, LogOut, User, Settings } from "lucide-react";
+import { Download, LogIn, LogOut, User, Settings } from "lucide-react";
+import { useInstallPrompt } from "@/shared/hooks/useInstallPrompt";
 
 export function AuthButton({
   onConfigOpen,
@@ -11,6 +12,7 @@ export function AuthButton({
   readonly onProfileOpen?: () => void;
 }) {
   const { user, isAuthenticated, login, logout } = useAuth();
+  const { canInstall, install } = useInstallPrompt();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
@@ -86,6 +88,18 @@ export function AuthButton({
                 >
                   <User size={14} />
                   {t("auth.profile")}
+                </button>
+              )}
+              {canInstall && (
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    install();
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-[11px] text-default-600 hover:bg-default-100 transition-all"
+                >
+                  <Download size={14} />
+                  {t("auth.install") || "Instalar app"}
                 </button>
               )}
               <button

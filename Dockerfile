@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm install --legacy-peer-deps
 COPY . .
 ENV VITE_API_URL=https://movicol-backend-develop.up.railway.app
+ENV VITE_GMAPS_KEY=AIzaSyBApoqOimZb0onMDqhWTaQGqBGO02VUJsQ
 RUN npm run build
 
 FROM nginx:alpine
