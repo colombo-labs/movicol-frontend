@@ -1,3 +1,4 @@
+import { API_URL } from "@/shared/config";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -17,7 +18,7 @@ export function useNotifications() {
 
   const fetchAll = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch("/api/notifications");
+    const res = await fetch(`${API_URL}/notifications`);
     if (res.ok) {
       const data = await res.json();
       setNotifications(data);
@@ -30,7 +31,7 @@ export function useNotifications() {
   }, [fetchAll]);
 
   const markRead = async (id: string) => {
-    await fetch(`/api/notifications/${id}/read`, { method: "PATCH" });
+    await fetch(`${API_URL}/notifications/${id}/read`, { method: "PATCH" });
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
@@ -38,19 +39,19 @@ export function useNotifications() {
   };
 
   const markAllRead = async () => {
-    await fetch("/api/notifications/read-all", { method: "PATCH" });
+    await fetch(`${API_URL}/notifications/read-all`, { method: "PATCH" });
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
   };
 
   const clear = async () => {
-    await fetch("/api/notifications", { method: "DELETE" });
+    await fetch(`${API_URL}/notifications`, { method: "DELETE" });
     setNotifications([]);
     setUnreadCount(0);
   };
 
   const remove = async (id: string) => {
-    await fetch(`/api/notifications/${id}`, { method: "DELETE" });
+    await fetch(`${API_URL}/notifications/${id}`, { method: "DELETE" });
     setNotifications((prev) => prev.filter((n) => n.id !== id));
     setUnreadCount((c) => Math.max(0, c - 1));
   };

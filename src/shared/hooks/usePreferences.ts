@@ -1,3 +1,4 @@
+import { API_URL } from "@/shared/config";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -13,7 +14,7 @@ export function usePreferences() {
 
   const fetch_ = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch("/api/preferences");
+    const res = await fetch(`${API_URL}/preferences`);
     if (res.ok) setPrefs(await res.json());
   }, [isAuthenticated]);
 
@@ -22,7 +23,7 @@ export function usePreferences() {
   }, [fetch_]);
 
   const update = async (data: Partial<Preferences>) => {
-    const res = await fetch("/api/preferences", {
+    const res = await fetch(`${API_URL}/preferences`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

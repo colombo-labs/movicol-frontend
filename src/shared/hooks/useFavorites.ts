@@ -1,3 +1,4 @@
+import { API_URL } from "@/shared/config";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -15,7 +16,7 @@ export function useFavorites() {
 
   const load = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch("/api/user/favorites");
+    const res = await fetch(`${API_URL}/user/favorites`);
     if (res.ok) setFavorites(await res.json());
   }, [isAuthenticated]);
 
@@ -29,7 +30,7 @@ export function useFavorites() {
     data: Record<string, unknown>,
   ) => {
     if (!isAuthenticated) return null;
-    const res = await fetch("/api/user/favorites", {
+    const res = await fetch(`${API_URL}/user/favorites`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type, label, data }),

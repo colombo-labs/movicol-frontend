@@ -1,3 +1,4 @@
+import { API_URL } from "@/shared/config";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { Search, Shield, X, Edit2 } from "lucide-react";
@@ -47,13 +48,13 @@ export function UsersTab() {
   useEscClose(!!selectedUser, closeModal);
 
   const load = () => {
-    fetch("/api/admin/users")
+    fetch(`${API_URL}/admin/users`)
       .then((r) => (r.ok ? r.json() : []))
       .then(setUsers);
-    fetch("/api/admin/roles")
+    fetch(`${API_URL}/admin/roles`)
       .then((r) => (r.ok ? r.json() : []))
       .then(setRoles);
-    fetch("/api/admin/permissions")
+    fetch(`${API_URL}/admin/permissions`)
       .then((r) => (r.ok ? r.json() : []))
       .then(setAllPerms);
   };
