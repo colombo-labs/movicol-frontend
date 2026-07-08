@@ -23,14 +23,26 @@ function notify() {
   listeners.forEach((l) => l());
 }
 
+function captureTokenFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+  if (token) {
+    document.cookie = `access_token=${token}; path=/; max-age=${15 * 60}; secure; samesite=lax`;
+    // Clean URL
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+}
+
 async function doFetchMe() {
   try {
+    // Capture token from OAuth redirect
+    captureTokenFromUrl();
     // Skip auth check if no session cookie exists
     if (!document.cookie.includes("access_token")) {
       globalUser = null;
       return;
     }
-    const res = await fetch("/api/auth/me");
+    const res = await fetch(`${API_URL}/auth/me`, { credentials: "include" });
     if (res.ok) {
       globalUser = await res.json();
     } else {
@@ -80,7 +92,10 @@ export function useAuth() {
     });
 
     socket.on("user:force_logout", () => {
-      fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+      fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      }).catch(() => {});
       document.cookie = "access_token=; Max-Age=0; path=/";
       globalUser = null;
       globalSocket?.disconnect();
@@ -101,7 +116,10 @@ export function useAuth() {
   const logout = async () => {
     globalSocket?.disconnect();
     globalSocket = null;
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    await fetch(`${API_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {});
     document.cookie = "access_token=; Max-Age=0; path=/";
     globalUser = null;
     fetchPromise = null;
