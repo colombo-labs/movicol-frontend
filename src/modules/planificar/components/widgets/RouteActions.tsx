@@ -6,7 +6,6 @@ import {
   Navigation,
   Bell,
   Share2,
-  MapPinned,
   MapPin,
   AlertCircle,
   ThumbsUp,
@@ -104,11 +103,7 @@ export function ActionButtons({
   );
 }
 
-export function QuickActions({
-  onFocusMap,
-}: {
-  readonly onFocusMap: () => void;
-}) {
+export function QuickActions() {
   const { t } = useTranslation();
   const [alarmSet, setAlarmSet] = useState(false);
   const [reported, setReported] = useState(false);
@@ -163,13 +158,6 @@ export function QuickActions({
           className={reported ? "text-success" : "text-warning"}
         />{" "}
         {reported ? "✓ Reportado" : t("route.reportIncident")}
-      </button>
-      <button
-        onClick={onFocusMap}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all"
-      >
-        <MapPinned size={12} className="text-default-500" />{" "}
-        {t("route.viewFullMap")}
       </button>
     </div>
   );

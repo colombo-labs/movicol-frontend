@@ -302,7 +302,7 @@ export function PlanificarViajePanel({
                 onClear={onClear}
                 onStartNavigation={() => setNavigating(true)}
               />
-              <QuickActions onFocusMap={() => {}} />
+              <QuickActions />
               <TravelTips
                 mode={mode === "publico" ? "transmilenio" : "vehiculo"}
               />
