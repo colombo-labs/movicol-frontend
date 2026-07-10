@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { API_URL } from "@/shared/config";
 import type { SitpRuta, TmTroncal, TmRuta, Tab } from "../models/types";
 
@@ -16,9 +16,13 @@ export function useRutasData() {
   const [sitpPage, setSitpPage] = useState(0);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("todas");
+  const tmLoaded = useRef(false);
 
-  // Load TM troncales + rutas
-  if (tmTroncales.length === 0) {
+  // Load TM troncales + rutas (once on mount)
+  useEffect(() => {
+    if (tmLoaded.current) return;
+    tmLoaded.current = true;
+
     Promise.all([
       fetch(`${API_URL}/graph/tm/troncales`).then((r) => r.json()),
       fetch(`${API_URL}/graph/tm/estaciones`).then((r) => r.json()),
@@ -47,7 +51,7 @@ export function useRutasData() {
         setTmRutas(rData.rutas || []);
       })
       .catch(() => {});
-  }
+  }, []);
 
   const handleTab = (
     t: Tab,
