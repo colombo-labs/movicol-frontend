@@ -213,19 +213,32 @@ export function QuickActions({
     setReported(true);
     setReportType(null);
 
-    // Get current position and log the incident
+    // Get current position and send to backend
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const incident = {
           type: incidentType,
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
-          timestamp: new Date().toISOString(),
+          route_code: "",
+          description: "",
         };
-        // Store locally (will sync when backend is available)
-        const stored = JSON.parse(localStorage.getItem("movicol_incidents") || "[]");
-        stored.push(incident);
-        localStorage.setItem("movicol_incidents", JSON.stringify(stored.slice(-50)));
+
+        // Send to backend
+        try {
+          const { API_URL } = await import("@/shared/config");
+          const res = await fetch(`${API_URL}/incidents`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(incident),
+          });
+          if (!res.ok) throw new Error("API error");
+        } catch {
+          // Fallback: store locally
+          const stored = JSON.parse(localStorage.getItem("movicol_incidents") || "[]");
+          stored.push({ ...incident, timestamp: new Date().toISOString() });
+          localStorage.setItem("movicol_incidents", JSON.stringify(stored.slice(-50)));
+        }
       },
       () => {},
     );
