@@ -495,15 +495,14 @@ export function TravelTips({ mode }: { readonly mode: string }) {
   else if (hour < 16) tip = t("route.tipMidday");
   else tip = t("route.tipEvening");
 
-  const handleVote = (newVote: "up" | "down") => {
+  const handleVote = async (newVote: "up" | "down") => {
     const selected = vote === newVote ? null : newVote;
     setVote(selected);
     // Send feedback to improve predictions
     if (selected) {
       try {
-        const AI_URL_VAL =
-          import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || "";
-        fetch(`${AI_URL_VAL}/incidents`, {
+        const { API_URL: BACKEND } = await import("@/shared/config");
+        fetch(`${BACKEND}/incidents`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

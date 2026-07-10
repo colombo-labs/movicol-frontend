@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const AI_URL =
-  import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || "";
+const BACKEND_URL = import.meta.env.VITE_API_URL || "";
 
 export interface AppNotification {
   id: string;
@@ -29,7 +28,7 @@ export function useNotifications() {
 
   const fetchAll = useCallback(async () => {
     try {
-      const res = await fetch(`${AI_URL}/notifications?hours=6`);
+      const res = await fetch(`${BACKEND_URL}/notifications?hours=6`);
       if (res.ok) {
         const data = await res.json();
         const items: AppNotification[] = data.map(
