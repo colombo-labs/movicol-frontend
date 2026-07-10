@@ -16,13 +16,20 @@ function getHeatColor(norm: number): string {
   return "#22c55e";
 }
 
+// Module-level cache
+let cachedSiniestros: SiniestroPoint[] | null = null;
+
 export function SiniestroLayer() {
-  const [points, setPoints] = useState<SiniestroPoint[]>([]);
+  const [points, setPoints] = useState<SiniestroPoint[]>(cachedSiniestros || []);
 
   useEffect(() => {
+    if (cachedSiniestros) return;
     fetch(`${API_URL}/siniestralidad/heatmap`)
       .then((r) => r.json())
-      .then((data) => setPoints(Array.isArray(data) ? data : []))
+      .then((data) => {
+        cachedSiniestros = Array.isArray(data) ? data : [];
+        setPoints(cachedSiniestros);
+      })
       .catch(() => {});
   }, []);
 
