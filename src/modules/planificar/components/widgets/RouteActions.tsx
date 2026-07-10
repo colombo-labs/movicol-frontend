@@ -26,17 +26,22 @@ export function ActionButtons({
   prediction,
   tripPoints,
   onClear,
+  onStartNavigation,
 }: {
   readonly prediction: RoutePrediction;
   readonly tripPoints: TripPoint[];
   readonly onClear: () => void;
+  readonly onStartNavigation?: () => void;
 }) {
   const { t } = useTranslation();
   const { requireAuth } = useRequireAuth();
   const { save: saveRoute } = useSavedRoutes();
   return (
     <>
-      <button className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.95] shadow-lg shadow-primary/30">
+      <button
+        onClick={onStartNavigation}
+        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-sm font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all active:scale-[0.95] shadow-lg shadow-primary/30"
+      >
         <Navigation size={14} className="animate-pulse" /> {t("route.startNav")}
       </button>
       <div className="flex gap-2">

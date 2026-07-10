@@ -11,6 +11,7 @@ import type {
 } from "../models/types";
 import { TripPointsList } from "../components/ui/TripPointsList";
 import { EmptyState } from "../components/ui/EmptyState";
+import { NavigationMode } from "../components/widgets/NavigationMode";
 import {
   ModeTabs,
   RouteOptionsList,
@@ -56,6 +57,7 @@ export function PlanificarViajePanel({
   const [departureType, setDepartureType] = useState<DepartureType>("ahora");
   const [departureTime, setDepartureTime] = useState("");
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [navigating, setNavigating] = useState(false);
 
   // Sync from map selection
   useEffect(() => {
@@ -132,6 +134,13 @@ export function PlanificarViajePanel({
   };
 
   return (
+    <>
+      {navigating && selectedOption && (
+        <NavigationMode
+          prediction={selectedOption.prediction}
+          onExit={() => setNavigating(false)}
+        />
+      )}
     <div className="space-y-3">
       <TripPointsList
         tripPoints={tripPoints}
@@ -291,6 +300,7 @@ export function PlanificarViajePanel({
                 prediction={selectedOption.prediction}
                 tripPoints={tripPoints}
                 onClear={onClear}
+                onStartNavigation={() => setNavigating(true)}
               />
               <QuickActions onFocusMap={() => {}} />
               <TravelTips
@@ -304,5 +314,6 @@ export function PlanificarViajePanel({
         </div>
       )}
     </div>
+    </>
   );
 }
