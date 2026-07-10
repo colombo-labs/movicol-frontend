@@ -20,7 +20,7 @@ export function SiniestroLayer() {
   const [points, setPoints] = useState<SiniestroPoint[]>([]);
 
   useEffect(() => {
-    fetch(`${API_URL}/graph/siniestralidad/heatmap`)
+    fetch(`${API_URL}/siniestralidad/heatmap`)
       .then((r) => r.json())
       .then((data) => setPoints(Array.isArray(data) ? data : []))
       .catch(() => {});
