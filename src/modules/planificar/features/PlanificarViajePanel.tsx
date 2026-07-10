@@ -185,13 +185,13 @@ export function PlanificarViajePanel({
         )}
       </div>
 
-      {/* Recalculate button */}
-      {tripPoints.length >= 2 && !isLoading && (
+      {/* Retry button — only shows when there was an error */}
+      {tripPoints.length >= 2 && !isLoading && error && (
         <button
           onClick={handleSearch}
-          className="w-full py-1.5 rounded-lg border border-primary/30 text-primary text-[10px] font-medium flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-all"
+          className="w-full py-2 rounded-lg border border-primary/30 bg-primary/5 text-primary text-[10px] font-medium flex items-center justify-center gap-1.5 hover:bg-primary/10 transition-all active:scale-[0.98]"
         >
-          <Navigation size={10} /> {t("planner.recalculate")}
+          <Navigation size={10} /> {t("planner.retry", "Reintentar")}
         </button>
       )}
 

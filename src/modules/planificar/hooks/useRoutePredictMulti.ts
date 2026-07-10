@@ -389,7 +389,14 @@ export function useRoutePredictMulti() {
       }
     } catch (err) {
       if (!cancelledRef.current) {
-        setError(err instanceof Error ? err.message : "Error al buscar rutas");
+        const message = err instanceof Error ? err.message : "";
+        if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
+          setError("Sin conexión al servidor. Verifica tu internet e intenta de nuevo.");
+        } else if (message.includes("No se encontraron rutas")) {
+          setError(message);
+        } else {
+          setError("No pudimos calcular la ruta. Intenta con otros puntos.");
+        }
         setOptions(null);
         setIsLoading(false);
       }
