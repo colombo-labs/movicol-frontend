@@ -319,7 +319,19 @@ export function PlanificarViajePanel({
                 prediction={selectedOption.prediction}
                 tripPoints={tripPoints}
                 onClear={onClear}
-                onStartNavigation={() => setNavigating(true)}
+                onStartNavigation={() => {
+                  setNavigating(true);
+                  // Increment trip counter for TuLlave balance estimation
+                  const today = new Date().toISOString().slice(0, 10);
+                  const saved = JSON.parse(localStorage.getItem("movicol_trips_today") || "{}");
+                  if (saved.date === today) {
+                    saved.count = (saved.count || 0) + 1;
+                  } else {
+                    saved.date = today;
+                    saved.count = 1;
+                  }
+                  localStorage.setItem("movicol_trips_today", JSON.stringify(saved));
+                }}
               />
               <QuickActions
                 onViewFullMap={onViewFullMap}

@@ -56,15 +56,18 @@ export function ActionButtons({
       </button>
       <div className="flex gap-2">
         <button
-          onClick={() => {
-            if (navigator.share)
-              navigator
-                .share({
-                  title: "Mi ruta MoviCol",
-                  text: `Ruta de ${Math.round(prediction.total_time_minutes)} min`,
-                  url: globalThis.location.href,
-                })
-                .catch(() => {});
+          onClick={async () => {
+            const text = `Mi ruta MoviCol: ${Math.round(prediction.total_time_minutes)} min`;
+            const url = globalThis.location.href;
+            try {
+              if (navigator.share) {
+                await navigator.share({ title: "Mi ruta MoviCol", text, url });
+              } else {
+                await navigator.clipboard.writeText(`${text} — ${url}`);
+                const btn = document.activeElement as HTMLButtonElement;
+                if (btn) { btn.textContent = "✓ Copiado"; setTimeout(() => { btn.textContent = t("route.share"); }, 1500); }
+              }
+            } catch { /* cancelled */ }
           }}
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
