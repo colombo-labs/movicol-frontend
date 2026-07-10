@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useRef } from "react";
-import { Marker, useMap } from "react-leaflet";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Marker, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
 
 // Draggable Marker component
@@ -128,4 +128,42 @@ export function MapClickHandler({
     };
   }, [active, map, onClick]);
   return null;
+}
+
+/** Fly to user's location on first load and show a pulsing dot. */
+export function UserLocationLayer() {
+  const map = useMap();
+  const [pos, setPos] = useState<[number, number] | null>(null);
+  const hasCentered = useRef(false);
+
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        const latlng: [number, number] = [p.coords.latitude, p.coords.longitude];
+        setPos(latlng);
+        if (!hasCentered.current) {
+          map.flyTo(latlng, 14, { duration: 1.2 });
+          hasCentered.current = true;
+        }
+      },
+      () => {},
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 },
+    );
+  }, [map]);
+
+  if (!pos) return null;
+
+  return (
+    <CircleMarker
+      center={pos}
+      radius={8}
+      pathOptions={{
+        color: "#3b82f6",
+        fillColor: "#3b82f6",
+        fillOpacity: 0.4,
+        weight: 2,
+      }}
+    />
+  );
 }
