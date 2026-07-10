@@ -13,6 +13,7 @@ interface SidePanelProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
+  snapOverride?: SnapPoint | null;
 }
 
 type SnapPoint = "peek" | "half" | "full";
@@ -28,11 +29,17 @@ export function SidePanel({
   onClose,
   title,
   children,
+  snapOverride,
 }: SidePanelProps) {
   const startY = useRef(0);
   const [snap, setSnap] = useState<SnapPoint>("half");
   const { t } = useTranslation();
   const [city, setCity] = useState("");
+
+  // External snap control (e.g. "Ver mapa completo" minimizes to peek)
+  useEffect(() => {
+    if (snapOverride) setSnap(snapOverride);
+  }, [snapOverride]);
 
   useEffect(() => {
     if (!navigator.onLine) return;

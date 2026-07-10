@@ -50,6 +50,7 @@ export function PlanificarViajePanel({
   onRequestAddPoint,
   onSelectRoute,
   selectedRouteIdx,
+  onViewFullMap,
 }: PlanificarProps) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<TransportMode>("publico");
@@ -302,7 +303,7 @@ export function PlanificarViajePanel({
                 onClear={onClear}
                 onStartNavigation={() => setNavigating(true)}
               />
-              <QuickActions />
+              <QuickActions onViewFullMap={onViewFullMap} />
               <TravelTips
                 mode={mode === "publico" ? "transmilenio" : "vehiculo"}
               />
