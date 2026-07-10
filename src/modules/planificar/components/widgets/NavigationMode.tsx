@@ -197,66 +197,73 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
   }, []);
 
   // GPS tracking
+  // --- GPS position handler helpers ---
+  const updateSpeedAndHeading = useCallback(
+    (lat: number, lng: number, now: number) => {
+      if (!prevPosRef.current) return;
+      const dt = (now - prevPosRef.current.time) / 1000;
+      if (dt <= 1) return;
+      const dist = haversineM(
+        prevPosRef.current.lat,
+        prevPosRef.current.lng,
+        lat,
+        lng,
+      );
+      setSpeed(Math.round((dist / dt) * 3.6));
+      const dLat = lat - prevPosRef.current.lat;
+      const dLng = lng - prevPosRef.current.lng;
+      if (Math.abs(dLat) > 0.00001 || Math.abs(dLng) > 0.00001) {
+        setHeading((Math.atan2(dLng, dLat) * 180) / Math.PI);
+      }
+    },
+    [],
+  );
+
+  const checkOffRoute = useCallback(
+    (lat: number, lng: number) => {
+      if (routeCoords.length === 0) return;
+      const minDist = Math.min(
+        ...routeCoords.map((c) => haversineM(lat, lng, c[0], c[1])),
+      );
+      setOffRoute(minDist > 150);
+    },
+    [routeCoords],
+  );
+
+  const advanceStep = useCallback(
+    (lat: number, lng: number) => {
+      const nextCoord = getStepCoord(currentStepIdx + 1);
+      if (!nextCoord) return;
+      const dist = haversineM(lat, lng, nextCoord[0], nextCoord[1]);
+      setDistanceToNext(dist);
+      if (dist >= 30 || currentStepIdx >= steps.length - 1) return;
+      setCurrentStepIdx((prev) => prev + 1);
+      if ("vibrate" in navigator) navigator.vibrate(100);
+      if (voiceEnabled && "speechSynthesis" in window) {
+        const next = steps[currentStepIdx + 1];
+        if (next) {
+          const u = new SpeechSynthesisUtterance(next.instruction);
+          u.lang = "es-CO";
+          u.rate = 1.1;
+          speechSynthesis.speak(u);
+        }
+      }
+    },
+    [currentStepIdx, steps, voiceEnabled, getStepCoord],
+  );
+
+  // --- GPS tracking effect ---
   useEffect(() => {
     if (!navigator.geolocation) return;
     watchRef.current = navigator.geolocation.watchPosition(
       (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
         setUserPos({ lat, lng });
-
-        // Calculate speed from positions
         const now = Date.now();
-        if (prevPosRef.current) {
-          const dt = (now - prevPosRef.current.time) / 1000;
-          if (dt > 1) {
-            const dist = haversineM(
-              prevPosRef.current.lat,
-              prevPosRef.current.lng,
-              lat,
-              lng,
-            );
-            setSpeed(Math.round((dist / dt) * 3.6)); // m/s → km/h
-
-            // Calculate heading from movement
-            const dLat = lat - prevPosRef.current.lat;
-            const dLng = lng - prevPosRef.current.lng;
-            if (Math.abs(dLat) > 0.00001 || Math.abs(dLng) > 0.00001) {
-              const angle = (Math.atan2(dLng, dLat) * 180) / Math.PI;
-              setHeading(angle);
-            }
-          }
-        }
+        updateSpeedAndHeading(lat, lng, now);
         prevPosRef.current = { lat, lng, time: now };
-
-        // Check off-route (>150m from nearest route point)
-        if (routeCoords.length > 0) {
-          const minDist = Math.min(
-            ...routeCoords.map((c) => haversineM(lat, lng, c[0], c[1])),
-          );
-          setOffRoute(minDist > 150);
-        }
-
-        // Auto-advance step
-        const nextCoord = getStepCoord(currentStepIdx + 1);
-        if (nextCoord) {
-          const dist = haversineM(lat, lng, nextCoord[0], nextCoord[1]);
-          setDistanceToNext(dist);
-          if (dist < 30 && currentStepIdx < steps.length - 1) {
-            setCurrentStepIdx((prev) => prev + 1);
-            // Haptic feedback
-            if ("vibrate" in navigator) navigator.vibrate(100);
-            // Voice
-            if (voiceEnabled && "speechSynthesis" in window) {
-              const next = steps[currentStepIdx + 1];
-              if (next) {
-                const u = new SpeechSynthesisUtterance(next.instruction);
-                u.lang = "es-CO";
-                u.rate = 1.1;
-                speechSynthesis.speak(u);
-              }
-            }
-          }
-        }
+        checkOffRoute(lat, lng);
+        advanceStep(lat, lng);
       },
       () => {},
       { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 },

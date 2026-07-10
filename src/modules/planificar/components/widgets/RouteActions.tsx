@@ -269,11 +269,12 @@ export function QuickActions({
     setTimeout(() => setReported(false), 3000);
   };
 
-  const reportButtonClass = reported
-    ? "bg-success/20 text-success border-success/30"
-    : reportType
-      ? "bg-warning/10 border-warning/30 text-warning"
-      : "bg-default-100 text-foreground hover:bg-default-200";
+  let reportButtonClass = "bg-default-100 text-foreground hover:bg-default-200";
+  if (reported) {
+    reportButtonClass = "bg-success/20 text-success border-success/30";
+  } else if (reportType) {
+    reportButtonClass = "bg-warning/10 border-warning/30 text-warning";
+  }
 
   return (
     <div className="space-y-1.5">
