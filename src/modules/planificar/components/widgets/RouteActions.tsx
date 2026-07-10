@@ -2,6 +2,16 @@ import { useTranslation } from "react-i18next";
 import { useRequireAuth } from "@shared/hooks/useRequireAuth";
 import { useSavedRoutes } from "@shared/hooks/useSavedRoutes";
 import { useState, useEffect, useRef } from "react";
+
+function haversineM(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371000;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 import {
   Navigation,
   Bell,
@@ -104,16 +114,87 @@ export function ActionButtons({
   );
 }
 
-export function QuickActions({ onViewFullMap }: { readonly onViewFullMap?: () => void }) {
+export function QuickActions({
+  onViewFullMap,
+  destinationName,
+  destinationLat,
+  destinationLng,
+}: {
+  readonly onViewFullMap?: () => void;
+  readonly destinationName?: string;
+  readonly destinationLat?: number;
+  readonly destinationLng?: number;
+}) {
   const { t } = useTranslation();
   const [alarmSet, setAlarmSet] = useState(false);
   const [reported, setReported] = useState(false);
+  const [reportType, setReportType] = useState<string | null>(null);
+  const watchRef = useRef<number | null>(null);
 
-  const handleAlarm = () => {
-    setAlarmSet(!alarmSet);
-    if (!alarmSet && "Notification" in globalThis) {
-      Notification.requestPermission();
+  // Cleanup geolocation watch on unmount
+  useEffect(() => {
+    return () => {
+      if (watchRef.current !== null) {
+        navigator.geolocation.clearWatch(watchRef.current);
+      }
+    };
+  }, []);
+
+  const handleAlarm = async () => {
+    if (alarmSet) {
+      // Turn off alarm
+      setAlarmSet(false);
+      if (watchRef.current !== null) {
+        navigator.geolocation.clearWatch(watchRef.current);
+        watchRef.current = null;
+      }
+      return;
     }
+
+    // Request notification permission
+    if ("Notification" in globalThis && Notification.permission === "default") {
+      await Notification.requestPermission();
+    }
+
+    if (!destinationLat || !destinationLng) {
+      setAlarmSet(true);
+      return;
+    }
+
+    setAlarmSet(true);
+
+    // Watch position and notify when within 300m of destination
+    watchRef.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        const dist = haversineM(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          destinationLat,
+          destinationLng,
+        );
+
+        if (dist < 300) {
+          // Notify user
+          if (Notification.permission === "granted") {
+            new Notification("MoviCol — Próxima parada", {
+              body: `Estás a ${Math.round(dist)}m de ${destinationName || "tu destino"}. ¡Prepárate para bajar!`,
+              icon: "/icons/icon-192.png",
+            });
+          }
+          // Also vibrate
+          if ("vibrate" in navigator) navigator.vibrate([200, 100, 200, 100, 200]);
+
+          // Stop watching
+          if (watchRef.current !== null) {
+            navigator.geolocation.clearWatch(watchRef.current);
+            watchRef.current = null;
+          }
+          setAlarmSet(false);
+        }
+      },
+      () => {},
+      { enableHighAccuracy: true, maximumAge: 5000 },
+    );
   };
 
   const handleShareLive = async () => {
@@ -127,46 +208,99 @@ export function QuickActions({ onViewFullMap }: { readonly onViewFullMap?: () =>
     }
   };
 
-  const handleReport = () => {
+  const handleReport = (type?: string) => {
+    const incidentType = type || reportType || "otro";
     setReported(true);
+    setReportType(null);
+
+    // Get current position and log the incident
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const incident = {
+          type: incidentType,
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          timestamp: new Date().toISOString(),
+        };
+        // Store locally (will sync when backend is available)
+        const stored = JSON.parse(localStorage.getItem("movicol_incidents") || "[]");
+        stored.push(incident);
+        localStorage.setItem("movicol_incidents", JSON.stringify(stored.slice(-50)));
+      },
+      () => {},
+    );
+
     setTimeout(() => setReported(false), 3000);
   };
 
   return (
-    <div className="grid grid-cols-2 gap-1.5">
-      <button
-        onClick={handleAlarm}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${alarmSet ? "bg-primary/20 text-primary border-primary/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}
-      >
-        <Bell
-          size={12}
-          className={alarmSet ? "text-primary" : "text-default-500"}
-        />{" "}
-        {alarmSet ? "✓ Activa" : t("route.alarmStop")}
-      </button>
-      <button
-        onClick={handleShareLive}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all"
-      >
-        <Share2 size={12} className="text-default-500" /> {t("route.shareLive")}
-      </button>
-      <button
-        onClick={handleReport}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${reported ? "bg-success/20 text-success border-success/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}
-      >
-        <AlertCircle
-          size={12}
-          className={reported ? "text-success" : "text-warning"}
-        />{" "}
-        {reported ? "✓ Reportado" : t("route.reportIncident")}
-      </button>
-      <button
-        onClick={onViewFullMap}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all"
-      >
-        <MapPinned size={12} className="text-default-500" />{" "}
-        {t("route.viewFullMap")}
-      </button>
+    <div className="space-y-1.5">
+      <div className="grid grid-cols-2 gap-1.5">
+        <button
+          onClick={handleAlarm}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${alarmSet ? "bg-primary/20 text-primary border-primary/30" : "bg-default-100 text-foreground hover:bg-default-200"}`}
+        >
+          <Bell
+            size={12}
+            className={alarmSet ? "text-primary" : "text-default-500"}
+          />{" "}
+          {alarmSet ? "\u2713 Monitoreando" : t("route.alarmStop")}
+        </button>
+        <button
+          onClick={handleShareLive}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all"
+        >
+          <Share2 size={12} className="text-default-500" /> {t("route.shareLive")}
+        </button>
+        <button
+          onClick={() => setReportType(reportType ? null : "show")}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${reported ? "bg-success/20 text-success border-success/30" : reportType ? "bg-warning/10 border-warning/30 text-warning" : "bg-default-100 text-foreground hover:bg-default-200"}`}
+        >
+          <AlertCircle
+            size={12}
+            className={reported ? "text-success" : "text-warning"}
+          />{" "}
+          {reported ? "\u2713 Reportado" : t("route.reportIncident")}
+        </button>
+        <button
+          onClick={onViewFullMap}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all"
+        >
+          <MapPinned size={12} className="text-default-500" />{" "}
+          {t("route.viewFullMap")}
+        </button>
+      </div>
+
+      {/* Incident type selector */}
+      {reportType === "show" && !reported && (
+        <div className="flex gap-1 flex-wrap">
+          {[
+            { id: "demora", label: "\u23F1 Demora", emoji: "\u23F1\uFE0F" },
+            { id: "lleno", label: "\uD83D\uDE8F Lleno" },
+            { id: "inseguro", label: "\u26A0\uFE0F Inseguro" },
+            { id: "cerrado", label: "\uD83D\uDEAB Cerrado" },
+            { id: "accidente", label: "\uD83D\uDEA8 Accidente" },
+          ].map((type) => (
+            <button
+              key={type.id}
+              onClick={() => handleReport(type.id)}
+              className="px-2 py-1 rounded-md bg-warning/10 border border-warning/20 text-[9px] text-warning hover:bg-warning/20 transition-all"
+            >
+              {type.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Alarm status indicator */}
+      {alarmSet && (
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-primary/5 border border-primary/10">
+          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span className="text-[9px] text-primary">
+            Te avisaremos al acercarte a {destinationName || "tu destino"}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

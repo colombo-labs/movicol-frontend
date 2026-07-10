@@ -303,7 +303,12 @@ export function PlanificarViajePanel({
                 onClear={onClear}
                 onStartNavigation={() => setNavigating(true)}
               />
-              <QuickActions onViewFullMap={onViewFullMap} />
+              <QuickActions
+                onViewFullMap={onViewFullMap}
+                destinationName={destination?.label}
+                destinationLat={destination?.lat}
+                destinationLng={destination?.lng}
+              />
               <TravelTips
                 mode={mode === "publico" ? "transmilenio" : "vehiculo"}
               />
