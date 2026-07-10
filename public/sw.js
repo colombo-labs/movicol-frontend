@@ -3,16 +3,20 @@ const STATIC_ASSETS = ["/", "/manifest.json"];
 
 globalThis.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)),
   );
   globalThis.skipWaiting();
 });
 
 globalThis.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)),
+        ),
+      ),
   );
   globalThis.clients.claim();
 });
@@ -39,7 +43,8 @@ globalThis.addEventListener("fetch", (event) => {
     requestUrl.pathname.startsWith("/saved-routes") ||
     requestUrl.pathname.startsWith("/user/") ||
     requestUrl.pathname.startsWith("/preferences")
-  ) return;
+  )
+    return;
 
   // Cache-first for static assets
   if (
@@ -50,10 +55,12 @@ globalThis.addEventListener("fetch", (event) => {
     requestUrl.pathname.endsWith(".png") ||
     requestUrl.pathname.endsWith(".svg") ||
     requestUrl.pathname.endsWith(".woff2") ||
-    STATIC_ASSETS.some((a) => requestUrl.pathname === a)
+    STATIC_ASSETS.includes(requestUrl.pathname)
   ) {
     event.respondWith(
-      caches.match(event.request).then((cached) => cached || fetch(event.request))
+      caches
+        .match(event.request)
+        .then((cached) => cached || fetch(event.request)),
     );
   }
 });

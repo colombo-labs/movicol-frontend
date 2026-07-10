@@ -316,35 +316,37 @@ async function fetchVehicleRoute(
 async function fetchTransitRoute(
   params: PredictMultiParams,
 ): Promise<RouteOption[]> {
-  const [tmResult, sitpResult, multimodalResult, rutasCercanasResult] = await Promise.allSettled([
-    routePredictionApi.predict({
-      origin: params.origin,
-      destination: params.destination,
-      departure_time: params.departureTime,
-      mode: "transmilenio",
-    }),
-    routePredictionApi.predict({
-      origin: params.origin,
-      destination: params.destination,
-      departure_time: params.departureTime,
-      mode: "sitp",
-    }),
-    routePredictionApi.predict({
-      origin: params.origin,
-      destination: params.destination,
-      departure_time: params.departureTime,
-      mode: "multimodal",
-    }),
-    fetchRutasCercanas(
-      params.origin.lat,
-      params.origin.lng ?? params.origin.lon ?? 0,
-      800,
-    ),
-  ]);
+  const [tmResult, sitpResult, multimodalResult, rutasCercanasResult] =
+    await Promise.allSettled([
+      routePredictionApi.predict({
+        origin: params.origin,
+        destination: params.destination,
+        departure_time: params.departureTime,
+        mode: "transmilenio",
+      }),
+      routePredictionApi.predict({
+        origin: params.origin,
+        destination: params.destination,
+        departure_time: params.departureTime,
+        mode: "sitp",
+      }),
+      routePredictionApi.predict({
+        origin: params.origin,
+        destination: params.destination,
+        departure_time: params.departureTime,
+        mode: "multimodal",
+      }),
+      fetchRutasCercanas(
+        params.origin.lat,
+        params.origin.lng ?? params.origin.lon ?? 0,
+        800,
+      ),
+    ]);
 
   const tm = tmResult.status === "fulfilled" ? tmResult.value : null;
   let sitp = sitpResult.status === "fulfilled" ? sitpResult.value : null;
-  const multimodal = multimodalResult.status === "fulfilled" ? multimodalResult.value : null;
+  const multimodal =
+    multimodalResult.status === "fulfilled" ? multimodalResult.value : null;
 
   if (sitp && !sitp.route_code) {
     const cercanas =
@@ -390,8 +392,13 @@ export function useRoutePredictMulti() {
     } catch (err) {
       if (!cancelledRef.current) {
         const message = err instanceof Error ? err.message : "";
-        if (message.includes("Failed to fetch") || message.includes("NetworkError")) {
-          setError("Sin conexión al servidor. Verifica tu internet e intenta de nuevo.");
+        if (
+          message.includes("Failed to fetch") ||
+          message.includes("NetworkError")
+        ) {
+          setError(
+            "Sin conexión al servidor. Verifica tu internet e intenta de nuevo.",
+          );
         } else if (message.includes("No se encontraron rutas")) {
           setError(message);
         } else {

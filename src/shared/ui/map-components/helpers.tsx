@@ -140,7 +140,10 @@ export function UserLocationLayer() {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (p) => {
-        const latlng: [number, number] = [p.coords.latitude, p.coords.longitude];
+        const latlng: [number, number] = [
+          p.coords.latitude,
+          p.coords.longitude,
+        ];
         setPos(latlng);
         if (!hasCentered.current) {
           map.flyTo(latlng, 14, { duration: 1.2 });

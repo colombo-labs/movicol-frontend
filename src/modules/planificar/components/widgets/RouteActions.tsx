@@ -3,13 +3,20 @@ import { useRequireAuth } from "@shared/hooks/useRequireAuth";
 import { useSavedRoutes } from "@shared/hooks/useSavedRoutes";
 import { useState, useEffect, useRef } from "react";
 
-function haversineM(lat1: number, lon1: number, lat2: number, lon2: number): number {
+function haversineM(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
   const R = 6371000;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 import {
@@ -65,9 +72,16 @@ export function ActionButtons({
               } else {
                 await navigator.clipboard.writeText(`${text} — ${url}`);
                 const btn = document.activeElement as HTMLButtonElement;
-                if (btn) { btn.textContent = "✓ Copiado"; setTimeout(() => { btn.textContent = t("route.share"); }, 1500); }
+                if (btn) {
+                  btn.textContent = "✓ Copiado";
+                  setTimeout(() => {
+                    btn.textContent = t("route.share");
+                  }, 1500);
+                }
               }
-            } catch { /* cancelled */ }
+            } catch {
+              /* cancelled */
+            }
           }}
           className="flex-1 py-2 rounded-lg border border-divider text-[10px] font-medium text-default-500 hover:bg-default-100 transition-all flex items-center justify-center gap-1"
         >
@@ -185,7 +199,8 @@ export function QuickActions({
             });
           }
           // Also vibrate
-          if ("vibrate" in navigator) navigator.vibrate([200, 100, 200, 100, 200]);
+          if ("vibrate" in navigator)
+            navigator.vibrate([200, 100, 200, 100, 200]);
 
           // Stop watching
           if (watchRef.current !== null) {
@@ -238,9 +253,14 @@ export function QuickActions({
           if (!res.ok) throw new Error("API error");
         } catch {
           // Fallback: store locally
-          const stored = JSON.parse(localStorage.getItem("movicol_incidents") || "[]");
+          const stored = JSON.parse(
+            localStorage.getItem("movicol_incidents") || "[]",
+          );
           stored.push({ ...incident, timestamp: new Date().toISOString() });
-          localStorage.setItem("movicol_incidents", JSON.stringify(stored.slice(-50)));
+          localStorage.setItem(
+            "movicol_incidents",
+            JSON.stringify(stored.slice(-50)),
+          );
         }
       },
       () => {},
@@ -248,6 +268,12 @@ export function QuickActions({
 
     setTimeout(() => setReported(false), 3000);
   };
+
+  const reportButtonClass = reported
+    ? "bg-success/20 text-success border-success/30"
+    : reportType
+      ? "bg-warning/10 border-warning/30 text-warning"
+      : "bg-default-100 text-foreground hover:bg-default-200";
 
   return (
     <div className="space-y-1.5">
@@ -266,11 +292,12 @@ export function QuickActions({
           onClick={handleShareLive}
           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-default-100 border border-divider/50 text-[10px] text-foreground hover:bg-default-200 transition-all"
         >
-          <Share2 size={12} className="text-default-500" /> {t("route.shareLive")}
+          <Share2 size={12} className="text-default-500" />{" "}
+          {t("route.shareLive")}
         </button>
         <button
           onClick={() => setReportType(reportType ? null : "show")}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${reported ? "bg-success/20 text-success border-success/30" : reportType ? "bg-warning/10 border-warning/30 text-warning" : "bg-default-100 text-foreground hover:bg-default-200"}`}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-divider/50 text-[10px] transition-all ${reportButtonClass}`}
         >
           <AlertCircle
             size={12}
@@ -473,7 +500,8 @@ export function TravelTips({ mode }: { readonly mode: string }) {
     // Send feedback to improve predictions
     if (selected) {
       try {
-        const AI_URL_VAL = import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || "";
+        const AI_URL_VAL =
+          import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || "";
         fetch(`${AI_URL_VAL}/incidents`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -484,7 +512,9 @@ export function TravelTips({ mode }: { readonly mode: string }) {
             description: `User rated route prediction as ${selected}`,
           }),
         }).catch(() => {});
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
   };
 
@@ -538,11 +568,15 @@ function TuLlaveCard() {
   // Calculate estimated balance from saved trips today
   const tripsToday = (() => {
     try {
-      const saved = JSON.parse(localStorage.getItem("movicol_trips_today") || "{}");
+      const saved = JSON.parse(
+        localStorage.getItem("movicol_trips_today") || "{}",
+      );
       const today = new Date().toISOString().slice(0, 10);
       if (saved.date !== today) return 0;
       return saved.count || 0;
-    } catch { return 0; }
+    } catch {
+      return 0;
+    }
   })();
   const FARE = 3550;
   const INITIAL_BALANCE = 20000; // Assumed initial load
@@ -569,7 +603,9 @@ function TuLlaveCard() {
             </p>
           </div>
         </div>
-        <p className={`text-sm font-bold ${balance > FARE ? "text-success" : "text-danger"}`}>
+        <p
+          className={`text-sm font-bold ${balance > FARE ? "text-success" : "text-danger"}`}
+        >
           ${balance.toLocaleString("es-CO")}
         </p>
       </div>

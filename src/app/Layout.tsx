@@ -89,7 +89,9 @@ export function Layout() {
     useRoutePredictMulti();
   const [selectedRouteIdx, setSelectedRouteIdx] = useState(0);
   const [addingPoint, setAddingPoint] = useState(false);
-  const [panelSnap, setPanelSnap] = useState<"peek" | "half" | "full" | null>(null);
+  const [panelSnap, setPanelSnap] = useState<"peek" | "half" | "full" | null>(
+    null,
+  );
 
   const togglePanel = useCallback(
     (id: PanelId) => {

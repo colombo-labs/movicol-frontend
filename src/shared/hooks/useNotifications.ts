@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-
-const AI_URL = import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || "";
+const AI_URL =
+  import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || "";
 
 export interface AppNotification {
   id: string;
@@ -18,25 +18,33 @@ export interface AppNotification {
 }
 
 export function useNotifications() {
-  
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const readIds = useState(() => new Set<string>(JSON.parse(localStorage.getItem("movicol_read_notifs") || "[]")))[0];
+  const readIdsRef = useRef(
+    new Set<string>(
+      JSON.parse(localStorage.getItem("movicol_read_notifs") || "[]"),
+    ),
+  );
+  const readIds = readIdsRef.current;
 
   const fetchAll = useCallback(async () => {
     try {
       const res = await fetch(`${AI_URL}/notifications?hours=6`);
       if (res.ok) {
         const data = await res.json();
-        const items: AppNotification[] = data.map((n: Record<string, unknown>) => ({
-          ...n,
-          read: readIds.has(n.id as string),
-          created_at: n.created_at as string,
-        }));
+        const items: AppNotification[] = data.map(
+          (n: Record<string, unknown>) => ({
+            ...n,
+            read: readIds.has(n.id as string),
+            created_at: n.created_at as string,
+          }),
+        );
         setNotifications(items);
         setUnreadCount(items.filter((n) => !n.read).length);
       }
-    } catch { /* offline */ }
+    } catch {
+      /* offline */
+    }
   }, [readIds]);
 
   useEffect(() => {

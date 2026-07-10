@@ -20,7 +20,9 @@ function getHeatColor(norm: number): string {
 let cachedSiniestros: SiniestroPoint[] | null = null;
 
 export function SiniestroLayer() {
-  const [points, setPoints] = useState<SiniestroPoint[]>(cachedSiniestros || []);
+  const [points, setPoints] = useState<SiniestroPoint[]>(
+    cachedSiniestros || [],
+  );
 
   useEffect(() => {
     if (cachedSiniestros) return;

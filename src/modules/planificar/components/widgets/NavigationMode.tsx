@@ -36,13 +36,20 @@ interface NavStep {
 
 // --- Utilities ---
 
-function haversineM(lat1: number, lon1: number, lat2: number, lon2: number): number {
+function haversineM(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
   const R = 6371000;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
     Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -53,25 +60,38 @@ function formatDistance(meters: number): string {
 
 function formatETA(seconds: number): string {
   const arrival = new Date(Date.now() + seconds * 1000);
-  return arrival.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+  return arrival.toLocaleTimeString("es-CO", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function getManeuverIcon(maneuver: string, size = 28) {
   if (maneuver.includes("left")) return <CornerUpLeft size={size} />;
   if (maneuver.includes("right")) return <CornerUpRight size={size} />;
-  if (maneuver.includes("uturn") || maneuver.includes("u-turn")) return <RotateCcw size={size} />;
+  if (maneuver.includes("uturn") || maneuver.includes("u-turn"))
+    return <RotateCcw size={size} />;
   return <ArrowUp size={size} />;
 }
 
 function getManeuverColor(maneuver: string): string {
-  if (maneuver.includes("left") || maneuver.includes("right")) return "bg-amber-500";
+  if (maneuver.includes("left") || maneuver.includes("right"))
+    return "bg-amber-500";
   if (maneuver.includes("uturn")) return "bg-red-500";
   return "bg-primary";
 }
 
 // --- Map follower component ---
 
-function FollowUser({ lat, lng, heading }: { lat: number; lng: number; heading: number | null }) {
+function FollowUser({
+  lat,
+  lng,
+  heading,
+}: {
+  lat: number;
+  lng: number;
+  heading: number | null;
+}) {
   const map = useMap();
   const prevPos = useRef<[number, number] | null>(null);
 
@@ -106,11 +126,15 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
   const [distanceToNext, setDistanceToNext] = useState<number>(0);
   const [speed, setSpeed] = useState(0); // km/h
   const [heading, setHeading] = useState<number | null>(null);
-  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(null);
+  const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
   const [offRoute, setOffRoute] = useState(false);
   const watchRef = useRef<number | null>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
-  const prevPosRef = useRef<{ lat: number; lng: number; time: number } | null>(null);
+  const prevPosRef = useRef<{ lat: number; lng: number; time: number } | null>(
+    null,
+  );
 
   const steps: NavStep[] = useMemo(
     () => prediction.navigation_steps || [],
@@ -145,7 +169,10 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
     (idx: number): [number, number] | null => {
       const segments = prediction.risk_segments || [];
       if (idx < segments.length && segments[idx].coordinates.length > 0) {
-        return [segments[idx].coordinates[0][0], segments[idx].coordinates[0][1]];
+        return [
+          segments[idx].coordinates[0][0],
+          segments[idx].coordinates[0][1],
+        ];
       }
       return null;
     },
@@ -159,10 +186,14 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
         if ("wakeLock" in navigator) {
           wakeLockRef.current = await navigator.wakeLock.request("screen");
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
     acquireWakeLock();
-    return () => { wakeLockRef.current?.release(); };
+    return () => {
+      wakeLockRef.current?.release();
+    };
   }, []);
 
   // GPS tracking
@@ -178,7 +209,12 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
         if (prevPosRef.current) {
           const dt = (now - prevPosRef.current.time) / 1000;
           if (dt > 1) {
-            const dist = haversineM(prevPosRef.current.lat, prevPosRef.current.lng, lat, lng);
+            const dist = haversineM(
+              prevPosRef.current.lat,
+              prevPosRef.current.lng,
+              lat,
+              lng,
+            );
             setSpeed(Math.round((dist / dt) * 3.6)); // m/s → km/h
 
             // Calculate heading from movement
@@ -195,7 +231,7 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
         // Check off-route (>150m from nearest route point)
         if (routeCoords.length > 0) {
           const minDist = Math.min(
-            ...routeCoords.map((c) => haversineM(lat, lng, c[0], c[1]))
+            ...routeCoords.map((c) => haversineM(lat, lng, c[0], c[1])),
           );
           setOffRoute(minDist > 150);
         }
@@ -226,7 +262,8 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
       { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 },
     );
     return () => {
-      if (watchRef.current !== null) navigator.geolocation.clearWatch(watchRef.current);
+      if (watchRef.current !== null)
+        navigator.geolocation.clearWatch(watchRef.current);
     };
   }, [currentStepIdx, steps, voiceEnabled, getStepCoord, routeCoords]);
 
@@ -248,7 +285,10 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
           <p className="text-sm text-default-500 mb-4">
             No hay instrucciones de navegación para esta ruta.
           </p>
-          <button onClick={onExit} className="px-4 py-2 rounded-lg bg-primary text-white text-sm">
+          <button
+            onClick={onExit}
+            className="px-4 py-2 rounded-lg bg-primary text-white text-sm"
+          >
             Volver
           </button>
         </div>
@@ -256,13 +296,18 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
     );
   }
 
-  const progress = steps.length > 1 ? (currentStepIdx / (steps.length - 1)) * 100 : 0;
-  const mapCenter = userPos ? [userPos.lat, userPos.lng] as [number, number] : routeCoords[0] || [4.65, -74.1] as [number, number];
+  const progress =
+    steps.length > 1 ? (currentStepIdx / (steps.length - 1)) * 100 : 0;
+  const mapCenter = userPos
+    ? ([userPos.lat, userPos.lng] as [number, number])
+    : routeCoords[0] || ([4.65, -74.1] as [number, number]);
 
   return (
     <div className="fixed inset-0 z-[700] flex flex-col bg-background">
       {/* Instruction banner */}
-      <div className={`${getManeuverColor(currentStep?.maneuver || "")} text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10`}>
+      <div
+        className={`${getManeuverColor(currentStep?.maneuver || "")} text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10`}
+      >
         <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
           {getManeuverIcon(currentStep?.maneuver || "", 32)}
         </div>
@@ -271,17 +316,24 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
             {currentStep?.instruction || "Iniciando..."}
           </p>
           {currentStep?.street && (
-            <p className="text-sm opacity-80 truncate mt-0.5">{currentStep.street}</p>
+            <p className="text-sm opacity-80 truncate mt-0.5">
+              {currentStep.street}
+            </p>
           )}
         </div>
         <div className="text-right shrink-0">
-          <p className="text-2xl font-black">{formatDistance(distanceToNext)}</p>
+          <p className="text-2xl font-black">
+            {formatDistance(distanceToNext)}
+          </p>
         </div>
       </div>
 
       {/* Progress bar */}
       <div className="h-1.5 bg-black/20 relative z-10">
-        <div className="h-full bg-white/80 transition-all duration-700" style={{ width: `${progress}%` }} />
+        <div
+          className="h-full bg-white/80 transition-all duration-700"
+          style={{ width: `${progress}%` }}
+        />
       </div>
 
       {/* Map */}
@@ -294,7 +346,9 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-          {userPos && <FollowUser lat={userPos.lat} lng={userPos.lng} heading={heading} />}
+          {userPos && (
+            <FollowUser lat={userPos.lat} lng={userPos.lng} heading={heading} />
+          )}
 
           {/* Full route — gray for completed, colored for remaining */}
           {routeCoords.length > 0 && (
@@ -306,7 +360,10 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
               {/* Completed portion overlay */}
               {currentStepIdx > 0 && (
                 <Polyline
-                  positions={routeCoords.slice(0, Math.min(currentStepIdx * 3, routeCoords.length))}
+                  positions={routeCoords.slice(
+                    0,
+                    Math.min(currentStepIdx * 3, routeCoords.length),
+                  )}
                   pathOptions={{ color: "#6b7280", weight: 6, opacity: 0.7 }}
                 />
               )}
@@ -375,7 +432,8 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
             {formatETA(remaining.time)}
           </p>
           <p className="text-[10px] text-default-400">
-            {formatDistance(remaining.distance)} • {Math.round(remaining.time / 60)} min
+            {formatDistance(remaining.distance)} •{" "}
+            {Math.round(remaining.time / 60)} min
           </p>
         </div>
 

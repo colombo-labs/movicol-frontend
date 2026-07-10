@@ -1,8 +1,8 @@
 import { API_URL } from "@/shared/config";
 
 function getToken(): string | null {
-  const match = document.cookie.match(/access_token=([^;]+)/);
-  return match ? match[1] : null;
+  const result = /access_token=([^;]+)/.exec(document.cookie);
+  return result ? result[1] : null;
 }
 
 export async function authFetch(
