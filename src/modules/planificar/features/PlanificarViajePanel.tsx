@@ -57,6 +57,9 @@ export function PlanificarViajePanel({
   const temp = useWeather();
   const [departureType, setDepartureType] = useState<DepartureType>("ahora");
   const [departureTime, setDepartureTime] = useState("");
+  const [departureDate, setDepartureDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [navigating, setNavigating] = useState(false);
 
@@ -84,7 +87,7 @@ export function PlanificarViajePanel({
     const dt =
       departureType === "programar" && departureTime
         ? new Date(
-            `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+            `${departureDate}T${departureTime}:00`,
           ).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
@@ -96,7 +99,7 @@ export function PlanificarViajePanel({
     const dt =
       departureType === "programar" && departureTime
         ? new Date(
-            `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+            `${departureDate}T${departureTime}:00`,
           ).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
@@ -110,7 +113,7 @@ export function PlanificarViajePanel({
       const dt =
         departureType === "programar" && departureTime
           ? new Date(
-              `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
+              `${departureDate}T${departureTime}:00`,
             ).toISOString()
           : new Date().toISOString();
       onPredictMulti?.(origin, destination, newMode, dt);
@@ -177,21 +180,36 @@ export function PlanificarViajePanel({
           {t("planner.schedule")}
         </button>
         {departureType === "programar" && (
-          <input
-            type="time"
-            value={departureTime}
-            onChange={(e) => {
-              setDepartureTime(e.target.value);
-              if (e.target.value && origin && destination) {
-                const dt = new Date(
-                  `2026-06-12T${e.target.value}:00`,
-                ).toISOString();
-                setSelectedOptionId(null);
-                onPredictMulti?.(origin, destination, mode, dt);
-              }
-            }}
-            className="px-2 py-0.5 rounded-lg bg-default-100 border border-divider text-[10px] outline-none text-foreground"
-          />
+          <div className="flex items-center gap-1.5">
+            <input
+              type="date"
+              value={departureDate}
+              min={new Date().toISOString().slice(0, 10)}
+              onChange={(e) => {
+                setDepartureDate(e.target.value);
+                if (departureTime && origin && destination) {
+                  const dt = new Date(`${e.target.value}T${departureTime}:00`).toISOString();
+                  setSelectedOptionId(null);
+                  onPredictMulti?.(origin, destination, mode, dt);
+                }
+              }}
+              className="px-2 py-0.5 rounded-lg bg-default-100 border border-divider text-[10px] outline-none text-foreground"
+            />
+            <input
+              type="time"
+              value={departureTime}
+              onChange={(e) => {
+                setDepartureTime(e.target.value);
+                if (e.target.value && origin && destination) {
+                  const date = departureDate || new Date().toISOString().slice(0, 10);
+                  const dt = new Date(`${date}T${e.target.value}:00`).toISOString();
+                  setSelectedOptionId(null);
+                  onPredictMulti?.(origin, destination, mode, dt);
+                }
+              }}
+              className="px-2 py-0.5 rounded-lg bg-default-100 border border-divider text-[10px] outline-none text-foreground"
+            />
+          </div>
         )}
       </div>
 
