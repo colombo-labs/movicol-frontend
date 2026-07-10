@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Key, Search, X } from "lucide-react";
 import { Select, SelectItem } from "@heroui/react";
 import { useEscClose } from "../hooks/useEscClose";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 interface Permission {
   id: number;
@@ -21,6 +22,7 @@ export function PermissionsTab({
   readonly onCloseCreate: () => void;
 }) {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [search, setSearch] = useState("");
   const [filterModule, setFilterModule] = useState<string>("all");
@@ -37,6 +39,7 @@ export function PermissionsTab({
   useEscClose(showCreate, onCloseCreate);
 
   const load = () => {
+    if (!isAuthenticated) return;
     authFetch("/admin/permissions")
       .then((r) => (r.ok ? r.json() : []))
       .then(setPermissions);
@@ -44,7 +47,7 @@ export function PermissionsTab({
 
   useEffect(() => {
     load();
-  }, []);
+  }, [isAuthenticated]);
 
   const create = async () => {
     if (!module.trim() || !action.trim()) return;

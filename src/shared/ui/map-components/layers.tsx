@@ -16,7 +16,7 @@ function getRiskLabel(risk: string) {
   return "Bajo";
 }
 
-const AI_URL = "http://localhost:8000";
+const AI_URL = import.meta.env.VITE_AI_URL || API_URL;
 
 function ParaderoPopupContent({ id, nombre, direccion, color }: any) {
   const [aiData, setAiData] = useState<any>(null);

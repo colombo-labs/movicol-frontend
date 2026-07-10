@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { Trash2, X, Search, Shield, Edit2 } from "lucide-react";
 import { useEscClose } from "../hooks/useEscClose";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 interface Permission {
   id: number;
@@ -28,6 +29,7 @@ export function RolesTab({
   readonly onCloseCreate: () => void;
 }) {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [roles, setRoles] = useState<Role[]>([]);
   const [allPerms, setAllPerms] = useState<Permission[]>([]);
   const [search, setSearch] = useState("");
@@ -42,6 +44,7 @@ export function RolesTab({
   useEscClose(showCreate, onCloseCreate);
 
   const load = () => {
+    if (!isAuthenticated) return;
     authFetch("/admin/roles")
       .then((r) => (r.ok ? r.json() : []))
       .then(setRoles);
@@ -52,7 +55,7 @@ export function RolesTab({
 
   useEffect(() => {
     load();
-  }, []);
+  }, [isAuthenticated]);
 
   const createRole = async () => {
     if (!newName.trim()) return;

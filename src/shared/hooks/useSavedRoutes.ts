@@ -41,9 +41,9 @@ export function useSavedRoutes() {
   }, [fetch_]);
 
   const save = async (data: Omit<SavedRoute, "id" | "createdAt">) => {
-    const res = await fetch(`${API_URL}/saved-routes`, {
+    if (!isAuthenticated) return null;
+    const res = await authFetch("/saved-routes", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     if (res.ok) {
@@ -55,7 +55,8 @@ export function useSavedRoutes() {
   };
 
   const remove = async (id: string) => {
-    await authFetch("/saved-routes/${id}", { method: "DELETE" });
+    if (!isAuthenticated) return;
+    await authFetch(`/saved-routes/${id}`, { method: "DELETE" });
     setRoutes((prev) => prev.filter((r) => r.id !== id));
   };
 

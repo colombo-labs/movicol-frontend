@@ -31,7 +31,7 @@ export function useNotifications() {
   }, [fetchAll]);
 
   const markRead = async (id: string) => {
-    await fetch(`${API_URL}/notifications/${id}/read`, { method: "PATCH" });
+    await authFetch(`/notifications/${id}/read`, { method: "PATCH" });
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
@@ -39,19 +39,19 @@ export function useNotifications() {
   };
 
   const markAllRead = async () => {
-    await fetch(`${API_URL}/notifications/read-all`, { method: "PATCH" });
+    await authFetch("/notifications/read-all", { method: "PATCH" });
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
   };
 
   const clear = async () => {
-    await fetch(`${API_URL}/notifications`, { method: "DELETE" });
+    await authFetch("/notifications", { method: "DELETE" });
     setNotifications([]);
     setUnreadCount(0);
   };
 
   const remove = async (id: string) => {
-    await fetch(`${API_URL}/notifications/${id}`, { method: "DELETE" });
+    await authFetch(`/notifications/${id}`, { method: "DELETE" });
     setNotifications((prev) => prev.filter((n) => n.id !== id));
     setUnreadCount((c) => Math.max(0, c - 1));
   };

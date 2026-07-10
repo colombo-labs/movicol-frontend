@@ -23,9 +23,9 @@ export function usePreferences() {
   }, [fetch_]);
 
   const update = async (data: Partial<Preferences>) => {
-    const res = await fetch(`${API_URL}/preferences`, {
+    if (!isAuthenticated) return;
+    const res = await authFetch("/preferences", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     if (res.ok) setPrefs(await res.json());

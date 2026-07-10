@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Search, Shield, X, Edit2 } from "lucide-react";
 import { Select, SelectItem } from "@heroui/react";
 import { useEscClose } from "../hooks/useEscClose";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 interface User {
   id: string;
@@ -29,6 +30,7 @@ interface Permission {
 
 export function UsersTab() {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [allPerms, setAllPerms] = useState<Permission[]>([]);
@@ -48,6 +50,7 @@ export function UsersTab() {
   useEscClose(!!selectedUser, closeModal);
 
   const load = () => {
+    if (!isAuthenticated) return;
     authFetch("/admin/users")
       .then((r) => (r.ok ? r.json() : []))
       .then(setUsers);
@@ -61,7 +64,7 @@ export function UsersTab() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [isAuthenticated]);
 
   const [draftRoleId, setDraftRoleId] = useState<number>(0);
   const [draftActive, setDraftActive] = useState<boolean>(true);

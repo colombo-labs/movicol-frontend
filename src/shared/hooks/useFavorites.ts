@@ -30,9 +30,8 @@ export function useFavorites() {
     data: Record<string, unknown>,
   ) => {
     if (!isAuthenticated) return null;
-    const res = await fetch(`${API_URL}/user/favorites`, {
+    const res = await authFetch("/user/favorites", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type, label, data }),
     });
     if (res.ok) {
@@ -43,7 +42,8 @@ export function useFavorites() {
   };
 
   const removeFavorite = async (id: string) => {
-    await authFetch("/user/favorites/${id}", { method: "DELETE" });
+    if (!isAuthenticated) return;
+    await authFetch(`/user/favorites/${id}`, { method: "DELETE" });
     load();
   };
 
