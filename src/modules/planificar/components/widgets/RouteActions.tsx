@@ -464,6 +464,27 @@ export function TravelTips({ mode }: { readonly mode: string }) {
   else if (hour < 16) tip = t("route.tipMidday");
   else tip = t("route.tipEvening");
 
+  const handleVote = (newVote: "up" | "down") => {
+    const selected = vote === newVote ? null : newVote;
+    setVote(selected);
+    // Send feedback to improve predictions
+    if (selected) {
+      try {
+        const AI_URL_VAL = import.meta.env.VITE_AI_URL || import.meta.env.VITE_API_URL || "";
+        fetch(`${AI_URL_VAL}/incidents`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: selected === "up" ? "route_accurate" : "route_inaccurate",
+            lat: 0,
+            lng: 0,
+            description: `User rated route prediction as ${selected}`,
+          }),
+        }).catch(() => {});
+      } catch { /* ignore */ }
+    }
+  };
+
   return (
     <>
       <div className="px-3 py-2 rounded-lg bg-blue-500/5 border border-blue-500/10">
@@ -484,7 +505,7 @@ export function TravelTips({ mode }: { readonly mode: string }) {
         <div className="flex gap-2">
           <button
             className="p-1.5 rounded-full hover:bg-success/20 transition-colors"
-            onClick={() => setVote(vote === "up" ? null : "up")}
+            onClick={() => handleVote("up")}
           >
             <ThumbsUp
               size={14}
@@ -494,7 +515,7 @@ export function TravelTips({ mode }: { readonly mode: string }) {
           </button>
           <button
             className="p-1.5 rounded-full hover:bg-danger/20 transition-colors"
-            onClick={() => setVote(vote === "down" ? null : "down")}
+            onClick={() => handleVote("down")}
           >
             <ThumbsDown
               size={14}
@@ -511,6 +532,20 @@ export function TravelTips({ mode }: { readonly mode: string }) {
 
 function TuLlaveCard() {
   const { t } = useTranslation();
+  // Calculate estimated balance from saved trips today
+  const tripsToday = (() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("movicol_trips_today") || "{}");
+      const today = new Date().toISOString().slice(0, 10);
+      if (saved.date !== today) return 0;
+      return saved.count || 0;
+    } catch { return 0; }
+  })();
+  const FARE = 3550;
+  const INITIAL_BALANCE = 20000; // Assumed initial load
+  const balance = Math.max(0, INITIAL_BALANCE - tripsToday * FARE);
+  const tripsRemaining = Math.floor(balance / FARE);
+
   return (
     <GlassCard>
       <div className="flex items-center justify-between">
@@ -525,11 +560,15 @@ function TuLlaveCard() {
           <div>
             <p className="text-[10px] font-semibold">{t("route.tullave")}</p>
             <p className="text-[9px] text-default-400">
-              {t("route.estimatedBalance")}
+              {tripsRemaining > 0
+                ? `~${tripsRemaining} viajes restantes`
+                : "Recarga tu tarjeta"}
             </p>
           </div>
         </div>
-        <p className="text-sm font-bold text-success">$12,050</p>
+        <p className={`text-sm font-bold ${balance > FARE ? "text-success" : "text-danger"}`}>
+          ${balance.toLocaleString("es-CO")}
+        </p>
       </div>
     </GlassCard>
   );
