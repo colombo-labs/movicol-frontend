@@ -68,7 +68,7 @@ export function PermissionsTab({
   };
 
   const remove = async (id: number) => {
-    await fetch(`/api/admin/permissions/${id}`, { method: "DELETE" });
+    await authFetch(`/admin/permissions/${id}`, { method: "DELETE" });
     load();
   };
 

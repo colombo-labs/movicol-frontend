@@ -75,7 +75,7 @@ export function UsersTab() {
     setEditing(false);
     setDraftRoleId(user.roleId);
     setDraftActive(user.isActive);
-    const res = await fetch(`/api/admin/users/${user.id}/permissions`);
+    const res = await authFetch(`/admin/users/${user.id}/permissions`);
     if (res.ok) {
       const data = await res.json();
       setUserPerms(data);
@@ -100,7 +100,7 @@ export function UsersTab() {
     if (!selectedUser) return;
     // Save role if changed
     if (draftRoleId !== selectedUser.roleId) {
-      await fetch(`/api/admin/users/${selectedUser.id}/role`, {
+      await authFetch(`/admin/users/${selectedUser.id}/role`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roleId: draftRoleId }),
@@ -108,12 +108,12 @@ export function UsersTab() {
     }
     // Save status if changed
     if (draftActive !== selectedUser.isActive) {
-      await fetch(`/api/admin/users/${selectedUser.id}/status`, {
+      await authFetch(`/admin/users/${selectedUser.id}/status`, {
         method: "PATCH",
       });
     }
     // Save extra perms
-    await fetch(`/api/admin/users/${selectedUser.id}/permissions`, {
+    await authFetch(`/admin/users/${selectedUser.id}/permissions`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ permissionIds: draftExtraPerms }),
@@ -121,7 +121,7 @@ export function UsersTab() {
     setEditing(false);
     load();
     // Refresh user data
-    const res = await fetch(`/api/admin/users/${selectedUser.id}/permissions`);
+    const res = await authFetch(`/admin/users/${selectedUser.id}/permissions`);
     if (res.ok) setUserPerms(await res.json());
     setSelectedUser((u) =>
       u

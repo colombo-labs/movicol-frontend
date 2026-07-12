@@ -81,7 +81,7 @@ export function RolesTab({
 
   const saveChanges = async () => {
     if (!selectedRole) return;
-    await fetch(`/api/admin/roles/${selectedRole.id}/permissions`, {
+    await authFetch(`/admin/roles/${selectedRole.id}/permissions`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ permissionIds: draftPerms }),
@@ -92,7 +92,7 @@ export function RolesTab({
 
   const deleteRole = async () => {
     if (!selectedRole) return;
-    await fetch(`/api/admin/roles/${selectedRole.id}`, { method: "DELETE" });
+    await authFetch(`/admin/roles/${selectedRole.id}`, { method: "DELETE" });
     setSelectedRole(null);
     load();
   };
