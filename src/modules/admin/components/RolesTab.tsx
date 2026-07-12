@@ -1,8 +1,9 @@
-import { API_URL } from "@/shared/config";
+import { authFetch } from "@/shared/api/auth-fetch";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { Trash2, X, Search, Shield, Edit2 } from "lucide-react";
 import { useEscClose } from "../hooks/useEscClose";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 interface Permission {
   id: number;
@@ -28,6 +29,7 @@ export function RolesTab({
   readonly onCloseCreate: () => void;
 }) {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [roles, setRoles] = useState<Role[]>([]);
   const [allPerms, setAllPerms] = useState<Permission[]>([]);
   const [search, setSearch] = useState("");
@@ -42,21 +44,22 @@ export function RolesTab({
   useEscClose(showCreate, onCloseCreate);
 
   const load = () => {
-    fetch(`${API_URL}/admin/roles`)
+    if (!isAuthenticated) return;
+    authFetch("/admin/roles")
       .then((r) => (r.ok ? r.json() : []))
       .then(setRoles);
-    fetch(`${API_URL}/admin/permissions`)
+    authFetch("/admin/permissions")
       .then((r) => (r.ok ? r.json() : []))
       .then(setAllPerms);
   };
 
   useEffect(() => {
     load();
-  }, []);
+  }, [isAuthenticated]);
 
   const createRole = async () => {
     if (!newName.trim()) return;
-    await fetch(`${API_URL}/admin/roles`, {
+    await authFetch("/admin/roles", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -23,6 +23,7 @@ import {
   DraggableMarker,
   FitRouteBounds,
   InvalidateSize,
+  UserLocationLayer,
   MapClickHandler,
 } from "./map-components/helpers";
 
@@ -119,6 +120,7 @@ export function MapView({
         />
         <ZoomControl position="topright" />
         <InvalidateSize />
+        <UserLocationLayer />
         <MapClickHandler
           onClick={(lat, lng) => onMapClick?.(lat, lng)}
           active={!!predictionMode}

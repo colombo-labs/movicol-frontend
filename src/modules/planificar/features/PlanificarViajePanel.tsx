@@ -11,6 +11,7 @@ import type {
 } from "../models/types";
 import { TripPointsList } from "../components/ui/TripPointsList";
 import { EmptyState } from "../components/ui/EmptyState";
+import { NavigationMode } from "../components/widgets/NavigationMode";
 import {
   ModeTabs,
   RouteOptionsList,
@@ -49,13 +50,18 @@ export function PlanificarViajePanel({
   onRequestAddPoint,
   onSelectRoute,
   selectedRouteIdx,
+  onViewFullMap,
 }: PlanificarProps) {
   const { t } = useTranslation();
   const [mode, setMode] = useState<TransportMode>("publico");
   const temp = useWeather();
   const [departureType, setDepartureType] = useState<DepartureType>("ahora");
   const [departureTime, setDepartureTime] = useState("");
+  const [departureDate, setDepartureDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
+  const [navigating, setNavigating] = useState(false);
 
   // Sync from map selection
   useEffect(() => {
@@ -80,9 +86,7 @@ export function PlanificarViajePanel({
     prevPointsRef.current = key;
     const dt =
       departureType === "programar" && departureTime
-        ? new Date(
-            `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
-          ).toISOString()
+        ? new Date(`${departureDate}T${departureTime}:00`).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
@@ -92,9 +96,7 @@ export function PlanificarViajePanel({
     if (!origin || !destination) return;
     const dt =
       departureType === "programar" && departureTime
-        ? new Date(
-            `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
-          ).toISOString()
+        ? new Date(`${departureDate}T${departureTime}:00`).toISOString()
         : new Date().toISOString();
     setSelectedOptionId(null);
     onPredictMulti?.(origin, destination, mode, dt);
@@ -106,9 +108,7 @@ export function PlanificarViajePanel({
     if (origin && destination) {
       const dt =
         departureType === "programar" && departureTime
-          ? new Date(
-              `${new Date().toISOString().slice(0, 10)}T${departureTime}:00`,
-            ).toISOString()
+          ? new Date(`${departureDate}T${departureTime}:00`).toISOString()
           : new Date().toISOString();
       onPredictMulti?.(origin, destination, newMode, dt);
     }
@@ -132,177 +132,228 @@ export function PlanificarViajePanel({
   };
 
   return (
-    <div className="space-y-3">
-      <TripPointsList
-        tripPoints={tripPoints}
-        mode={mode}
-        onRemovePoint={onRemovePoint}
-        onUseMyLocation={onUseMyLocation}
-        onSwapPoints={onSwapPoints}
-        onClear={onClear}
-        onAddPoint={onAddPoint}
-        onUpdatePoint={onUpdatePoint}
-        onRequestAddPoint={onRequestAddPoint}
-      />
-
-      <EmptyState
-        tripPoints={tripPoints}
-        onUseMyLocation={onUseMyLocation}
-        onAddPoint={onAddPoint}
-      />
-
-      {/* Departure time */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Clock size={13} className="text-default-400 shrink-0" />
-        <button
-          onClick={() => setDepartureType("ahora")}
-          className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "ahora" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
-        >
-          {t("planner.departNow")}
-        </button>
-        <button
-          onClick={() => setDepartureType("programar")}
-          className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "programar" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
-        >
-          {t("planner.schedule")}
-        </button>
-        {departureType === "programar" && (
-          <input
-            type="time"
-            value={departureTime}
-            onChange={(e) => {
-              setDepartureTime(e.target.value);
-              if (e.target.value && origin && destination) {
-                const dt = new Date(
-                  `2026-06-12T${e.target.value}:00`,
-                ).toISOString();
-                setSelectedOptionId(null);
-                onPredictMulti?.(origin, destination, mode, dt);
-              }
-            }}
-            className="px-2 py-0.5 rounded-lg bg-default-100 border border-divider text-[10px] outline-none text-foreground"
-          />
-        )}
-      </div>
-
-      {/* Recalculate button */}
-      {tripPoints.length >= 2 && !isLoading && (
-        <button
-          onClick={handleSearch}
-          className="w-full py-1.5 rounded-lg border border-primary/30 text-primary text-[10px] font-medium flex items-center justify-center gap-1.5 hover:bg-primary/5 transition-all"
-        >
-          <Navigation size={10} /> {t("planner.recalculate")}
-        </button>
+    <>
+      {navigating && selectedOption && (
+        <NavigationMode
+          prediction={selectedOption.prediction}
+          onExit={() => setNavigating(false)}
+        />
       )}
+      <div className="space-y-3">
+        <TripPointsList
+          tripPoints={tripPoints}
+          mode={mode}
+          onRemovePoint={onRemovePoint}
+          onUseMyLocation={onUseMyLocation}
+          onSwapPoints={onSwapPoints}
+          onClear={onClear}
+          onAddPoint={onAddPoint}
+          onUpdatePoint={onUpdatePoint}
+          onRequestAddPoint={onRequestAddPoint}
+        />
 
-      {/* Loading */}
-      {isLoading && <RouteSkeleton />}
+        <EmptyState
+          tripPoints={tripPoints}
+          onUseMyLocation={onUseMyLocation}
+          onAddPoint={onAddPoint}
+        />
 
-      {/* Error */}
-      {error && (
-        <div className="flex items-start gap-2 p-2.5 rounded-xl bg-danger/10 border border-danger/20">
-          <AlertCircle size={12} className="text-danger mt-0.5 shrink-0" />
-          <p className="text-[10px] text-danger">{error}</p>
-        </div>
-      )}
-
-      {/* Rush hour */}
-      {options &&
-        (() => {
-          const hour = new Date().getHours();
-          if (!((hour >= 6 && hour <= 9) || (hour >= 17 && hour <= 20)))
-            return null;
-          return (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-warning/10 border border-warning/20">
-              <Clock size={12} className="text-warning shrink-0" />
-              <div>
-                <p className="text-[10px] text-warning font-semibold">
-                  Hora pico activa
-                </p>
-                <p className="text-[9px] text-warning/70">
-                  El tiempo puede ser mayor al estimado
-                </p>
-              </div>
+        {/* Departure time */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <Clock size={13} className="text-default-400 shrink-0" />
+          <button
+            onClick={() => setDepartureType("ahora")}
+            className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "ahora" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
+          >
+            {t("planner.departNow")}
+          </button>
+          <button
+            onClick={() => setDepartureType("programar")}
+            className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${departureType === "programar" ? "bg-primary/20 text-primary" : "bg-default-100 text-default-500"}`}
+          >
+            {t("planner.schedule")}
+          </button>
+          {departureType === "programar" && (
+            <div className="flex items-center gap-1.5">
+              <input
+                type="date"
+                value={departureDate}
+                min={new Date().toISOString().slice(0, 10)}
+                onChange={(e) => {
+                  setDepartureDate(e.target.value);
+                  if (departureTime && origin && destination) {
+                    const dt = new Date(
+                      `${e.target.value}T${departureTime}:00`,
+                    ).toISOString();
+                    setSelectedOptionId(null);
+                    onPredictMulti?.(origin, destination, mode, dt);
+                  }
+                }}
+                className="px-2 py-0.5 rounded-lg bg-default-100 border border-divider text-[10px] outline-none text-foreground"
+              />
+              <input
+                type="time"
+                value={departureTime}
+                onChange={(e) => {
+                  setDepartureTime(e.target.value);
+                  if (e.target.value && origin && destination) {
+                    const date =
+                      departureDate || new Date().toISOString().slice(0, 10);
+                    const dt = new Date(
+                      `${date}T${e.target.value}:00`,
+                    ).toISOString();
+                    setSelectedOptionId(null);
+                    onPredictMulti?.(origin, destination, mode, dt);
+                  }
+                }}
+                className="px-2 py-0.5 rounded-lg bg-default-100 border border-divider text-[10px] outline-none text-foreground"
+              />
             </div>
-          );
-        })()}
-
-      {/* Results */}
-      {options && (
-        <div className="space-y-2.5">
-          <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-default-100/50 text-[9px] text-default-400">
-            <span>{temp ?? "..."}°C Bogotá</span>
-            <span>{t("metrics.liveData")}</span>
-            <span>
-              {new Date().toLocaleTimeString("es-CO", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-          </div>
-
-          <ModeTabs
-            mode={mode}
-            onModeChange={handleModeChange}
-            optionsCount={options.length}
-          />
-
-          <RouteOptionsList
-            options={options}
-            selectedId={selectedOptionId}
-            onSelect={handleSelectOption}
-          />
-
-          {/* Detalle de la opción seleccionada */}
-          {selectedOption && (
-            <>
-              <SelectedRouteDetail option={selectedOption} />
-              <EcoInfo prediction={selectedOption.prediction} />
-              <CongestionBar prediction={selectedOption.prediction} />
-              {mode === "publico" && (
-                <WaitEstimation prediction={selectedOption.prediction} />
-              )}
-              <RouteAlerts prediction={selectedOption.prediction} />
-              {mode === "publico" &&
-                selectedOption.prediction.stations.length > 0 && (
-                  <NavigationSteps
-                    prediction={selectedOption.prediction}
-                    mode={
-                      selectedOption.prediction.mode === "sitp"
-                        ? "sitp"
-                        : "transmilenio"
-                    }
-                    getETA={getETA}
-                  />
-                )}
-              {mode === "vehiculo" &&
-                selectedOption.prediction.navigation_steps &&
-                selectedOption.prediction.navigation_steps.length > 0 && (
-                  <VehicleNavSteps
-                    steps={selectedOption.prediction.navigation_steps}
-                    getETA={getETA}
-                  />
-                )}
-              <NearDestination
-                destLat={destination?.lat}
-                destLng={destination?.lng}
-              />
-              <ActionButtons
-                prediction={selectedOption.prediction}
-                tripPoints={tripPoints}
-                onClear={onClear}
-              />
-              <QuickActions onFocusMap={() => {}} />
-              <TravelTips
-                mode={mode === "publico" ? "transmilenio" : "vehiculo"}
-              />
-              {selectedOption.prediction.stations.length > 0 && (
-                <StationsList prediction={selectedOption.prediction} />
-              )}
-            </>
           )}
         </div>
-      )}
-    </div>
+
+        {/* Retry button — only shows when there was an error */}
+        {tripPoints.length >= 2 && !isLoading && error && (
+          <button
+            onClick={handleSearch}
+            className="w-full py-2 rounded-lg border border-primary/30 bg-primary/5 text-primary text-[10px] font-medium flex items-center justify-center gap-1.5 hover:bg-primary/10 transition-all active:scale-[0.98]"
+          >
+            <Navigation size={10} /> {t("planner.retry", "Reintentar")}
+          </button>
+        )}
+
+        {/* Loading */}
+        {isLoading && <RouteSkeleton />}
+
+        {/* Error */}
+        {error && (
+          <div className="flex items-start gap-2 p-2.5 rounded-xl bg-danger/10 border border-danger/20">
+            <AlertCircle size={12} className="text-danger mt-0.5 shrink-0" />
+            <p className="text-[10px] text-danger">{error}</p>
+          </div>
+        )}
+
+        {/* Rush hour */}
+        {options &&
+          (() => {
+            const hour = new Date().getHours();
+            if (!((hour >= 6 && hour <= 9) || (hour >= 17 && hour <= 20)))
+              return null;
+            return (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-warning/10 border border-warning/20">
+                <Clock size={12} className="text-warning shrink-0" />
+                <div>
+                  <p className="text-[10px] text-warning font-semibold">
+                    Hora pico activa
+                  </p>
+                  <p className="text-[9px] text-warning/70">
+                    El tiempo puede ser mayor al estimado
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
+
+        {/* Results */}
+        {options && (
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-default-100/50 text-[9px] text-default-400">
+              <span>{temp ?? "..."}°C Bogotá</span>
+              <span>{t("metrics.liveData")}</span>
+              <span>
+                {new Date().toLocaleTimeString("es-CO", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+
+            <ModeTabs
+              mode={mode}
+              onModeChange={handleModeChange}
+              optionsCount={options.length}
+            />
+
+            <RouteOptionsList
+              options={options}
+              selectedId={selectedOptionId}
+              onSelect={handleSelectOption}
+            />
+
+            {/* Detalle de la opción seleccionada */}
+            {selectedOption && (
+              <>
+                <SelectedRouteDetail option={selectedOption} />
+                <EcoInfo prediction={selectedOption.prediction} />
+                <CongestionBar prediction={selectedOption.prediction} />
+                {mode === "publico" && (
+                  <WaitEstimation prediction={selectedOption.prediction} />
+                )}
+                <RouteAlerts prediction={selectedOption.prediction} />
+                {mode === "publico" &&
+                  selectedOption.prediction.stations.length > 0 && (
+                    <NavigationSteps
+                      prediction={selectedOption.prediction}
+                      mode={
+                        selectedOption.prediction.mode === "sitp"
+                          ? "sitp"
+                          : "transmilenio"
+                      }
+                      getETA={getETA}
+                    />
+                  )}
+                {mode === "vehiculo" &&
+                  selectedOption.prediction.navigation_steps &&
+                  selectedOption.prediction.navigation_steps.length > 0 && (
+                    <VehicleNavSteps
+                      steps={selectedOption.prediction.navigation_steps}
+                      getETA={getETA}
+                    />
+                  )}
+                <NearDestination
+                  destLat={destination?.lat}
+                  destLng={destination?.lng}
+                />
+                <ActionButtons
+                  prediction={selectedOption.prediction}
+                  tripPoints={tripPoints}
+                  onClear={onClear}
+                  onStartNavigation={() => {
+                    setNavigating(true);
+                    // Increment trip counter for TuLlave balance estimation
+                    const today = new Date().toISOString().slice(0, 10);
+                    const saved = JSON.parse(
+                      localStorage.getItem("movicol_trips_today") || "{}",
+                    );
+                    if (saved.date === today) {
+                      saved.count = (saved.count || 0) + 1;
+                    } else {
+                      saved.date = today;
+                      saved.count = 1;
+                    }
+                    localStorage.setItem(
+                      "movicol_trips_today",
+                      JSON.stringify(saved),
+                    );
+                  }}
+                />
+                <QuickActions
+                  onViewFullMap={onViewFullMap}
+                  destinationName={destination?.label}
+                  destinationLat={destination?.lat}
+                  destinationLng={destination?.lng}
+                />
+                <TravelTips
+                  mode={mode === "publico" ? "transmilenio" : "vehiculo"}
+                />
+                {selectedOption.prediction.stations.length > 0 && (
+                  <StationsList prediction={selectedOption.prediction} />
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

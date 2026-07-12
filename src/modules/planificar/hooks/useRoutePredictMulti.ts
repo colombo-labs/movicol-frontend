@@ -151,6 +151,7 @@ function addSitpOptions(
 function buildOptions(
   tm: RoutePrediction | null,
   sitp: RoutePrediction | null,
+  multimodal: RoutePrediction | null,
   origin: Coordinates,
   destination: Coordinates,
 ): RouteOption[] {
@@ -161,7 +162,6 @@ function buildOptions(
     destination.lat,
     destination.lng ?? destination.lon ?? 0,
   );
-  const walkTime = Math.round(dist * 0.15 * 12);
 
   if (tm && tm.stations.length > 0) {
     addTmOptions(options, tm, dist);
@@ -171,113 +171,24 @@ function buildOptions(
     addSitpOptions(options, sitp, tm, dist);
   }
 
-  if (tm && sitp && tm.stations.length > 1 && sitp.stations.length > 1) {
-    const tmC = deriveLineName(tm);
-    const sitpC = deriveLineName(sitp);
-    if (tmC !== sitpC) {
-      options.push(buildCombinedOption(tm, sitp, dist, walkTime));
-    }
+  // Use real multimodal prediction from backend (real transfers, real geometry)
+  if (multimodal && multimodal.stations.length > 0) {
+    const mmCode = deriveLineName(multimodal);
+    options.push(
+      predictionToOption(
+        multimodal,
+        "multimodal",
+        mmCode ? `TM+SITP ${mmCode}` : "TM + SITP",
+        dist,
+        "cheapest",
+      ),
+    );
   }
 
   options.sort((a, b) => a.total_time_minutes - b.total_time_minutes);
   if (options.length > 0) options[0].tag = "fastest";
 
   return options;
-}
-
-function buildCombinedOption(
-  tm: RoutePrediction,
-  sitp: RoutePrediction,
-  dist: number,
-  walkTime: number,
-): RouteOption {
-  const tmHalf = Math.ceil(tm.stations.length / 2);
-  const transferStation = tm.stations[tmHalf - 1];
-  const combinedTime = Math.round(
-    tm.total_time_minutes * 0.6 + sitp.total_time_minutes * 0.5 + 5,
-  );
-  const combinedDist =
-    tm.total_distance_km * 0.6 + sitp.total_distance_km * 0.5;
-  const tmC = deriveLineName(tm);
-  const sitpC = deriveLineName(sitp);
-
-  const tmSegHalf = Math.ceil(tm.risk_segments.length / 2);
-  const combinedPrediction: RoutePrediction = {
-    route_id: `combined-${tm.route_id}-${sitp.route_id}`,
-    total_time_minutes: combinedTime,
-    total_distance_km: combinedDist,
-    cost: "$3.550",
-    mode: "combined",
-    risk_segments: [
-      ...tm.risk_segments.slice(0, tmSegHalf),
-      ...sitp.risk_segments,
-    ],
-    overall_risk: tm.overall_risk,
-    safety_score: Math.round((tm.safety_score + sitp.safety_score) / 2),
-    explanation: "",
-    stations: [...tm.stations.slice(0, tmHalf), ...sitp.stations],
-    departure_time: tm.departure_time,
-    route_code: `${tmC}+${sitpC}`,
-    transfers: 1,
-    estimated_wait_minutes: Math.max(
-      tm.estimated_wait_minutes ?? 0,
-      sitp.estimated_wait_minutes ?? 0,
-    ),
-    alternatives: [],
-  };
-
-  return {
-    id: "tm-sitp-transfer",
-    label:
-      "TM" + (tmC ? " " + tmC : "") + " + SITP" + (sitpC ? " " + sitpC : ""),
-    total_time_minutes: combinedTime,
-    total_distance_km: combinedDist,
-    cost: "$3.550",
-    transfers: 1,
-    legs: [
-      {
-        type: "walk",
-        from: "Tu ubicación",
-        to: tm.stations[0],
-        duration_minutes: walkTime,
-        distance_km: dist * 0.15,
-      },
-      {
-        type: "transmilenio",
-        from: tm.stations[0],
-        to: transferStation,
-        duration_minutes: Math.round(tm.total_time_minutes * 0.5),
-        distance_km: tm.total_distance_km * 0.5,
-        stations: tm.stations.slice(0, tmHalf),
-        line: tmC || "TM",
-      },
-      {
-        type: "walk",
-        from: transferStation,
-        to: sitp.stations[0],
-        duration_minutes: 5,
-        distance_km: 0.3,
-      },
-      {
-        type: "sitp",
-        from: sitp.stations[0],
-        to: sitp.stations[sitp.stations.length - 1],
-        duration_minutes: Math.round(sitp.total_time_minutes * 0.5),
-        distance_km: sitp.total_distance_km * 0.5,
-        stations: sitp.stations,
-        line: sitpC || "SITP",
-      },
-      {
-        type: "walk",
-        from: sitp.stations[sitp.stations.length - 1],
-        to: "Destino",
-        duration_minutes: Math.round(walkTime * 0.5),
-        distance_km: dist * 0.05,
-      },
-    ],
-    prediction: combinedPrediction,
-    tag: "cheapest",
-  };
 }
 
 function buildSimpleVehicleOptions(results: RoutePrediction[]): RouteOption[] {
@@ -405,28 +316,37 @@ async function fetchVehicleRoute(
 async function fetchTransitRoute(
   params: PredictMultiParams,
 ): Promise<RouteOption[]> {
-  const [tmResult, sitpResult, rutasCercanasResult] = await Promise.allSettled([
-    routePredictionApi.predict({
-      origin: params.origin,
-      destination: params.destination,
-      departure_time: params.departureTime,
-      mode: "transmilenio",
-    }),
-    routePredictionApi.predict({
-      origin: params.origin,
-      destination: params.destination,
-      departure_time: params.departureTime,
-      mode: "sitp",
-    }),
-    fetchRutasCercanas(
-      params.origin.lat,
-      params.origin.lng ?? params.origin.lon ?? 0,
-      800,
-    ),
-  ]);
+  const [tmResult, sitpResult, multimodalResult, rutasCercanasResult] =
+    await Promise.allSettled([
+      routePredictionApi.predict({
+        origin: params.origin,
+        destination: params.destination,
+        departure_time: params.departureTime,
+        mode: "transmilenio",
+      }),
+      routePredictionApi.predict({
+        origin: params.origin,
+        destination: params.destination,
+        departure_time: params.departureTime,
+        mode: "sitp",
+      }),
+      routePredictionApi.predict({
+        origin: params.origin,
+        destination: params.destination,
+        departure_time: params.departureTime,
+        mode: "multimodal",
+      }),
+      fetchRutasCercanas(
+        params.origin.lat,
+        params.origin.lng ?? params.origin.lon ?? 0,
+        800,
+      ),
+    ]);
 
   const tm = tmResult.status === "fulfilled" ? tmResult.value : null;
   let sitp = sitpResult.status === "fulfilled" ? sitpResult.value : null;
+  const multimodal =
+    multimodalResult.status === "fulfilled" ? multimodalResult.value : null;
 
   if (sitp && !sitp.route_code) {
     const cercanas =
@@ -438,13 +358,13 @@ async function fetchTransitRoute(
     }
   }
 
-  if (!tm && !sitp) {
+  if (!tm && !sitp && !multimodal) {
     throw new Error(
       "No se encontraron rutas de transporte público para este trayecto",
     );
   }
 
-  return buildOptions(tm, sitp, params.origin, params.destination);
+  return buildOptions(tm, sitp, multimodal, params.origin, params.destination);
 }
 
 export function useRoutePredictMulti() {
@@ -471,7 +391,19 @@ export function useRoutePredictMulti() {
       }
     } catch (err) {
       if (!cancelledRef.current) {
-        setError(err instanceof Error ? err.message : "Error al buscar rutas");
+        const message = err instanceof Error ? err.message : "";
+        if (
+          message.includes("Failed to fetch") ||
+          message.includes("NetworkError")
+        ) {
+          setError(
+            "Sin conexión al servidor. Verifica tu internet e intenta de nuevo.",
+          );
+        } else if (message.includes("No se encontraron rutas")) {
+          setError(message);
+        } else {
+          setError("No pudimos calcular la ruta. Intenta con otros puntos.");
+        }
         setOptions(null);
         setIsLoading(false);
       }

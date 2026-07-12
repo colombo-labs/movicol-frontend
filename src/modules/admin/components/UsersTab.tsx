@@ -1,9 +1,10 @@
-import { API_URL } from "@/shared/config";
+import { authFetch } from "@/shared/api/auth-fetch";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState, useCallback } from "react";
 import { Search, Shield, X, Edit2 } from "lucide-react";
 import { Select, SelectItem } from "@heroui/react";
 import { useEscClose } from "../hooks/useEscClose";
+import { useAuth } from "@/shared/hooks/useAuth";
 
 interface User {
   id: string;
@@ -29,6 +30,7 @@ interface Permission {
 
 export function UsersTab() {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [allPerms, setAllPerms] = useState<Permission[]>([]);
@@ -48,20 +50,21 @@ export function UsersTab() {
   useEscClose(!!selectedUser, closeModal);
 
   const load = () => {
-    fetch(`${API_URL}/admin/users`)
+    if (!isAuthenticated) return;
+    authFetch("/admin/users")
       .then((r) => (r.ok ? r.json() : []))
       .then(setUsers);
-    fetch(`${API_URL}/admin/roles`)
+    authFetch("/admin/roles")
       .then((r) => (r.ok ? r.json() : []))
       .then(setRoles);
-    fetch(`${API_URL}/admin/permissions`)
+    authFetch("/admin/permissions")
       .then((r) => (r.ok ? r.json() : []))
       .then(setAllPerms);
   };
 
   useEffect(() => {
     load();
-  }, []);
+  }, [isAuthenticated]);
 
   const [draftRoleId, setDraftRoleId] = useState<number>(0);
   const [draftActive, setDraftActive] = useState<boolean>(true);

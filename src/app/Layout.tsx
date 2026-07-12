@@ -89,6 +89,9 @@ export function Layout() {
     useRoutePredictMulti();
   const [selectedRouteIdx, setSelectedRouteIdx] = useState(0);
   const [addingPoint, setAddingPoint] = useState(false);
+  const [panelSnap, setPanelSnap] = useState<"peek" | "half" | "full" | null>(
+    null,
+  );
 
   const togglePanel = useCallback(
     (id: PanelId) => {
@@ -240,6 +243,7 @@ export function Layout() {
                 handleClearPrediction();
               }}
               title={t("nav.planificar")}
+              snapOverride={panelSnap}
             >
               <PlanificarViajePanel
                 onPredictMulti={handlePredict}
@@ -256,6 +260,7 @@ export function Layout() {
                 onRequestAddPoint={() => setAddingPoint(true)}
                 onSelectRoute={(idx: number) => setSelectedRouteIdx(idx)}
                 selectedRouteIdx={selectedRouteIdx}
+                onViewFullMap={() => setPanelSnap("peek")}
               />
             </SidePanel>
             <SidePanel

@@ -1,4 +1,4 @@
-import { API_URL } from "@/shared/config";
+import { authFetch } from "@/shared/api/auth-fetch";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -16,7 +16,7 @@ export function useFavorites() {
 
   const load = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch(`${API_URL}/user/favorites`);
+    const res = await authFetch("/user/favorites");
     if (res.ok) setFavorites(await res.json());
   }, [isAuthenticated]);
 
@@ -30,9 +30,8 @@ export function useFavorites() {
     data: Record<string, unknown>,
   ) => {
     if (!isAuthenticated) return null;
-    const res = await fetch(`${API_URL}/user/favorites`, {
+    const res = await authFetch("/user/favorites", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type, label, data }),
     });
     if (res.ok) {
@@ -43,7 +42,8 @@ export function useFavorites() {
   };
 
   const removeFavorite = async (id: string) => {
-    await fetch(`/api/user/favorites/${id}`, { method: "DELETE" });
+    if (!isAuthenticated) return;
+    await authFetch(`/user/favorites/${id}`, { method: "DELETE" });
     load();
   };
 

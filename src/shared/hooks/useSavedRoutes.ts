@@ -1,4 +1,4 @@
-import { API_URL } from "@/shared/config";
+import { authFetch } from "@/shared/api/auth-fetch";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./useAuth";
 
@@ -21,7 +21,7 @@ export function useSavedRoutes() {
 
   const fetch_ = useCallback(async () => {
     if (!isAuthenticated) return;
-    const res = await fetch(`${API_URL}/saved-routes`);
+    const res = await authFetch("/saved-routes");
     if (res.ok) {
       const data = await res.json();
       setRoutes(
@@ -41,9 +41,9 @@ export function useSavedRoutes() {
   }, [fetch_]);
 
   const save = async (data: Omit<SavedRoute, "id" | "createdAt">) => {
-    const res = await fetch(`${API_URL}/saved-routes`, {
+    if (!isAuthenticated) return null;
+    const res = await authFetch("/saved-routes", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     if (res.ok) {
@@ -55,7 +55,8 @@ export function useSavedRoutes() {
   };
 
   const remove = async (id: string) => {
-    await fetch(`/api/saved-routes/${id}`, { method: "DELETE" });
+    if (!isAuthenticated) return;
+    await authFetch(`/saved-routes/${id}`, { method: "DELETE" });
     setRoutes((prev) => prev.filter((r) => r.id !== id));
   };
 

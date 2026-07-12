@@ -16,13 +16,22 @@ function getHeatColor(norm: number): string {
   return "#22c55e";
 }
 
+// Module-level cache
+let cachedSiniestros: SiniestroPoint[] | null = null;
+
 export function SiniestroLayer() {
-  const [points, setPoints] = useState<SiniestroPoint[]>([]);
+  const [points, setPoints] = useState<SiniestroPoint[]>(
+    cachedSiniestros || [],
+  );
 
   useEffect(() => {
-    fetch(`${API_URL}/graph/siniestralidad/heatmap`)
+    if (cachedSiniestros) return;
+    fetch(`${API_URL}/siniestralidad/heatmap`)
       .then((r) => r.json())
-      .then((data) => setPoints(Array.isArray(data) ? data : []))
+      .then((data) => {
+        cachedSiniestros = Array.isArray(data) ? data : [];
+        setPoints(cachedSiniestros);
+      })
       .catch(() => {});
   }, []);
 
@@ -33,29 +42,31 @@ export function SiniestroLayer() {
 
   return (
     <>
-      {points.map((p) => {
-        const norm = p.intensity / maxIntensity;
-        return (
-          <CircleMarker
-            key={`${p.lat}-${p.lon}`}
-            center={[p.lat, p.lon]}
-            radius={4 + norm * 8}
-            pathOptions={{
-              color: "transparent",
-              fillColor: getHeatColor(norm),
-              fillOpacity: 0.3 + norm * 0.4,
-            }}
-          >
-            <Tooltip>
-              <div className="text-xs">
-                <p className="font-semibold">{p.paradero}</p>
-                <p>{p.localidad}</p>
-                <p>Intensidad: {(p.intensity ?? 0).toFixed(0)} siniestros</p>
-              </div>
-            </Tooltip>
-          </CircleMarker>
-        );
-      })}
+      {points
+        .filter((p) => p.lat != null && p.lon != null)
+        .map((p) => {
+          const norm = p.intensity / maxIntensity;
+          return (
+            <CircleMarker
+              key={`${p.lat}-${p.lon}`}
+              center={[p.lat, p.lon]}
+              radius={4 + norm * 8}
+              pathOptions={{
+                color: "transparent",
+                fillColor: getHeatColor(norm),
+                fillOpacity: 0.3 + norm * 0.4,
+              }}
+            >
+              <Tooltip>
+                <div className="text-xs">
+                  <p className="font-semibold">{p.paradero}</p>
+                  <p>{p.localidad}</p>
+                  <p>Intensidad: {(p.intensity ?? 0).toFixed(0)} siniestros</p>
+                </div>
+              </Tooltip>
+            </CircleMarker>
+          );
+        })}
     </>
   );
 }

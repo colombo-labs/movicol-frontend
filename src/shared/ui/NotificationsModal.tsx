@@ -42,7 +42,7 @@ function NotifItem({ notif }: { readonly notif: AppNotification }) {
           {notif.body}
         </p>
         <p className="text-[9px] text-default-400 mt-0.5">
-          {new Date(notif.createdAt).toLocaleString()}
+          {new Date(notif.created_at).toLocaleString()}
         </p>
       </div>
     </div>

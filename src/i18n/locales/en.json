@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "MoviCol",
-    "subtitle": "Smart transportation",
+    "subtitle": "Smart mobility",
     "version": "v1.0",
     "systemOnline": "System online",
     "connected": "Connected"
@@ -28,7 +28,8 @@
     "city": "City",
     "trips": "Trips",
     "favorites": "Favorites",
-    "reports": "Reports"
+    "reports": "Reports",
+    "install": "Install app"
   },
   "admin": {
     "title": "Administration",

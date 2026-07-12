@@ -16,7 +16,11 @@ function getRiskLabel(risk: string) {
   return "Bajo";
 }
 
-const AI_URL = "http://localhost:8000";
+const AI_URL = import.meta.env.VITE_AI_URL || API_URL;
+
+// Module-level cache: persists across mount/unmount cycles
+let cachedParaderos: any[] | null = null;
+let cachedHeatmap: any[] | null = null;
 
 function ParaderoPopupContent({ id, nombre, direccion, color }: any) {
   const [aiData, setAiData] = useState<any>(null);
@@ -77,14 +81,16 @@ function ParaderoPopupContent({ id, nombre, direccion, color }: any) {
 }
 
 export function SitpLayer() {
-  const [paraderos, setParaderos] = useState<any[]>([]);
+  const [paraderos, setParaderos] = useState<any[]>(cachedParaderos || []);
 
   useEffect(() => {
+    if (cachedParaderos) return; // Already loaded
     fetch(`${API_URL}/graph/sitp/paraderos`)
       .then((r) => (r.ok ? r.json() : { features: [] }))
       .then((d) => {
         const features = d.features || [];
-        setParaderos(features.filter((f: any) => f.geometry));
+        cachedParaderos = features.filter((f: any) => f.geometry);
+        setParaderos(cachedParaderos!);
       })
       .catch(() => {});
   }, []);
@@ -146,13 +152,20 @@ export function CongestionLayer() {
       congestion: number;
       risk: string;
     }[]
-  >([]);
+  >(cachedHeatmap || []);
   useEffect(() => {
+    if (cachedHeatmap) {
+      setStations(cachedHeatmap);
+      return;
+    }
     const hour = new Date().getHours();
     fetch(`${API_URL}/graph/heatmap?hour=${hour}`)
       .then((r) => (r.ok ? r.json() : []))
       .then((d) => {
-        if (Array.isArray(d)) setStations(d);
+        if (Array.isArray(d)) {
+          cachedHeatmap = d;
+          setStations(d);
+        }
       })
       .catch(() => {});
   }, []);

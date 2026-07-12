@@ -13,14 +13,15 @@ interface SidePanelProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
+  snapOverride?: SnapPoint | null;
 }
 
 type SnapPoint = "peek" | "half" | "full";
 
 const SNAP_HEIGHTS: Record<SnapPoint, string> = {
-  peek: "h-[18vh]",
-  half: "h-[50vh]",
-  full: "h-[82vh]",
+  peek: "h-[15vh]",
+  half: "h-[55vh]",
+  full: "h-[85vh]",
 };
 
 export function SidePanel({
@@ -28,11 +29,17 @@ export function SidePanel({
   onClose,
   title,
   children,
+  snapOverride,
 }: SidePanelProps) {
   const startY = useRef(0);
   const [snap, setSnap] = useState<SnapPoint>("half");
   const { t } = useTranslation();
   const [city, setCity] = useState("");
+
+  // External snap control (e.g. "Ver mapa completo" minimizes to peek)
+  useEffect(() => {
+    if (snapOverride) setSnap(snapOverride);
+  }, [snapOverride]);
 
   useEffect(() => {
     if (!navigator.onLine) return;
@@ -175,7 +182,7 @@ export function SidePanel({
 
         {/* Content */}
         <div
-          className={`flex-1 overflow-y-auto overflow-x-hidden p-4 custom-scrollbar overscroll-contain transition-opacity duration-200 ${
+          className={`flex-1 overflow-y-auto overflow-x-hidden p-4 pb-20 md:pb-4 custom-scrollbar overscroll-contain transition-opacity duration-200 ${
             snap === "peek" ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
         >

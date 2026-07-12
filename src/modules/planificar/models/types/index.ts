@@ -61,6 +61,7 @@ export interface PlanificarProps {
   readonly onRequestAddPoint?: () => void;
   readonly onSelectRoute?: (index: number) => void;
   readonly selectedRouteIdx?: number;
+  readonly onViewFullMap?: () => void;
 }
 
 export interface RutaCercana {

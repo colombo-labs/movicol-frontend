@@ -1,7 +1,7 @@
 {
   "app": {
     "name": "MoviCol",
-    "subtitle": "Transporte inteligente",
+    "subtitle": "Movilidad inteligente",
     "version": "v1.0",
     "systemOnline": "Sistema operativo",
     "connected": "Conectado"
@@ -28,7 +28,8 @@
     "city": "Ciudad",
     "trips": "Viajes",
     "favorites": "Favoritos",
-    "reports": "Reportes"
+    "reports": "Reportes",
+    "install": "Instalar app"
   },
   "admin": {
     "title": "Administración",
