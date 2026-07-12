@@ -122,9 +122,27 @@ function addAlternatives(
  * Classify a route prediction automatically based on its segments and transfers.
  * Returns a human-readable label like "Solo TM", "SITP → TM", etc.
  */
+/**
+ * Clean route_code for display:
+ * - Strip "→ Destination" suffix (backend appends it for SITP)
+ * - Remove numeric-only codes that look like internal IDs (e.g. "1-1")
+ * - Keep only the line name/number
+ */
+function cleanRouteCode(code: string, mode: string): string {
+  if (!code) return "";
+  // Strip destination after →
+  let clean = code.split("→")[0].trim();
+  // If it looks like a numeric ID pattern (e.g. "1-1", "3"), ignore for TM
+  if (mode === "transmilenio" && /^\d+(-\d+)?$/.test(clean)) return "";
+  // Truncate if too long
+  if (clean.length > 20) clean = clean.slice(0, 20);
+  return clean;
+}
+
 function classifyRoute(prediction: RoutePrediction): string {
   const segments = prediction.risk_segments || [];
-  const code = prediction.route_code || "";
+  const rawCode = prediction.route_code || "";
+  const code = cleanRouteCode(rawCode, prediction.mode);
 
   // Determine transport modes used (excluding walk segments)
   const transportModes = segments
@@ -136,23 +154,19 @@ function classifyRoute(prediction: RoutePrediction): string {
   const transfers = prediction.transfers ?? 0;
 
   if (transfers === 0) {
-    // Direct route — no transfers
     if (hasTm && !hasSitp) return code ? `Solo TM · ${code}` : "Solo TM";
     if (hasSitp && !hasTm) return code ? `Solo SITP · ${code}` : "Solo SITP";
     if (hasTm && hasSitp) return code ? `TM + SITP · ${code}` : "TM + SITP";
   } else {
-    // Route with transfers — detect type
     if (hasTm && !hasSitp) return code ? `TM → TM · ${code}` : "TM → TM";
     if (hasSitp && !hasTm)
       return code ? `SITP → SITP · ${code}` : "SITP → SITP";
-    // Mixed: determine order (first non-walk segment determines start)
     const firstMode = transportModes[0];
     if (firstMode === "transmilenio")
       return code ? `TM → SITP · ${code}` : "TM → SITP";
     return code ? `SITP → TM · ${code}` : "SITP → TM";
   }
 
-  // Fallback based on backend mode field
   if (prediction.mode === "transmilenio") return code ? `TM · ${code}` : "TM";
   if (prediction.mode === "sitp") return code ? `SITP · ${code}` : "SITP";
   return code ? `TM + SITP · ${code}` : "TM + SITP";
