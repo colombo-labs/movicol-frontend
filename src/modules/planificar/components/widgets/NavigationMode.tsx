@@ -60,7 +60,9 @@ function haversineM(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function extractRouteCoords(segments: RoutePrediction["risk_segments"]): [number, number][] {
+function extractRouteCoords(
+  segments: RoutePrediction["risk_segments"],
+): [number, number][] {
   const coords: [number, number][] = [];
   for (const seg of segments || []) {
     for (const c of seg.coordinates || []) coords.push([c[0], c[1]]);
@@ -127,14 +129,23 @@ function RouteMapView({
         {routeCoords.length > 0 && (
           <Polyline
             positions={routeCoords}
-            pathOptions={{ color: routeColor, weight: routeWeight, opacity: 0.9 }}
+            pathOptions={{
+              color: routeColor,
+              weight: routeWeight,
+              opacity: 0.9,
+            }}
           />
         )}
         {userPos && (
           <CircleMarker
             center={[userPos.lat, userPos.lng]}
             radius={10}
-            pathOptions={{ color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 0.9, weight: 3 }}
+            pathOptions={{
+              color: "#3b82f6",
+              fillColor: "#3b82f6",
+              fillOpacity: 0.9,
+              weight: 3,
+            }}
           />
         )}
       </MapContainer>
@@ -158,14 +169,26 @@ function TimelineDot({
   modeBg: string;
 }) {
   if (isFirst)
-    return <div className="w-4 h-4 rounded-full bg-success border-2 border-success/30 shrink-0 mt-2.5" />;
+    return (
+      <div className="w-4 h-4 rounded-full bg-success border-2 border-success/30 shrink-0 mt-2.5" />
+    );
   if (isLast)
-    return <div className="w-4 h-4 rounded-full bg-danger border-2 border-danger/30 shrink-0 mt-2.5" />;
+    return (
+      <div className="w-4 h-4 rounded-full bg-danger border-2 border-danger/30 shrink-0 mt-2.5" />
+    );
   if (isCurrent)
-    return <div className={`w-4 h-4 rounded-full ${modeBg} border-2 border-white shadow-lg shrink-0 mt-2.5 animate-pulse`} />;
+    return (
+      <div
+        className={`w-4 h-4 rounded-full ${modeBg} border-2 border-white shadow-lg shrink-0 mt-2.5 animate-pulse`}
+      />
+    );
   if (isPast)
-    return <div className="w-2.5 h-2.5 rounded-full bg-default-300 shrink-0 mt-3" />;
-  return <div className="w-2.5 h-2.5 rounded-full bg-default-200 shrink-0 mt-3" />;
+    return (
+      <div className="w-2.5 h-2.5 rounded-full bg-default-300 shrink-0 mt-3" />
+    );
+  return (
+    <div className="w-2.5 h-2.5 rounded-full bg-default-200 shrink-0 mt-3" />
+  );
 }
 
 function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
@@ -175,8 +198,14 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   );
   const watchRef = useRef<number | null>(null);
 
-  const stations = useMemo(() => prediction.stations || [], [prediction.stations]);
-  const segments = useMemo(() => prediction.risk_segments || [], [prediction.risk_segments]);
+  const stations = useMemo(
+    () => prediction.stations || [],
+    [prediction.stations],
+  );
+  const segments = useMemo(
+    () => prediction.risk_segments || [],
+    [prediction.risk_segments],
+  );
   const mode = prediction.mode;
   const code = prediction.route_code || "";
   const totalTime = prediction.total_time_minutes;
@@ -674,10 +703,11 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
         userPos={userPos}
         className="flex-1"
       >
-        {userPos && <FollowUser lat={userPos.lat} lng={userPos.lng} heading={heading} />}
+        {userPos && (
+          <FollowUser lat={userPos.lat} lng={userPos.lng} heading={heading} />
+        )}
       </RouteMapView>
       <div className="absolute inset-0 pointer-events-none">
-
         {/* Speed */}
         <div className="absolute bottom-4 left-4 z-[10] bg-background/90 backdrop-blur rounded-xl px-3 py-2 border border-divider">
           <div className="flex items-center gap-1.5">
