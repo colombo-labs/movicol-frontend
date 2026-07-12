@@ -26,7 +26,7 @@ export function SiniestroLayer() {
 
   useEffect(() => {
     if (cachedSiniestros) return;
-    fetch(`${API_URL}/siniestralidad/heatmap`)
+    fetch(`${API_URL}/graph/siniestralidad/heatmap`)
       .then((r) => r.json())
       .then((data) => {
         cachedSiniestros = Array.isArray(data) ? data : [];
