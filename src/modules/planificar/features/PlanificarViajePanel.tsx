@@ -284,6 +284,9 @@ export function PlanificarViajePanel({
             {selectedOption && (
               <>
                 <SelectedRouteDetail option={selectedOption} />
+                {selectedOption.prediction.stations.length > 0 && (
+                  <StationsList prediction={selectedOption.prediction} />
+                )}
                 <EcoInfo prediction={selectedOption.prediction} />
                 <CongestionBar prediction={selectedOption.prediction} />
                 {mode === "publico" && (
@@ -346,9 +349,6 @@ export function PlanificarViajePanel({
                 <TravelTips
                   mode={mode === "publico" ? "transmilenio" : "vehiculo"}
                 />
-                {selectedOption.prediction.stations.length > 0 && (
-                  <StationsList prediction={selectedOption.prediction} />
-                )}
               </>
             )}
           </div>

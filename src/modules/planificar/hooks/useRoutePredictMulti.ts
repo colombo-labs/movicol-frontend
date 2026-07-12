@@ -3,6 +3,10 @@ import type {
   Coordinates,
   RoutePrediction,
 } from "@modules/predicciones/models";
+import {
+  getPredictionStationNames,
+  withPredictionStations,
+} from "@modules/predicciones/models/routeStops";
 import { routePredictionApi } from "@modules/predicciones/api";
 import type { RouteOption, RouteLeg, TransportMode } from "../models/types";
 import { calcDistance, fetchRutasCercanas } from "../api/planificarApi";
@@ -29,38 +33,43 @@ function predictionToOption(
   dist: number,
   tag?: RouteOption["tag"],
 ): RouteOption {
+  const normalizedPrediction = withPredictionStations(prediction);
   const walkTime = Math.round(dist * 0.15 * 12);
-  const code = deriveLineName(prediction);
+  const code = deriveLineName(normalizedPrediction);
   const legType: RouteLeg["type"] =
-    prediction.mode === "transmilenio"
+    normalizedPrediction.mode === "transmilenio"
       ? "transmilenio"
-      : prediction.mode === "sitp"
+      : normalizedPrediction.mode === "sitp"
         ? "sitp"
-        : prediction.mode === "vehiculo"
+        : normalizedPrediction.mode === "vehiculo"
           ? "drive"
           : "transmilenio";
 
   const legs: RouteLeg[] = [];
-  if (prediction.stations.length > 0) {
+  if (normalizedPrediction.stations.length > 0) {
     legs.push({
       type: "walk",
       from: "Tu ubicación",
-      to: prediction.stations[0],
+      to: normalizedPrediction.stations[0],
       duration_minutes: walkTime,
       distance_km: dist * 0.15,
     });
     legs.push({
       type: legType,
-      from: prediction.stations[0],
-      to: prediction.stations[prediction.stations.length - 1],
-      duration_minutes: prediction.total_time_minutes - walkTime * 2,
-      distance_km: prediction.total_distance_km * 0.85,
-      stations: prediction.stations,
-      line: code || prediction.mode.toUpperCase(),
+      from: normalizedPrediction.stations[0],
+      to: normalizedPrediction.stations[
+        normalizedPrediction.stations.length - 1
+      ],
+      duration_minutes: normalizedPrediction.total_time_minutes - walkTime * 2,
+      distance_km: normalizedPrediction.total_distance_km * 0.85,
+      stations: normalizedPrediction.stations,
+      line: code || normalizedPrediction.mode.toUpperCase(),
     });
     legs.push({
       type: "walk",
-      from: prediction.stations[prediction.stations.length - 1],
+      from: normalizedPrediction.stations[
+        normalizedPrediction.stations.length - 1
+      ],
       to: "Destino",
       duration_minutes: walkTime,
       distance_km: dist * 0.15,
@@ -70,20 +79,20 @@ function predictionToOption(
       type: legType,
       from: "Origen",
       to: "Destino",
-      duration_minutes: prediction.total_time_minutes,
-      distance_km: prediction.total_distance_km,
+      duration_minutes: normalizedPrediction.total_time_minutes,
+      distance_km: normalizedPrediction.total_distance_km,
     });
   }
 
   return {
     id,
     label,
-    total_time_minutes: prediction.total_time_minutes,
-    total_distance_km: prediction.total_distance_km,
-    cost: prediction.cost || "$3.550",
-    transfers: prediction.transfers ?? 0,
+    total_time_minutes: normalizedPrediction.total_time_minutes,
+    total_distance_km: normalizedPrediction.total_distance_km,
+    cost: normalizedPrediction.cost || "$3.550",
+    transfers: normalizedPrediction.transfers ?? 0,
     legs,
-    prediction,
+    prediction: normalizedPrediction,
     tag,
   };
 }
@@ -167,14 +176,14 @@ function buildOptions(
   // Deduplicate: track added route_codes to avoid showing same route twice
   const addedCodes = new Set<string>();
 
-  if (tm && tm.stations.length > 0) {
+  if (tm && getPredictionStationNames(tm).length > 0) {
     const label = classifyRoute(tm);
     addedCodes.add(tm.route_code || "tm");
     options.push(predictionToOption(tm, "tm-direct", label, dist, "fastest"));
     addAlternatives(options, tm, "TM", "tm", dist);
   }
 
-  if (sitp && sitp.stations.length > 0) {
+  if (sitp && getPredictionStationNames(sitp).length > 0) {
     const sitpCode = sitp.route_code || "sitp";
     // Skip if same route as TM result
     if (!addedCodes.has(sitpCode)) {
@@ -187,7 +196,7 @@ function buildOptions(
     }
   }
 
-  if (multimodal && multimodal.stations.length > 0) {
+  if (multimodal && getPredictionStationNames(multimodal).length > 0) {
     const mmCode = multimodal.route_code || "mm";
     // Skip if same route already shown
     if (!addedCodes.has(mmCode)) {

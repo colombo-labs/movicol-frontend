@@ -148,7 +148,10 @@ export function SidePanel({
             {/* Snap controls (mobile only) */}
             {snap !== "peek" && (
               <button
-                onClick={() => { setSnap("peek"); onSnapChange?.(); }}
+                onClick={() => {
+                  setSnap("peek");
+                  onSnapChange?.();
+                }}
                 className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-default-400 hover:text-foreground transition-colors"
                 aria-label="Minimizar"
               >
@@ -157,7 +160,10 @@ export function SidePanel({
             )}
             {snap !== "full" && (
               <button
-                onClick={() => { setSnap(snap === "peek" ? "half" : "full"); onSnapChange?.(); }}
+                onClick={() => {
+                  setSnap(snap === "peek" ? "half" : "full");
+                  onSnapChange?.();
+                }}
                 className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-default-400 hover:text-foreground transition-colors"
                 aria-label="Expandir"
               >
@@ -166,7 +172,10 @@ export function SidePanel({
             )}
             {snap === "full" && (
               <button
-                onClick={() => { setSnap("half"); onSnapChange?.(); }}
+                onClick={() => {
+                  setSnap("half");
+                  onSnapChange?.();
+                }}
                 className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-default-400 hover:text-foreground transition-colors"
                 aria-label="Reducir"
               >
