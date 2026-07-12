@@ -60,6 +60,14 @@ function haversineM(
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function extractRouteCoords(segments: RoutePrediction["risk_segments"]): [number, number][] {
+  const coords: [number, number][] = [];
+  for (const seg of segments || []) {
+    for (const c of seg.coordinates || []) coords.push([c[0], c[1]]);
+  }
+  return coords;
+}
+
 function formatDistance(meters: number): string {
   if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km`;
   return `${Math.round(meters / 10) * 10} m`;
@@ -136,6 +144,30 @@ function RouteMapView({
 
 // ═══════════════════════════════════════════════════════════════════
 
+function TimelineDot({
+  isFirst,
+  isLast,
+  isCurrent,
+  isPast,
+  modeBg,
+}: {
+  isFirst: boolean;
+  isLast: boolean;
+  isCurrent: boolean;
+  isPast: boolean;
+  modeBg: string;
+}) {
+  if (isFirst)
+    return <div className="w-4 h-4 rounded-full bg-success border-2 border-success/30 shrink-0 mt-2.5" />;
+  if (isLast)
+    return <div className="w-4 h-4 rounded-full bg-danger border-2 border-danger/30 shrink-0 mt-2.5" />;
+  if (isCurrent)
+    return <div className={`w-4 h-4 rounded-full ${modeBg} border-2 border-white shadow-lg shrink-0 mt-2.5 animate-pulse`} />;
+  if (isPast)
+    return <div className="w-2.5 h-2.5 rounded-full bg-default-300 shrink-0 mt-3" />;
+  return <div className="w-2.5 h-2.5 rounded-full bg-default-200 shrink-0 mt-3" />;
+}
+
 function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const [currentStopIdx, setCurrentStopIdx] = useState(0);
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
@@ -151,15 +183,10 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const totalDist = prediction.total_distance_km;
 
   // Route coords for map
-  const routeCoords: [number, number][] = useMemo(() => {
-    const coords: [number, number][] = [];
-    for (const seg of segments) {
-      for (const c of seg.coordinates || []) {
-        coords.push([c[0], c[1]]);
-      }
-    }
-    return coords;
-  }, [segments]);
+  const routeCoords: [number, number][] = useMemo(
+    () => extractRouteCoords(segments),
+    [segments],
+  );
 
   // GPS tracking to auto-advance stops
   useEffect(() => {
@@ -295,19 +322,13 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
               <div key={`nav-stop-${i}`} className="flex items-stretch gap-3">
                 {/* Timeline dot + line */}
                 <div className="flex flex-col items-center w-5 shrink-0">
-                  {isFirst ? (
-                    <div className="w-4 h-4 rounded-full bg-success border-2 border-success/30 shrink-0 mt-2.5" />
-                  ) : isLast ? (
-                    <div className="w-4 h-4 rounded-full bg-danger border-2 border-danger/30 shrink-0 mt-2.5" />
-                  ) : isCurrent ? (
-                    <div
-                      className={`w-4 h-4 rounded-full ${modeBg} border-2 border-white shadow-lg shrink-0 mt-2.5 animate-pulse`}
-                    />
-                  ) : isPast ? (
-                    <div className="w-2.5 h-2.5 rounded-full bg-default-300 shrink-0 mt-3" />
-                  ) : (
-                    <div className="w-2.5 h-2.5 rounded-full bg-default-200 shrink-0 mt-3" />
-                  )}
+                  <TimelineDot
+                    isFirst={isFirst}
+                    isLast={isLast}
+                    isCurrent={isCurrent}
+                    isPast={isPast}
+                    modeBg={modeBg}
+                  />
                   {!isLast && (
                     <div
                       className={`w-0.5 flex-1 min-h-[20px] ${isPast ? "bg-default-300" : modeBg + "/30"}`}
@@ -461,13 +482,10 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
   const currentStep = steps[currentStepIdx] || null;
   const nextStep = steps[currentStepIdx + 1] || null;
 
-  const routeCoords: [number, number][] = useMemo(() => {
-    const coords: [number, number][] = [];
-    for (const seg of prediction.risk_segments || []) {
-      for (const c of seg.coordinates || []) coords.push([c[0], c[1]]);
-    }
-    return coords;
-  }, [prediction]);
+  const routeCoords: [number, number][] = useMemo(
+    () => extractRouteCoords(prediction.risk_segments),
+    [prediction],
+  );
 
   const remaining = useMemo(() => {
     const rem = steps.slice(currentStepIdx);
