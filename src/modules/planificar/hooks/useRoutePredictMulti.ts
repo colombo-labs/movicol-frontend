@@ -148,6 +148,46 @@ function addSitpOptions(
   addAlternatives(options, sitp, "SITP", "sitp", dist);
 }
 
+/**
+ * Classify a route prediction automatically based on its segments and transfers.
+ * Returns a human-readable label like "Solo TM", "SITP → TM", etc.
+ */
+function classifyRoute(prediction: RoutePrediction): string {
+  const segments = prediction.risk_segments || [];
+  const code = prediction.route_code || "";
+
+  // Determine transport modes used (excluding walk segments)
+  const transportModes = segments
+    .map((s) => s.mode)
+    .filter((m) => m && m !== "walk");
+
+  const hasTm = transportModes.includes("transmilenio");
+  const hasSitp = transportModes.includes("sitp");
+  const transfers = prediction.transfers ?? 0;
+
+  if (transfers === 0) {
+    // Direct route — no transfers
+    if (hasTm && !hasSitp) return code ? `Solo TM · ${code}` : "Solo TM";
+    if (hasSitp && !hasTm) return code ? `Solo SITP · ${code}` : "Solo SITP";
+    if (hasTm && hasSitp) return code ? `TM + SITP · ${code}` : "TM + SITP";
+  } else {
+    // Route with transfers — detect type
+    if (hasTm && !hasSitp) return code ? `TM → TM · ${code}` : "TM → TM";
+    if (hasSitp && !hasTm)
+      return code ? `SITP → SITP · ${code}` : "SITP → SITP";
+    // Mixed: determine order (first non-walk segment determines start)
+    const firstMode = transportModes[0];
+    if (firstMode === "transmilenio")
+      return code ? `TM → SITP · ${code}` : "TM → SITP";
+    return code ? `SITP → TM · ${code}` : "SITP → TM";
+  }
+
+  // Fallback based on backend mode field
+  if (prediction.mode === "transmilenio") return code ? `TM · ${code}` : "TM";
+  if (prediction.mode === "sitp") return code ? `SITP · ${code}` : "SITP";
+  return code ? `TM + SITP · ${code}` : "TM + SITP";
+}
+
 function buildOptions(
   tm: RoutePrediction | null,
   sitp: RoutePrediction | null,
@@ -163,26 +203,38 @@ function buildOptions(
     destination.lng ?? destination.lon ?? 0,
   );
 
+  // Deduplicate: track added route_codes to avoid showing same route twice
+  const addedCodes = new Set<string>();
+
   if (tm && tm.stations.length > 0) {
-    addTmOptions(options, tm, dist);
+    const label = classifyRoute(tm);
+    addedCodes.add(tm.route_code || "tm");
+    options.push(predictionToOption(tm, "tm-direct", label, dist, "fastest"));
+    addAlternatives(options, tm, "TM", "tm", dist);
   }
 
   if (sitp && sitp.stations.length > 0) {
-    addSitpOptions(options, sitp, tm, dist);
+    const sitpCode = sitp.route_code || "sitp";
+    // Skip if same route as TM result
+    if (!addedCodes.has(sitpCode)) {
+      const label = classifyRoute(sitp);
+      addedCodes.add(sitpCode);
+      options.push(
+        predictionToOption(sitp, "sitp-direct", label, dist, "less_walking"),
+      );
+      addAlternatives(options, sitp, "SITP", "sitp", dist);
+    }
   }
 
-  // Use real multimodal prediction from backend (real transfers, real geometry)
   if (multimodal && multimodal.stations.length > 0) {
-    const mmCode = deriveLineName(multimodal);
-    options.push(
-      predictionToOption(
-        multimodal,
-        "multimodal",
-        mmCode ? `TM+SITP ${mmCode}` : "TM + SITP",
-        dist,
-        "cheapest",
-      ),
-    );
+    const mmCode = multimodal.route_code || "mm";
+    // Skip if same route already shown
+    if (!addedCodes.has(mmCode)) {
+      const label = classifyRoute(multimodal);
+      options.push(
+        predictionToOption(multimodal, "multimodal", label, dist, "cheapest"),
+      );
+    }
   }
 
   options.sort((a, b) => a.total_time_minutes - b.total_time_minutes);
