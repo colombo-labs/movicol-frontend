@@ -175,8 +175,8 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   );
   const watchRef = useRef<number | null>(null);
 
-  const stations = prediction.stations || [];
-  const segments = prediction.risk_segments || [];
+  const stations = useMemo(() => prediction.stations || [], [prediction.stations]);
+  const segments = useMemo(() => prediction.risk_segments || [], [prediction.risk_segments]);
   const mode = prediction.mode;
   const code = prediction.route_code || "";
   const totalTime = prediction.total_time_minutes;

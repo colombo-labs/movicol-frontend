@@ -154,7 +154,8 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
 //  (consolidated into NavigationSteps above)
 // ═══════════════════════════════════════════════════════════════════
 
-export function StationsList(_props: {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function StationsList(_: {
   readonly prediction: RoutePrediction;
 }) {
   // Consolidated into NavigationSteps — render nothing
