@@ -49,11 +49,15 @@ interface MapViewProps {
   readonly showSiniestros?: boolean;
 }
 
-const RISK_COLORS: Record<string, string> = {
-  low: "#22c55e",
-  medium: "#eab308",
-  high: "#f97316",
-  critical: "#ef4444",
+/** Mode-based route colors matching Bogotá's transit system */
+const MODE_COLORS: Record<string, string> = {
+  transmilenio: "#ef4444", // Red — TM institutional
+  sitp: "#3b82f6", // Blue — SITP zonal
+  walk: "#9ca3af", // Gray — walking
+  vehiculo: "#22c55e", // Green — vehicle
+  moto: "#22c55e",
+  bicicleta: "#06b6d4",
+  caminando: "#9ca3af",
 };
 
 const originIcon = makeIcon("#22c55e", 36, "A");
@@ -203,7 +207,7 @@ export function MapView({
 
         <FitRouteBounds prediction={prediction} tripPoints={tripPoints} />
 
-        {/* Alternative route polylines (light green, clickable like Google Maps) */}
+        {/* Alternative route polylines (subtle gray, clickable) */}
         {altPredictions.map((alt, ai) =>
           alt.risk_segments.map((segment, si) => (
             <Polyline
@@ -212,9 +216,9 @@ export function MapView({
                 (c) => [c[0], c[1]] as [number, number],
               )}
               pathOptions={{
-                color: "#86efac",
-                weight: 5,
-                opacity: 0.6,
+                color: "#6b7280",
+                weight: 4,
+                opacity: 0.4,
                 lineCap: "round",
                 lineJoin: "round",
               }}
@@ -223,7 +227,7 @@ export function MapView({
           )),
         )}
 
-        {/* Prediction route segments (selected — bold, colored) */}
+        {/* Prediction route segments (selected — mode-colored) */}
         {prediction?.risk_segments.map((segment, i) => (
           <Polyline
             key={`pred-seg-${i}-${segment.from_station}-${segment.to_station}`}
@@ -231,11 +235,12 @@ export function MapView({
               (c) => [c[0], c[1]] as [number, number],
             )}
             pathOptions={{
-              color: RISK_COLORS[segment.risk_label] ?? "#6b7280",
-              weight: 6,
+              color: MODE_COLORS[segment.mode || prediction.mode] ?? "#22c55e",
+              weight: segment.mode === "walk" ? 4 : 6,
               opacity: 0.9,
               lineCap: "round",
               lineJoin: "round",
+              dashArray: segment.mode === "walk" ? "8, 12" : undefined,
             }}
           >
             <Popup>
@@ -247,10 +252,17 @@ export function MapView({
                 <span
                   style={{
                     fontWeight: 600,
-                    color: RISK_COLORS[segment.risk_label] ?? "#22c55e",
+                    color:
+                      MODE_COLORS[segment.mode || prediction.mode] ?? "#22c55e",
                   }}
                 >
-                  {Math.round(segment.congestion_level * 100)}% congestión
+                  {segment.mode === "walk"
+                    ? "🚶 Caminando"
+                    : segment.mode === "transmilenio"
+                      ? "🚇 TransMilenio"
+                      : segment.mode === "sitp"
+                        ? "🚌 SITP"
+                        : "🚗 Vehículo"}
                 </span>
               </div>
             </Popup>
