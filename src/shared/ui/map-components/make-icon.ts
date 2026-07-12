@@ -14,3 +14,22 @@ export function makeIcon(color: string, size = 32, label?: string) {
     </div>`,
   });
 }
+
+export function makeTransitStopIcon(
+  mode: "transmilenio" | "sitp",
+  accentColor: string,
+  size = 24,
+) {
+  const logo = mode === "transmilenio" ? "tm-logo.svg" : "sitp-logo.svg";
+  const logoWidth = mode === "transmilenio" ? 15 : 18;
+
+  return L.divIcon({
+    className: "",
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -size / 2],
+    html: `<div style="width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;border:2px solid #475569;border-radius:9999px;background:#fff;box-shadow:0 0 0 2px ${accentColor},0 2px 5px rgba(0,0,0,0.4);">
+      <img src="/icons/${logo}" alt="" style="display:block;width:${logoWidth}px;height:16px;object-fit:contain;" />
+    </div>`,
+  });
+}

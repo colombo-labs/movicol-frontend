@@ -12,6 +12,7 @@ import {
   ZoomControl,
   Polyline,
   CircleMarker,
+  Marker,
   Popup,
 } from "react-leaflet";
 import { TroncalesLayer } from "./TroncalesLayer";
@@ -19,7 +20,7 @@ import { SitpLayer, CongestionLayer } from "./map-components/layers";
 import { SelectedTroncalLayer } from "./map-components/troncal-layer";
 import { SiniestroLayer } from "./map-components/siniestro-layer";
 import { CarrilPreferencialLayer } from "./CarrilPreferencialLayer";
-import { makeIcon } from "./map-components/make-icon";
+import { makeIcon, makeTransitStopIcon } from "./map-components/make-icon";
 import {
   DraggableMarker,
   FitRouteBounds,
@@ -256,23 +257,38 @@ export function MapView({
             </Popup>
           </Polyline>
         ))}
-        {predictionStops.map((stop, i) => (
-          <CircleMarker
-            key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}
-            center={[stop.lat, stop.lon]}
-            radius={5}
-            pathOptions={{
-              color: "#475569",
-              fillColor: getStopFillColor(i, predictionStops.length),
-              fillOpacity: 1,
-              weight: 2,
-            }}
-          >
+        {predictionStops.map((stop, i) => {
+          const fillColor = getStopFillColor(i, predictionStops.length);
+          const popup = (
             <Popup>
               <b>{i + 1}.</b> {stop.name}
             </Popup>
-          </CircleMarker>
-        ))}
+          );
+
+          return stop.mode ? (
+            <Marker
+              key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}
+              position={[stop.lat, stop.lon]}
+              icon={makeTransitStopIcon(stop.mode, fillColor)}
+            >
+              {popup}
+            </Marker>
+          ) : (
+            <CircleMarker
+              key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}
+              center={[stop.lat, stop.lon]}
+              radius={5}
+              pathOptions={{
+                color: "#475569",
+                fillColor,
+                fillOpacity: 1,
+                weight: 2,
+              }}
+            >
+              {popup}
+            </CircleMarker>
+          );
+        })}
 
         {/* Walking lines — dashed from origin to first segment and last segment to destination */}
         {prediction &&
