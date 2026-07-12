@@ -102,6 +102,58 @@ describe("useRoutePredictMulti", () => {
     });
   });
 
+  it("should keep transit options when stations are derived from segments", async () => {
+    const mockTm = {
+      route_id: "tm-derived-stations",
+      total_time_minutes: 25,
+      total_distance_km: 12,
+      cost: "$3.550",
+      mode: "transmilenio",
+      risk_segments: [
+        {
+          from_station: "Las Aguas",
+          to_station: "Banderas",
+          congestion_level: 0.2,
+          risk_label: "low",
+          coordinates: [
+            [4.6, -74.07],
+            [4.63, -74.14],
+          ],
+          mode: "transmilenio",
+        },
+      ],
+      overall_risk: "low",
+      safety_score: 85,
+      explanation: "",
+      stations: [],
+      departure_time: "2026-06-21T15:00:00",
+      route_code: "F23B",
+      transfers: 0,
+      estimated_wait_minutes: 4,
+      alternatives: [],
+    };
+    (routePredictionApi.predict as any).mockResolvedValue(mockTm);
+
+    const { result } = renderHook(() => useRoutePredictMulti());
+
+    await act(async () => {
+      result.current.predictMulti({
+        origin: { lat: 4.6, lng: -74.07 },
+        destination: { lat: 4.63, lng: -74.14 },
+        departureTime: "2026-06-21T15:00:00",
+        mode: "publico",
+      });
+    });
+
+    await waitFor(() => {
+      expect(result.current.options).toHaveLength(1);
+      expect(result.current.options?.[0].prediction.stations).toEqual([
+        "Las Aguas",
+        "Banderas",
+      ]);
+    });
+  });
+
   it("should clear options", () => {
     const { result } = renderHook(() => useRoutePredictMulti());
     act(() => result.current.clear());

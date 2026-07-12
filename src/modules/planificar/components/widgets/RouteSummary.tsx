@@ -95,6 +95,12 @@ export function RouteSummaryCard({
   rutasDisponibles,
   getETA,
 }: Props) {
+  const predictedRouteCode = prediction.route_code?.trim();
+  const routeCode =
+    mode === "transmilenio"
+      ? predictedRouteCode || "Troncal"
+      : predictedRouteCode || rutasDisponibles[0]?.ruta || "...";
+
   return (
     <GlassCard>
       <div className="flex items-center justify-between mb-2">
@@ -144,9 +150,7 @@ export function RouteSummaryCard({
           ) : (
             <>
               <span>Ruta: </span>
-              <strong className="text-foreground">
-                {rutasDisponibles.length > 0 ? rutasDisponibles[0].ruta : "..."}
-              </strong>
+              <strong className="text-foreground">{routeCode}</strong>
             </>
           )}
         </div>
