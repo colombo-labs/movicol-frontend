@@ -109,45 +109,6 @@ function addAlternatives(
   });
 }
 
-function addTmOptions(
-  options: RouteOption[],
-  tm: RoutePrediction,
-  dist: number,
-): void {
-  const tmCode = deriveLineName(tm);
-  options.push(
-    predictionToOption(
-      tm,
-      "tm-direct",
-      tmCode ? `TM ${tmCode}` : "TransMilenio",
-      dist,
-      "fastest",
-    ),
-  );
-  addAlternatives(options, tm, "TM", "tm", dist);
-}
-
-function addSitpOptions(
-  options: RouteOption[],
-  sitp: RoutePrediction,
-  tm: RoutePrediction | null,
-  dist: number,
-): void {
-  const sitpCode = deriveLineName(sitp);
-  const tmCode = tm ? deriveLineName(tm) : "";
-  if (sitpCode === tmCode) return;
-  options.push(
-    predictionToOption(
-      sitp,
-      "sitp-direct",
-      sitpCode ? `SITP ${sitpCode}` : "SITP",
-      dist,
-      "less_walking",
-    ),
-  );
-  addAlternatives(options, sitp, "SITP", "sitp", dist);
-}
-
 /**
  * Classify a route prediction automatically based on its segments and transfers.
  * Returns a human-readable label like "Solo TM", "SITP → TM", etc.
