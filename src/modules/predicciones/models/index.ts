@@ -16,6 +16,7 @@ export interface RiskSegment {
   congestion_level: number;
   risk_label: "low" | "medium" | "high" | "critical";
   coordinates: [number, number][];
+  mode?: "transmilenio" | "sitp" | "walk" | "vehiculo";
 }
 
 export interface RoutePrediction {
