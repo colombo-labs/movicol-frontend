@@ -411,6 +411,7 @@ export function useRoutePredictMulti() {
 
   const predictMulti = useCallback(async (params: PredictMultiParams) => {
     cancelledRef.current = false;
+    setOptions(null); // Clear previous routes immediately
     setIsLoading(true);
     setError(null);
 
