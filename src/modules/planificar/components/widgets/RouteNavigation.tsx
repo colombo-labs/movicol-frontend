@@ -46,7 +46,9 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
             ~{walkTime} min · {walkDist} m
           </p>
         </div>
-        <span className="text-[11px] font-bold text-default-500">{walkTime} min</span>
+        <span className="text-[11px] font-bold text-default-500">
+          {walkTime} min
+        </span>
       </div>
 
       <div className="h-px bg-divider/50 mx-2" />
@@ -54,7 +56,9 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
       {/* ── Leg 2: Transit (with accordion for stations) ── */}
       <div className="py-2">
         <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-lg ${modeBgLight} flex items-center justify-center shrink-0`}>
+          <div
+            className={`w-8 h-8 rounded-lg ${modeBgLight} flex items-center justify-center shrink-0`}
+          >
             <ModeIcon size={14} className={modeColor} />
           </div>
           <div className="flex-1 min-w-0">
@@ -62,7 +66,8 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
               {routeCode}
             </p>
             <p className="text-[9px] text-default-400">
-              {stations[0] || "Origen"} → {stations[stations.length - 1] || "Destino"}
+              {stations[0] || "Origen"} →{" "}
+              {stations[stations.length - 1] || "Destino"}
             </p>
           </div>
           <span className="text-[11px] font-bold text-default-500">
@@ -94,14 +99,22 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
                 {stations.map((s, i) => {
                   const isFirst = i === 0;
                   const isLast = i === stations.length - 1;
-                  const timePerStation = prediction.total_time_minutes / stations.length;
-                  const arriveAt = new Date(Date.now() + (walkTime + i * timePerStation) * 60000);
+                  const timePerStation =
+                    prediction.total_time_minutes / stations.length;
+                  const arriveAt = new Date(
+                    Date.now() + (walkTime + i * timePerStation) * 60000,
+                  );
 
                   return (
-                    <div key={`st-${i}-${s}`} className="flex items-center justify-between py-0.5">
+                    <div
+                      key={`st-${i}-${s}`}
+                      className="flex items-center justify-between py-0.5"
+                    >
                       <div className="flex items-center gap-2 min-w-0">
                         {isFirst ? (
-                          <div className={`w-2 h-2 rounded-full ${modeBg} shrink-0`} />
+                          <div
+                            className={`w-2 h-2 rounded-full ${modeBg} shrink-0`}
+                          />
                         ) : isLast ? (
                           <div className="w-2 h-2 rounded-full bg-danger shrink-0" />
                         ) : (
@@ -109,7 +122,9 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
                         )}
                         <span
                           className={`text-[10px] truncate ${
-                            isFirst || isLast ? "font-medium text-foreground" : "text-default-500"
+                            isFirst || isLast
+                              ? "font-medium text-foreground"
+                              : "text-default-500"
                           }`}
                         >
                           {s}
@@ -138,12 +153,16 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
           <MapPin size={14} className="text-danger" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-medium text-foreground">Camina a tu destino</p>
+          <p className="text-[11px] font-medium text-foreground">
+            Camina a tu destino
+          </p>
           <p className="text-[9px] text-success font-medium">
             Llegas aprox. {getETA()}
           </p>
         </div>
-        <span className="text-[11px] font-bold text-default-500">{walkTime} min</span>
+        <span className="text-[11px] font-bold text-default-500">
+          {walkTime} min
+        </span>
       </div>
     </GlassCard>
   );
@@ -154,9 +173,8 @@ export function NavigationSteps({ prediction, mode, getETA }: Props) {
 //  (consolidated into NavigationSteps above)
 // ═══════════════════════════════════════════════════════════════════
 
-export function StationsList(_props: {
-  readonly prediction: RoutePrediction;
-}) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function StationsList(_: { readonly prediction: RoutePrediction }) {
   // Consolidated into NavigationSteps — render nothing
   return null;
 }
@@ -189,7 +207,9 @@ export function VehicleNavSteps({
     return "↑";
   };
 
-  const filteredSteps = steps.filter((s) => s.distance_m > 0 || s.maneuver === "arrive");
+  const filteredSteps = steps.filter(
+    (s) => s.distance_m > 0 || s.maneuver === "arrive",
+  );
 
   return (
     <GlassCard>
@@ -222,7 +242,9 @@ export function VehicleNavSteps({
                 {s.maneuver === "arrive" ? (
                   <MapPin size={11} className="text-danger" />
                 ) : (
-                  <span className="text-[11px]">{maneuverIcon(s.maneuver)}</span>
+                  <span className="text-[11px]">
+                    {maneuverIcon(s.maneuver)}
+                  </span>
                 )}
                 {i < filteredSteps.length - 1 && (
                   <div className="w-0.5 flex-1 bg-primary/20 min-h-[8px]" />

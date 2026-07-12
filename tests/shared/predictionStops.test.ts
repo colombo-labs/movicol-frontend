@@ -18,6 +18,7 @@ const prediction: RoutePrediction = {
       to_station: "Intermedia",
       congestion_level: 0.2,
       risk_label: "low",
+      mode: "transmilenio",
       coordinates: [
         [4.6, -74.1],
         [4.61, -74.09],
@@ -28,6 +29,7 @@ const prediction: RoutePrediction = {
       to_station: "Destino",
       congestion_level: 0.3,
       risk_label: "medium",
+      mode: "transmilenio",
       coordinates: [
         [4.61, -74.09],
         [4.62, -74.08],
@@ -47,10 +49,28 @@ const prediction: RoutePrediction = {
 describe("prediction route stops", () => {
   it("derives map markers in origin-to-destination order", () => {
     expect(getPredictionStops(prediction)).toEqual([
-      { name: "Origen", lat: 4.6, lon: -74.1 },
-      { name: "Intermedia", lat: 4.61, lon: -74.09 },
-      { name: "Destino", lat: 4.62, lon: -74.08 },
+      { name: "Origen", lat: 4.6, lon: -74.1, mode: "transmilenio" },
+      {
+        name: "Intermedia",
+        lat: 4.61,
+        lon: -74.09,
+        mode: "transmilenio",
+      },
+      { name: "Destino", lat: 4.62, lon: -74.08, mode: "transmilenio" },
     ]);
+  });
+
+  it("uses the next transit mode for walking connections", () => {
+    const stops = getPredictionStops({
+      ...prediction,
+      mode: "multimodal",
+      risk_segments: [
+        { ...prediction.risk_segments[0], mode: "walk" },
+        { ...prediction.risk_segments[1], mode: "sitp" },
+      ],
+    });
+
+    expect(stops.map((stop) => stop.mode)).toEqual(["sitp", "sitp", "sitp"]);
   });
 
   it("fills an empty station list from risk segments", () => {
