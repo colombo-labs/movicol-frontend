@@ -83,7 +83,57 @@ function isTransitMode(mode: string): boolean {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-//  TRANSIT NAVIGATION (Timeline Journey View)
+//  SHARED: Route Map View (eliminates duplication between transit/vehicle)
+// ═══════════════════════════════════════════════════════════════════
+
+function RouteMapView({
+  center,
+  zoom,
+  routeCoords,
+  routeColor,
+  routeWeight = 5,
+  userPos,
+  children,
+  className = "h-[35vh]",
+}: {
+  center: [number, number];
+  zoom: number;
+  routeCoords: [number, number][];
+  routeColor: string;
+  routeWeight?: number;
+  userPos: { lat: number; lng: number } | null;
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`${className} relative overflow-hidden`}>
+      <MapContainer
+        center={center}
+        zoom={zoom}
+        zoomControl={false}
+        attributionControl={false}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+        {children}
+        {routeCoords.length > 0 && (
+          <Polyline
+            positions={routeCoords}
+            pathOptions={{ color: routeColor, weight: routeWeight, opacity: 0.9 }}
+          />
+        )}
+        {userPos && (
+          <CircleMarker
+            center={[userPos.lat, userPos.lng]}
+            radius={10}
+            pathOptions={{ color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 0.9, weight: 3 }}
+          />
+        )}
+      </MapContainer>
+    </div>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════════
 
 function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
@@ -204,39 +254,13 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
       </div>
 
       {/* Map */}
-      <div className="h-[35vh] relative overflow-hidden">
-        <MapContainer
-          center={mapCenter}
-          zoom={14}
-          zoomControl={false}
-          attributionControl={false}
-          style={{ height: "100%", width: "100%" }}
-        >
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-          {routeCoords.length > 0 && (
-            <Polyline
-              positions={routeCoords}
-              pathOptions={{
-                color: mode === "transmilenio" ? "#ef4444" : "#3b82f6",
-                weight: 5,
-                opacity: 0.9,
-              }}
-            />
-          )}
-          {userPos && (
-            <CircleMarker
-              center={[userPos.lat, userPos.lng]}
-              radius={10}
-              pathOptions={{
-                color: "#3b82f6",
-                fillColor: "#3b82f6",
-                fillOpacity: 0.9,
-                weight: 3,
-              }}
-            />
-          )}
-        </MapContainer>
-      </div>
+      <RouteMapView
+        center={mapCenter}
+        zoom={14}
+        routeCoords={routeCoords}
+        routeColor={mode === "transmilenio" ? "#ef4444" : "#3b82f6"}
+        userPos={userPos}
+      />
 
       {/* Journey timeline */}
       <div className="flex-1 overflow-y-auto px-4 py-3">
@@ -623,37 +647,18 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
       </div>
 
       {/* Map */}
-      <div className="flex-1 relative overflow-hidden">
-        <MapContainer
-          center={mapCenter}
-          zoom={17}
-          zoomControl={false}
-          attributionControl={false}
-          style={{ height: "100%", width: "100%" }}
-        >
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
-          {userPos && (
-            <FollowUser lat={userPos.lat} lng={userPos.lng} heading={heading} />
-          )}
-          {routeCoords.length > 0 && (
-            <Polyline
-              positions={routeCoords}
-              pathOptions={{ color: "#10b981", weight: 6, opacity: 0.9 }}
-            />
-          )}
-          {userPos && (
-            <CircleMarker
-              center={[userPos.lat, userPos.lng]}
-              radius={10}
-              pathOptions={{
-                color: "#3b82f6",
-                fillColor: "#3b82f6",
-                fillOpacity: 0.9,
-                weight: 3,
-              }}
-            />
-          )}
-        </MapContainer>
+      <RouteMapView
+        center={mapCenter}
+        zoom={17}
+        routeCoords={routeCoords}
+        routeColor="#10b981"
+        routeWeight={6}
+        userPos={userPos}
+        className="flex-1"
+      >
+        {userPos && <FollowUser lat={userPos.lat} lng={userPos.lng} heading={heading} />}
+      </RouteMapView>
+      <div className="absolute inset-0 pointer-events-none">
 
         {/* Speed */}
         <div className="absolute bottom-4 left-4 z-[10] bg-background/90 backdrop-blur rounded-xl px-3 py-2 border border-divider">
