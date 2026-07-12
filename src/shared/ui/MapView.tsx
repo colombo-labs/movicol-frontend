@@ -20,7 +20,12 @@ import { SitpLayer, CongestionLayer } from "./map-components/layers";
 import { SelectedTroncalLayer } from "./map-components/troncal-layer";
 import { SiniestroLayer } from "./map-components/siniestro-layer";
 import { CarrilPreferencialLayer } from "./CarrilPreferencialLayer";
-import { makeIcon, makeTransitStopIcon } from "./map-components/make-icon";
+import {
+  makeIcon,
+  makeTransitStopIcon,
+  makeTransitEndpointIcon,
+  makeArrowIcon,
+} from "./map-components/make-icon";
 import {
   DraggableMarker,
   FitRouteBounds,
@@ -269,7 +274,34 @@ export function MapView({
             </Popup>
           </Polyline>
         ))}
+
+        {/* Direction arrows along route */}
+        {prediction?.risk_segments.map((segment, segIdx) => {
+          if (segment.mode === "walk") return null;
+          const coords = segment.coordinates;
+          if (coords.length < 4) return null;
+          // Place an arrow at ~40% of each segment
+          const midIdx = Math.floor(coords.length * 0.4);
+          const p1 = coords[midIdx];
+          const p2 = coords[Math.min(midIdx + 1, coords.length - 1)];
+          if (!p1 || !p2) return null;
+          const angle =
+            (Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180) / Math.PI + 90;
+          const color =
+            MODE_COLORS[segment.mode || prediction.mode] ?? "#22c55e";
+          return (
+            <Marker
+              key={`arrow-${segIdx}`}
+              position={[p1[0], p1[1]] as [number, number]}
+              icon={makeArrowIcon(angle, color)}
+              interactive={false}
+            />
+          );
+        })}
+
         {predictionStops.map((stop, i) => {
+          const isFirst = i === 0;
+          const isLast = i === predictionStops.length - 1;
           const fillColor = getStopFillColor(i, predictionStops.length);
           const popup = (
             <Popup>
@@ -277,6 +309,20 @@ export function MapView({
             </Popup>
           );
 
+          // First/last stops get large TM/SITP endpoint icons
+          if (stop.mode && (isFirst || isLast)) {
+            return (
+              <Marker
+                key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}
+                position={[stop.lat, stop.lon]}
+                icon={makeTransitEndpointIcon(stop.mode, isFirst)}
+              >
+                {popup}
+              </Marker>
+            );
+          }
+
+          // Intermediate stops get small transit icons
           return stop.mode ? (
             <Marker
               key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}
