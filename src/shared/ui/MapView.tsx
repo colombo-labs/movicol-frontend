@@ -5,6 +5,7 @@ import "leaflet/dist/leaflet.css";
 import { useTheme } from "@shared/hooks/useTheme";
 import type { TripPoint } from "../../app/Layout";
 import type { RoutePrediction } from "../../modules/predicciones/models";
+import { getPredictionStops } from "../../modules/predicciones/models/routeStops";
 import {
   MapContainer,
   TileLayer,
@@ -97,6 +98,7 @@ export function MapView({
   const [showEstacionesLocal] = useState(false);
   const showEstaciones = showEstacionesOnMap ?? showEstacionesLocal;
   const [showSitp] = useState(false);
+  const predictionStops = getPredictionStops(prediction);
 
   return (
     <div
@@ -253,6 +255,23 @@ export function MapView({
               </div>
             </Popup>
           </Polyline>
+        ))}
+        {predictionStops.map((stop, i) => (
+          <CircleMarker
+            key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}
+            center={[stop.lat, stop.lon]}
+            radius={5}
+            pathOptions={{
+              color: "#475569",
+              fillColor: getStopFillColor(i, predictionStops.length),
+              fillOpacity: 1,
+              weight: 2,
+            }}
+          >
+            <Popup>
+              <b>{i + 1}.</b> {stop.name}
+            </Popup>
+          </CircleMarker>
         ))}
 
         {/* Walking lines — dashed from origin to first segment and last segment to destination */}
