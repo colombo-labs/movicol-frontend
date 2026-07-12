@@ -28,7 +28,7 @@ export function useNotifications() {
 
   const fetchAll = useCallback(async () => {
     try {
-      const res = await fetch(`${BACKEND_URL}/notifications?hours=6`);
+      const res = await fetch(`${BACKEND_URL}/feed/notifications?hours=6`);
       if (res.ok) {
         const data = await res.json();
         const items: AppNotification[] = data.map(
