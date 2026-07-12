@@ -14,6 +14,7 @@ interface SidePanelProps {
   title: string;
   children: ReactNode;
   snapOverride?: SnapPoint | null;
+  onSnapChange?: () => void;
 }
 
 type SnapPoint = "peek" | "half" | "full";
@@ -30,6 +31,7 @@ export function SidePanel({
   title,
   children,
   snapOverride,
+  onSnapChange,
 }: SidePanelProps) {
   const startY = useRef(0);
   const [snap, setSnap] = useState<SnapPoint>("half");
@@ -88,8 +90,9 @@ export function SidePanel({
         if (snap === "peek") setSnap("half");
         else if (snap === "half") setSnap("full");
       }
+      onSnapChange?.();
     },
-    [snap, onClose],
+    [snap, onClose, onSnapChange],
   );
 
   return (
@@ -145,7 +148,7 @@ export function SidePanel({
             {/* Snap controls (mobile only) */}
             {snap !== "peek" && (
               <button
-                onClick={() => setSnap("peek")}
+                onClick={() => { setSnap("peek"); onSnapChange?.(); }}
                 className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-default-400 hover:text-foreground transition-colors"
                 aria-label="Minimizar"
               >
@@ -154,7 +157,7 @@ export function SidePanel({
             )}
             {snap !== "full" && (
               <button
-                onClick={() => setSnap(snap === "peek" ? "half" : "full")}
+                onClick={() => { setSnap(snap === "peek" ? "half" : "full"); onSnapChange?.(); }}
                 className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-default-400 hover:text-foreground transition-colors"
                 aria-label="Expandir"
               >
@@ -163,7 +166,7 @@ export function SidePanel({
             )}
             {snap === "full" && (
               <button
-                onClick={() => setSnap("half")}
+                onClick={() => { setSnap("half"); onSnapChange?.(); }}
                 className="md:hidden w-7 h-7 rounded-lg flex items-center justify-center text-default-400 hover:text-foreground transition-colors"
                 aria-label="Reducir"
               >
