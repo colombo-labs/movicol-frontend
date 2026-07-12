@@ -1,12 +1,37 @@
 import type { RoutePrediction } from "./index";
 
+export type TransitStopMode = "transmilenio" | "sitp";
+
 export interface PredictionStop {
   name: string;
   lat: number;
   lon: number;
+  mode?: TransitStopMode;
 }
 
 const TRANSIT_MODES = new Set(["transmilenio", "sitp", "multimodal"]);
+
+function isTransitStopMode(mode: string | undefined): mode is TransitStopMode {
+  return mode === "transmilenio" || mode === "sitp";
+}
+
+function getStopMode(
+  prediction: RoutePrediction,
+  segmentIndex: number,
+): TransitStopMode | undefined {
+  const outgoingMode = prediction.risk_segments
+    .slice(segmentIndex)
+    .find((segment) => isTransitStopMode(segment.mode))?.mode;
+  if (isTransitStopMode(outgoingMode)) return outgoingMode;
+
+  const incomingMode = prediction.risk_segments
+    .slice(0, segmentIndex)
+    .reverse()
+    .find((segment) => isTransitStopMode(segment.mode))?.mode;
+  if (isTransitStopMode(incomingMode)) return incomingMode;
+
+  return isTransitStopMode(prediction.mode) ? prediction.mode : undefined;
+}
 
 function appendUniqueName(names: string[], name: string) {
   const normalized = name.trim();
@@ -49,7 +74,7 @@ export function getPredictionStops(
   if (!prediction || !TRANSIT_MODES.has(prediction.mode)) return [];
 
   const stops: PredictionStop[] = [];
-  prediction.risk_segments.forEach((segment) => {
+  prediction.risk_segments.forEach((segment, segmentIndex) => {
     const coordinate = segment.coordinates[0];
     if (!coordinate || !coordinate.every(Number.isFinite)) return;
     const previous = stops[stops.length - 1];
@@ -64,6 +89,7 @@ export function getPredictionStops(
       name: segment.from_station || `Parada ${stops.length + 1}`,
       lat: coordinate[0],
       lon: coordinate[1],
+      mode: getStopMode(prediction, segmentIndex),
     });
   });
 
@@ -83,6 +109,10 @@ export function getPredictionStops(
         name: lastSegment.to_station || `Parada ${stops.length + 1}`,
         lat: lastCoordinate[0],
         lon: lastCoordinate[1],
+        mode: getStopMode(
+          prediction,
+          prediction.risk_segments.indexOf(lastSegment),
+        ),
       });
     }
   }
