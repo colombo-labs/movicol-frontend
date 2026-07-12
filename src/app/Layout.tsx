@@ -244,6 +244,7 @@ export function Layout() {
               }}
               title={t("nav.planificar")}
               snapOverride={panelSnap}
+              onSnapChange={() => setPanelSnap(null)}
             >
               <PlanificarViajePanel
                 onPredictMulti={handlePredict}
