@@ -71,6 +71,9 @@ function getManeuverIcon(maneuver: string, size = 28) {
   if (maneuver.includes("right")) return <CornerUpRight size={size} />;
   if (maneuver.includes("uturn") || maneuver.includes("u-turn"))
     return <RotateCcw size={size} />;
+  if (maneuver === "board") return <ArrowUp size={size} />;
+  if (maneuver === "transfer") return <RotateCcw size={size} />;
+  if (maneuver === "arrive") return <ArrowUp size={size} />;
   return <ArrowUp size={size} />;
 }
 
@@ -78,6 +81,9 @@ function getManeuverColor(maneuver: string): string {
   if (maneuver.includes("left") || maneuver.includes("right"))
     return "bg-amber-500";
   if (maneuver.includes("uturn")) return "bg-red-500";
+  if (maneuver === "board") return "bg-emerald-600";
+  if (maneuver === "transfer") return "bg-orange-500";
+  if (maneuver === "arrive") return "bg-blue-600";
   return "bg-primary";
 }
 
@@ -136,10 +142,79 @@ export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
     null,
   );
 
-  const steps: NavStep[] = useMemo(
-    () => prediction.navigation_steps || [],
-    [prediction],
-  );
+  const steps: NavStep[] = useMemo(() => {
+    // If backend provides navigation_steps, use them (vehicle routes)
+    if (prediction.navigation_steps && prediction.navigation_steps.length > 0) {
+      return prediction.navigation_steps;
+    }
+
+    // For transit routes: generate steps from stations + risk_segments
+    const stations = prediction.stations || [];
+    const segments = prediction.risk_segments || [];
+    if (stations.length < 2) return [];
+
+    const generated: NavStep[] = [];
+    const totalTime = prediction.total_time_minutes * 60;
+    const totalDist = prediction.total_distance_km * 1000;
+    const perStop = stations.length > 1 ? 1 / (stations.length - 1) : 1;
+
+    // Step 1: Walk to first station
+    generated.push({
+      instruction: `Camina hacia ${stations[0]}`,
+      street: stations[0],
+      distance_m: Math.round(totalDist * 0.05),
+      duration_s: Math.round(totalTime * 0.05),
+      maneuver: "depart",
+    });
+
+    // Step 2: Board
+    const mode = prediction.mode === "sitp" ? "SITP" : "TransMilenio";
+    const code = prediction.route_code || mode;
+    generated.push({
+      instruction: `Toma el ${mode} ${code} en ${stations[0]}`,
+      street: stations[0],
+      distance_m: 0,
+      duration_s: Math.round((prediction.estimated_wait_minutes || 5) * 60),
+      maneuver: "board",
+    });
+
+    // Steps for each station segment
+    for (let i = 1; i < stations.length; i++) {
+      const segMode = segments[i - 1]?.mode;
+      const isTransfer = segMode === "walk";
+
+      if (isTransfer) {
+        generated.push({
+          instruction: `Transbordo: camina hacia ${stations[i]}`,
+          street: stations[i],
+          distance_m: Math.round(totalDist * perStop * 0.3),
+          duration_s: Math.round(totalTime * perStop * 0.5),
+          maneuver: "transfer",
+        });
+      } else {
+        generated.push({
+          instruction: i === stations.length - 1
+            ? `Baja en ${stations[i]}`
+            : `Pasa por ${stations[i]}`,
+          street: stations[i],
+          distance_m: Math.round(totalDist * perStop * 0.9),
+          duration_s: Math.round(totalTime * perStop * 0.9),
+          maneuver: i === stations.length - 1 ? "arrive" : "straight",
+        });
+      }
+    }
+
+    // Final: walk to destination
+    generated.push({
+      instruction: "Camina hacia tu destino",
+      street: "Destino",
+      distance_m: Math.round(totalDist * 0.05),
+      duration_s: Math.round(totalTime * 0.05),
+      maneuver: "arrive",
+    });
+
+    return generated;
+  }, [prediction]);
 
   const currentStep = steps[currentStepIdx] || null;
   const nextStep = steps[currentStepIdx + 1] || null;
