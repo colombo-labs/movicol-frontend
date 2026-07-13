@@ -120,7 +120,7 @@ function addAlternatives(
 
 /**
  * Classify a route prediction automatically based on its segments and transfers.
- * Returns a human-readable label like "Solo TM", "SITP → TM", etc.
+ * Returns a human-readable label like "TM · F19", "SITP → TM", etc.
  */
 /**
  * Clean route_code for display:
@@ -154,8 +154,8 @@ function classifyRoute(prediction: RoutePrediction): string {
   const transfers = prediction.transfers ?? 0;
 
   if (transfers === 0) {
-    if (hasTm && !hasSitp) return code ? `Solo TM · ${code}` : "Solo TM";
-    if (hasSitp && !hasTm) return code ? `Solo SITP · ${code}` : "Solo SITP";
+    if (hasTm && !hasSitp) return code ? `TM · ${code}` : "TransMilenio";
+    if (hasSitp && !hasTm) return code ? `SITP · ${code}` : "SITP";
     if (hasTm && hasSitp) return code ? `TM + SITP · ${code}` : "TM + SITP";
   } else {
     if (hasTm && !hasSitp) return code ? `TM → TM · ${code}` : "TM → TM";
