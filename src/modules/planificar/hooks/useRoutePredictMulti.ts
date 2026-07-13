@@ -140,36 +140,39 @@ function cleanRouteCode(code: string, mode: string): string {
 }
 
 function classifyRoute(prediction: RoutePrediction): string {
-  const segments = prediction.risk_segments || [];
   const rawCode = prediction.route_code || "";
   const code = cleanRouteCode(rawCode, prediction.mode);
+  const segments = prediction.risk_segments || [];
+  const transfers = prediction.transfers ?? 0;
 
-  // Determine transport modes used (excluding walk segments)
   const transportModes = segments
     .map((s) => s.mode)
     .filter((m) => m && m !== "walk");
 
   const hasTm = transportModes.includes("transmilenio");
   const hasSitp = transportModes.includes("sitp");
-  const transfers = prediction.transfers ?? 0;
 
+  const type = getRouteType(hasTm, hasSitp, transfers, transportModes[0]);
+  return code ? `${type} · ${code}` : type;
+}
+
+/** Determine route type label from mode composition */
+function getRouteType(
+  hasTm: boolean,
+  hasSitp: boolean,
+  transfers: number,
+  firstMode?: string,
+): string {
   if (transfers === 0) {
-    if (hasTm && !hasSitp) return code ? `TM · ${code}` : "TransMilenio";
-    if (hasSitp && !hasTm) return code ? `SITP · ${code}` : "SITP";
-    if (hasTm && hasSitp) return code ? `TM + SITP · ${code}` : "TM + SITP";
-  } else {
-    if (hasTm && !hasSitp) return code ? `TM → TM · ${code}` : "TM → TM";
-    if (hasSitp && !hasTm)
-      return code ? `SITP → SITP · ${code}` : "SITP → SITP";
-    const firstMode = transportModes[0];
-    if (firstMode === "transmilenio")
-      return code ? `TM → SITP · ${code}` : "TM → SITP";
-    return code ? `SITP → TM · ${code}` : "SITP → TM";
+    if (hasTm && !hasSitp) return "TM";
+    if (hasSitp && !hasTm) return "SITP";
+    if (hasTm && hasSitp) return "TM + SITP";
+    return "TransMilenio";
   }
-
-  if (prediction.mode === "transmilenio") return code ? `TM · ${code}` : "TM";
-  if (prediction.mode === "sitp") return code ? `SITP · ${code}` : "SITP";
-  return code ? `TM + SITP · ${code}` : "TM + SITP";
+  if (hasTm && !hasSitp) return "TM → TM";
+  if (hasSitp && !hasTm) return "SITP → SITP";
+  if (firstMode === "transmilenio") return "TM → SITP";
+  return "SITP → TM";
 }
 
 function buildOptions(
