@@ -3,10 +3,11 @@ import {
   MapContainer,
   TileLayer,
   Polyline,
-  CircleMarker,
+  Marker,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { makeUserGpsIcon } from "@shared/ui/map-components/make-icon";
 import {
   X,
   Volume2,
@@ -103,17 +104,19 @@ function RouteMapView({
   routeColor,
   routeWeight = 5,
   userPos,
+  heading = null,
   children,
   className = "h-[35vh]",
 }: {
-  center: [number, number];
-  zoom: number;
-  routeCoords: [number, number][];
-  routeColor: string;
-  routeWeight?: number;
-  userPos: { lat: number; lng: number } | null;
-  children?: React.ReactNode;
-  className?: string;
+  readonly center: [number, number];
+  readonly zoom: number;
+  readonly routeCoords: [number, number][];
+  readonly routeColor: string;
+  readonly routeWeight?: number;
+  readonly userPos: { lat: number; lng: number } | null;
+  readonly heading?: number | null;
+  readonly children?: React.ReactNode;
+  readonly className?: string;
 }) {
   return (
     <div className={`${className} relative overflow-hidden`}>
@@ -137,15 +140,10 @@ function RouteMapView({
           />
         )}
         {userPos && (
-          <CircleMarker
-            center={[userPos.lat, userPos.lng]}
-            radius={10}
-            pathOptions={{
-              color: "#3b82f6",
-              fillColor: "#3b82f6",
-              fillOpacity: 0.9,
-              weight: 3,
-            }}
+          <Marker
+            position={[userPos.lat, userPos.lng]}
+            icon={makeUserGpsIcon(heading)}
+            interactive={false}
           />
         )}
       </MapContainer>
@@ -196,6 +194,8 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
     null,
   );
+  const [heading, setHeading] = useState<number | null>(null);
+  const prevPosRef = useRef<{ lat: number; lng: number } | null>(null);
   const watchRef = useRef<number | null>(null);
 
   const stations = useMemo(
@@ -224,6 +224,16 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
       (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
         setUserPos({ lat, lng });
+
+        // Calculate heading from movement
+        if (prevPosRef.current) {
+          const dLat = lat - prevPosRef.current.lat;
+          const dLng = lng - prevPosRef.current.lng;
+          if (Math.abs(dLat) > 0.00002 || Math.abs(dLng) > 0.00002) {
+            setHeading((Math.atan2(dLng, dLat) * 180) / Math.PI);
+          }
+        }
+        prevPosRef.current = { lat, lng };
 
         // Find closest station to user
         // We only advance forward (never go back)
@@ -275,7 +285,7 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
       : [4.65, -74.1];
 
   return (
-    <div className="fixed inset-0 z-[700] flex flex-col bg-background">
+    <div className="fixed top-0 left-0 right-0 bottom-16 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
       {/* Header */}
       <div
         className={`${modeBg} text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10`}
@@ -315,6 +325,7 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
         zoom={14}
         routeCoords={routeCoords}
         routeColor={mode === "transmilenio" ? "#ef4444" : "#3b82f6"}
+        heading={heading}
         userPos={userPos}
       />
 
@@ -632,7 +643,7 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
   // No steps → show fallback message
   if (!steps.length) {
     return (
-      <div className="fixed inset-0 z-[700] bg-background flex items-center justify-center">
+      <div className="fixed top-0 left-0 right-0 bottom-16 md:bottom-0 md:left-[60px] z-[700] bg-background flex items-center justify-center">
         <div className="text-center p-6">
           <Navigation size={40} className="mx-auto mb-3 text-default-300" />
           <p className="text-sm text-default-500 mb-2">
@@ -660,7 +671,7 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
     : routeCoords[0] || ([4.65, -74.1] as [number, number]);
 
   return (
-    <div className="fixed inset-0 z-[700] flex flex-col bg-background">
+    <div className="fixed top-0 left-0 right-0 bottom-16 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
       {/* Instruction banner */}
       <div
         className={`${getManeuverColor(currentStep?.maneuver || "")} text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10`}

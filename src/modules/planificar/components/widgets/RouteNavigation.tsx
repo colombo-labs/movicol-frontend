@@ -35,7 +35,7 @@ function groupSegmentsIntoLegs(prediction: RoutePrediction): TransitLeg[] {
       {
         mode: (prediction.mode as "transmilenio" | "sitp") || "transmilenio",
         stations: prediction.stations || [],
-        durationMin: prediction.total_time_minutes,
+        durationMin: Math.round(prediction.total_time_minutes),
       },
     ];
   }
@@ -252,7 +252,7 @@ export function NavigationSteps({ prediction, getETA }: Props) {
                   </p>
                 </div>
                 <span className="text-[11px] font-bold text-default-500">
-                  {leg.durationMin} min
+                  {Math.round(leg.durationMin)} min
                 </span>
               </div>
 
