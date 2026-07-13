@@ -26,11 +26,10 @@ interface TransitLeg {
   durationMin: number;
 }
 
-/** Group risk_segments into legs by mode (consecutive same-mode segments become one leg) */
+/** Group risk_segments into legs by mode. Absorbs short walk segments into adjacent transit legs. */
 function groupSegmentsIntoLegs(prediction: RoutePrediction): TransitLeg[] {
   const segments = prediction.risk_segments || [];
   if (segments.length === 0) {
-    // Fallback: single leg from stations
     return [
       {
         mode: (prediction.mode as "transmilenio" | "sitp") || "transmilenio",
@@ -40,49 +39,87 @@ function groupSegmentsIntoLegs(prediction: RoutePrediction): TransitLeg[] {
     ];
   }
 
+  // First pass: determine the dominant transit mode
+  const transitModes = segments
+    .map((s) => s.mode)
+    .filter((m) => m && m !== "walk");
+  const dominantMode = transitModes[0] || prediction.mode || "transmilenio";
+
+  // Second pass: treat all segments as ONE transit leg unless there's a REAL
+  // mode change (e.g. transmilenio → sitp). Walk segments between same-mode
+  // transit are just connections, not transfers.
+  const allStations: string[] = [];
+  let hasRealTransfer = false;
+
+  for (const seg of segments) {
+    if (!allStations.includes(seg.from_station)) {
+      allStations.push(seg.from_station);
+    }
+    if (!allStations.includes(seg.to_station)) {
+      allStations.push(seg.to_station);
+    }
+    // Detect real transfer: mode changes between two non-walk modes
+    const segMode = seg.mode || dominantMode;
+    if (segMode !== "walk" && segMode !== dominantMode) {
+      hasRealTransfer = true;
+    }
+  }
+
+  // Simple case: single transit mode (even with walk connections) → one leg
+  if (!hasRealTransfer) {
+    return [
+      {
+        mode: dominantMode as "transmilenio" | "sitp" | "walk",
+        stations: allStations,
+        durationMin: Math.round(prediction.total_time_minutes),
+      },
+    ];
+  }
+
+  // Complex case: real multimodal (TM + SITP). Group by actual transit mode changes.
   const legs: TransitLeg[] = [];
   let currentMode = "";
   let currentStations: string[] = [];
-  const totalTransitTime = prediction.total_time_minutes;
-  const totalStations = segments.length + 1; // approximate
+  const totalTime = prediction.total_time_minutes;
+  const totalSegs = segments.length;
 
-  for (const seg of segments) {
-    const segMode = seg.mode || prediction.mode;
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i];
+    let segMode = seg.mode || dominantMode;
 
-    if (segMode !== currentMode) {
-      // Save previous leg
-      if (currentStations.length > 0) {
-        const legTime = Math.max(
+    // Walk between transit legs: assign to the NEXT transit mode
+    if (segMode === "walk") {
+      const nextTransit = segments
+        .slice(i + 1)
+        .find((s) => s.mode && s.mode !== "walk");
+      segMode = nextTransit?.mode || currentMode || dominantMode;
+    }
+
+    if (segMode !== currentMode && currentStations.length > 0) {
+      legs.push({
+        mode: currentMode as "transmilenio" | "sitp" | "walk",
+        stations: currentStations,
+        durationMin: Math.max(
           1,
-          Math.round(
-            (currentStations.length / totalStations) * totalTransitTime,
-          ),
-        );
-        legs.push({
-          mode: currentMode as "transmilenio" | "sitp" | "walk",
-          stations: currentStations,
-          durationMin: legTime,
-        });
-      }
-      // Start new leg
-      currentMode = segMode;
-      currentStations = [seg.from_station];
+          Math.round((currentStations.length / totalSegs) * totalTime),
+        ),
+      });
+      currentStations = [];
     }
-    // Always add the to_station
-    if (!currentStations.includes(seg.to_station)) {
+    currentMode = segMode;
+    if (!currentStations.includes(seg.from_station))
+      currentStations.push(seg.from_station);
+    if (!currentStations.includes(seg.to_station))
       currentStations.push(seg.to_station);
-    }
   }
-  // Push last leg
   if (currentStations.length > 0) {
-    const legTime = Math.max(
-      1,
-      Math.round((currentStations.length / totalStations) * totalTransitTime),
-    );
     legs.push({
       mode: currentMode as "transmilenio" | "sitp" | "walk",
       stations: currentStations,
-      durationMin: legTime,
+      durationMin: Math.max(
+        1,
+        Math.round((currentStations.length / totalSegs) * totalTime),
+      ),
     });
   }
 
