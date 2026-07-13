@@ -321,12 +321,11 @@ export function MapView({
           }
 
           // Intermediate stops: small dots colored by mode (Moovit style)
-          const dotColor =
-            stop.mode === "transmilenio"
-              ? "#ef4444"
-              : stop.mode === "sitp"
-                ? "#3b82f6"
-                : "#9ca3af";
+          const modeColors: Record<string, string> = {
+            transmilenio: "#ef4444",
+            sitp: "#3b82f6",
+          };
+          const dotColor = modeColors[stop.mode || ""] || "#9ca3af";
           return (
             <CircleMarker
               key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}

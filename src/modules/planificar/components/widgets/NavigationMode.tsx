@@ -108,15 +108,15 @@ function RouteMapView({
   children,
   className = "h-[35vh]",
 }: {
-  center: [number, number];
-  zoom: number;
-  routeCoords: [number, number][];
-  routeColor: string;
-  routeWeight?: number;
-  userPos: { lat: number; lng: number } | null;
-  heading?: number | null;
-  children?: React.ReactNode;
-  className?: string;
+  readonly center: [number, number];
+  readonly zoom: number;
+  readonly routeCoords: [number, number][];
+  readonly routeColor: string;
+  readonly routeWeight?: number;
+  readonly userPos: { lat: number; lng: number } | null;
+  readonly heading?: number | null;
+  readonly children?: React.ReactNode;
+  readonly className?: string;
 }) {
   return (
     <div className={`${className} relative overflow-hidden`}>

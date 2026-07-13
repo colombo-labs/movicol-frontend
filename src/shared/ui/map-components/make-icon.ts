@@ -16,7 +16,7 @@ export function makeArrowIcon(angle: number, color: string) {
 
 /** GPS user location icon with direction cone */
 export function makeUserGpsIcon(heading: number | null) {
-  const rotation = heading !== null ? heading : 0;
+  const rotation = heading ?? 0;
   const showCone = heading !== null;
   return L.divIcon({
     className: "",
