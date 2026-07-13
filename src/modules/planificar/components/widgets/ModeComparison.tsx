@@ -232,7 +232,7 @@ export function RouteOptionsList({
             {/* Summary line */}
             <div className="flex items-center gap-3 text-[9px] text-default-400 flex-wrap">
               <span>{opt.total_distance_km.toFixed(1)} km</span>
-              <span>{opt.cost}</span>
+              {opt.cost && opt.cost !== "$0" && <span>{opt.cost}</span>}
               {opt.transfers > 0 && (
                 <span className="flex items-center gap-0.5">
                   <ArrowRightLeft size={8} />
