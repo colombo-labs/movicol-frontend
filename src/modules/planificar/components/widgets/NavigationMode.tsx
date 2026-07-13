@@ -640,24 +640,79 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // No steps → show fallback message
+  // No turn-by-turn steps → show map + route summary (bici/caminando)
   if (!steps.length) {
+    const mapCenter = userPos
+      ? ([userPos.lat, userPos.lng] as [number, number])
+      : routeCoords[0] || ([4.65, -74.1] as [number, number]);
     return (
-      <div className="fixed top-0 left-0 right-0 bottom-16 md:bottom-0 md:left-[60px] z-[700] bg-background flex items-center justify-center">
-        <div className="text-center p-6">
-          <Navigation size={40} className="mx-auto mb-3 text-default-300" />
-          <p className="text-sm text-default-500 mb-2">
-            Ruta calculada sin instrucciones detalladas.
-          </p>
-          <p className="text-xs text-default-400 mb-4">
-            {formatDistance(prediction.total_distance_km * 1000)} ·{" "}
-            {formatMinutes(prediction.total_time_minutes)}
-          </p>
+      <div className="fixed top-0 left-0 right-0 bottom-16 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
+        {/* Header */}
+        <div className="bg-primary text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10">
+          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+            <Navigation size={20} />
+          </div>
+          <div className="flex-1">
+            <p className="text-base font-bold">
+              {prediction.mode === "bicicleta"
+                ? "🚴 En bici"
+                : prediction.mode === "caminando"
+                  ? "🚶 A pie"
+                  : "🚗 En camino"}
+            </p>
+            <p className="text-sm opacity-80">
+              {formatDistance(prediction.total_distance_km * 1000)} ·{" "}
+              {formatMinutes(prediction.total_time_minutes)}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-2xl font-black">
+              {formatETA(prediction.total_time_minutes * 60)}
+            </p>
+            <p className="text-[10px] opacity-70">llegada</p>
+          </div>
+        </div>
+
+        {/* Map */}
+        <RouteMapView
+          center={mapCenter}
+          zoom={15}
+          routeCoords={routeCoords}
+          routeColor={
+            prediction.mode === "bicicleta"
+              ? "#06b6d4"
+              : prediction.mode === "caminando"
+                ? "#9ca3af"
+                : "#22c55e"
+          }
+          routeWeight={5}
+          userPos={userPos}
+          heading={heading}
+          className="flex-1"
+        />
+
+        {/* Bottom */}
+        <div className="px-4 py-3 bg-background border-t border-divider flex items-center gap-3">
           <button
             onClick={onExit}
-            className="px-4 py-2 rounded-lg bg-primary text-white text-sm"
+            className="w-11 h-11 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center text-danger active:scale-90"
           >
-            Volver
+            <X size={20} />
+          </button>
+          <div className="flex-1 text-center">
+            <p className="text-lg font-bold text-foreground">
+              {formatETA(prediction.total_time_minutes * 60)}
+            </p>
+            <p className="text-[10px] text-default-400">
+              {formatDistance(prediction.total_distance_km * 1000)} ·{" "}
+              {formatMinutes(prediction.total_time_minutes)}
+            </p>
+          </div>
+          <button
+            onClick={() => setVoiceEnabled((v) => !v)}
+            className={`w-11 h-11 rounded-full border flex items-center justify-center active:scale-90 ${voiceEnabled ? "bg-primary/10 border-primary/30 text-primary" : "bg-default-100 border-divider text-default-400"}`}
+          >
+            {voiceEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
         </div>
       </div>
