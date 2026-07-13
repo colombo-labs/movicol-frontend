@@ -63,7 +63,7 @@ export function TripPointsList({
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const maxPoints = mode === "vehiculo" ? 10 : 2;
+  const maxPoints = mode === "vehiculo" || mode === "moto" ? 10 : 2;
 
   const handleSearch = (value: string, idx: number) => {
     setQuery(value);
@@ -233,7 +233,7 @@ export function TripPointsList({
         </div>
 
         {/* Add destination (vehículo only, more than 2) */}
-        {mode === "vehiculo" &&
+        {(mode === "vehiculo" || mode === "moto") &&
           tripPoints.length >= 2 &&
           !showExtraSlot &&
           tripPoints.length < maxPoints && (

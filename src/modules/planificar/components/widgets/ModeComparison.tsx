@@ -10,6 +10,28 @@ import {
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { TransportMode, RouteOption, RouteLeg } from "../../models/types";
 
+function TransitLogo({ mode, label }: { mode?: string; label?: string }) {
+  const isTm = mode === "transmilenio" || (label || "").includes("TM");
+  const isSitp = mode === "sitp" || (label || "").includes("SITP");
+  if (isTm)
+    return (
+      <img
+        src="/icons/tm-logo.svg"
+        alt="TM"
+        className="w-5 h-5 rounded-full bg-white p-px"
+      />
+    );
+  if (isSitp)
+    return (
+      <img
+        src="/icons/sitp-logo.svg"
+        alt="SITP"
+        className="w-5 h-5 rounded-full bg-white p-px"
+      />
+    );
+  return null;
+}
+
 function formatTime(min: number): string {
   const m = Math.round(min);
   if (m < 60) return `${m} min`;
@@ -172,23 +194,14 @@ export function RouteOptionsList({
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">
                 {/* Transit logo + route code */}
-                {opt.prediction?.mode === "transmilenio" ||
-                opt.label.includes("TM") ? (
-                  <img
-                    src="/icons/tm-logo.svg"
-                    alt="TM"
-                    className="w-4 h-4 rounded-full bg-white p-px"
-                  />
-                ) : opt.prediction?.mode === "sitp" ||
-                  opt.label.includes("SITP") ? (
-                  <img
-                    src="/icons/sitp-logo.svg"
-                    alt="SITP"
-                    className="w-4 h-4 rounded-full bg-white p-px"
-                  />
-                ) : null}
-                <span className="text-[11px] font-semibold text-foreground">
-                  {t(opt.label)}
+                <TransitLogo mode={opt.prediction?.mode} label={opt.label} />
+                <span className="text-[11px] font-bold text-foreground">
+                  {opt.prediction?.route_code || ""}
+                </span>
+                <span className="text-[10px] text-default-500 truncate max-w-[120px]">
+                  {opt.prediction?.stations?.[
+                    opt.prediction.stations.length - 1
+                  ] || ""}
                 </span>
                 {opt.tag && TAG_LABELS[opt.tag] && (
                   <span
@@ -203,28 +216,32 @@ export function RouteOptionsList({
               </span>
             </div>
 
-            {/* Legs timeline — Google Maps style */}
+            {/* Legs: walk → transit → walk (compact) */}
             <div className="flex items-center gap-1 mb-1.5 flex-wrap">
               {opt.legs
-                .filter((l) => l.type !== "walk" || l.duration_minutes > 3)
+                .filter((l) => l.type !== "walk" || l.duration_minutes > 2)
                 .map((leg, i) => (
                   <div
                     key={`leg-${opt.id}-${i}`}
                     className="flex items-center gap-1"
                   >
                     {i > 0 && (
-                      <ArrowRightLeft size={8} className="text-default-300" />
+                      <span className="text-[9px] text-default-300">›</span>
                     )}
-                    <span
-                      className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full ${getLegBg(leg.type)}`}
-                    >
-                      <LegIcon type={leg.type} size={11} />
-                      <span className="text-foreground">
-                        {leg.type === "walk"
-                          ? `${leg.duration_minutes}'`
-                          : leg.line || leg.type.toUpperCase()}
+                    {leg.type === "walk" ? (
+                      <span className="text-[9px] text-default-400">
+                        {Math.max(1, Math.round(leg.duration_minutes))}' 🚶
                       </span>
-                    </span>
+                    ) : (
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${getLegBg(leg.type)}`}
+                      >
+                        <LegIcon type={leg.type} size={10} />
+                        <span className="text-foreground font-bold">
+                          {leg.line || ""}
+                        </span>
+                      </span>
+                    )}
                   </div>
                 ))}
             </div>
@@ -232,7 +249,7 @@ export function RouteOptionsList({
             {/* Summary line */}
             <div className="flex items-center gap-3 text-[9px] text-default-400 flex-wrap">
               <span>{opt.total_distance_km.toFixed(1)} km</span>
-              <span>{opt.cost}</span>
+              {opt.cost && opt.cost !== "$0" && <span>{opt.cost}</span>}
               {opt.transfers > 0 && (
                 <span className="flex items-center gap-0.5">
                   <ArrowRightLeft size={8} />

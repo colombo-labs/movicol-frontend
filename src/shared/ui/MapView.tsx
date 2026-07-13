@@ -22,7 +22,6 @@ import { SiniestroLayer } from "./map-components/siniestro-layer";
 import { CarrilPreferencialLayer } from "./CarrilPreferencialLayer";
 import {
   makeIcon,
-  makeTransitStopIcon,
   makeTransitEndpointIcon,
   makeArrowIcon,
 } from "./map-components/make-icon";
@@ -126,7 +125,7 @@ export function MapView({
           url={
             darkMap
               ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           }
           attribution={darkMap ? "&copy; CartoDB" : "&copy; OpenStreetMap"}
         />
@@ -302,14 +301,13 @@ export function MapView({
         {predictionStops.map((stop, i) => {
           const isFirst = i === 0;
           const isLast = i === predictionStops.length - 1;
-          const fillColor = getStopFillColor(i, predictionStops.length);
           const popup = (
             <Popup>
               <b>{i + 1}.</b> {stop.name}
             </Popup>
           );
 
-          // First/last stops get large TM/SITP endpoint icons
+          // First/last stops get large TM/SITP endpoint icons with logo
           if (stop.mode && (isFirst || isLast)) {
             return (
               <Marker
@@ -322,23 +320,20 @@ export function MapView({
             );
           }
 
-          // Intermediate stops get small transit icons
-          return stop.mode ? (
-            <Marker
-              key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}
-              position={[stop.lat, stop.lon]}
-              icon={makeTransitStopIcon(stop.mode, fillColor)}
-            >
-              {popup}
-            </Marker>
-          ) : (
+          // Intermediate stops: small dots colored by mode (Moovit style)
+          const modeColors: Record<string, string> = {
+            transmilenio: "#ef4444",
+            sitp: "#3b82f6",
+          };
+          const dotColor = modeColors[stop.mode || ""] || "#9ca3af";
+          return (
             <CircleMarker
               key={`prediction-stop-${i}-${stop.lat}-${stop.lon}`}
               center={[stop.lat, stop.lon]}
-              radius={5}
+              radius={4}
               pathOptions={{
-                color: "#475569",
-                fillColor,
+                color: "#fff",
+                fillColor: dotColor,
                 fillOpacity: 1,
                 weight: 2,
               }}
