@@ -1,4 +1,8 @@
 import { useState } from "react";
+import {
+  groupSegmentsIntoLegs,
+  type TransitLeg,
+} from "../../utils/transitLegs";
 import { useTranslation } from "react-i18next";
 import {
   Footprints,
@@ -20,113 +24,6 @@ interface Props {
 }
 
 /** A grouped transit leg (consecutive segments of same mode) */
-type LegMode = "transmilenio" | "sitp" | "walk";
-
-interface TransitLeg {
-  mode: LegMode;
-  stations: string[];
-  durationMin: number;
-}
-
-/** Group risk_segments into legs by mode. Absorbs short walk segments into adjacent transit legs. */
-function groupSegmentsIntoLegs(prediction: RoutePrediction): TransitLeg[] {
-  const segments = prediction.risk_segments || [];
-  if (segments.length === 0) {
-    return [
-      {
-        mode: (prediction.mode as "transmilenio" | "sitp") || "transmilenio",
-        stations: prediction.stations || [],
-        durationMin: Math.round(prediction.total_time_minutes),
-      },
-    ];
-  }
-
-  // First pass: determine the dominant transit mode
-  const dominantMode =
-    segments.find((s) => s.mode && s.mode !== "walk")?.mode ||
-    prediction.mode ||
-    "transmilenio";
-
-  // Second pass: treat all segments as ONE transit leg unless there's a REAL
-  // mode change (e.g. transmilenio → sitp). Walk segments between same-mode
-  // transit are just connections, not transfers.
-  const allStations: string[] = [];
-  let hasRealTransfer = false;
-
-  for (const seg of segments) {
-    if (!allStations.includes(seg.from_station)) {
-      allStations.push(seg.from_station);
-    }
-    if (!allStations.includes(seg.to_station)) {
-      allStations.push(seg.to_station);
-    }
-    // Detect real transfer: mode changes between two non-walk modes
-    const segMode = seg.mode || dominantMode;
-    if (segMode !== "walk" && segMode !== dominantMode) {
-      hasRealTransfer = true;
-    }
-  }
-
-  // Simple case: single transit mode (even with walk connections) → one leg
-  if (!hasRealTransfer) {
-    return [
-      {
-        mode: dominantMode as "transmilenio" | "sitp" | "walk",
-        stations: allStations,
-        durationMin: Math.round(prediction.total_time_minutes),
-      },
-    ];
-  }
-
-  // Complex case: real multimodal (TM + SITP). Group by actual transit mode changes.
-  const legs: TransitLeg[] = [];
-  let currentMode = "";
-  let currentStations: string[] = [];
-  const totalTime = prediction.total_time_minutes;
-  const totalSegs = segments.length;
-
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i];
-    let segMode = seg.mode || dominantMode;
-
-    // Walk between transit legs: assign to the NEXT transit mode
-    if (segMode === "walk") {
-      const nextTransit = segments
-        .slice(i + 1)
-        .find((s) => s.mode && s.mode !== "walk");
-      segMode = nextTransit?.mode || currentMode || dominantMode;
-    }
-
-    if (segMode !== currentMode && currentStations.length > 0) {
-      legs.push({
-        mode: currentMode as "transmilenio" | "sitp" | "walk",
-        stations: currentStations,
-        durationMin: Math.max(
-          1,
-          Math.round((currentStations.length / totalSegs) * totalTime),
-        ),
-      });
-      currentStations = [];
-    }
-    currentMode = segMode;
-    if (!currentStations.includes(seg.from_station))
-      currentStations.push(seg.from_station);
-    if (!currentStations.includes(seg.to_station))
-      currentStations.push(seg.to_station);
-  }
-  if (currentStations.length > 0) {
-    legs.push({
-      mode: currentMode as "transmilenio" | "sitp" | "walk",
-      stations: currentStations,
-      durationMin: Math.max(
-        1,
-        Math.round((currentStations.length / totalSegs) * totalTime),
-      ),
-    });
-  }
-
-  return legs;
-}
 
 // ═══════════════════════════════════════════════════════════════════
 

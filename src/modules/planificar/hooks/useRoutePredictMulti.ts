@@ -10,6 +10,7 @@ import {
 import { routePredictionApi } from "@modules/predicciones/api";
 import type { RouteOption, RouteLeg, TransportMode } from "../models/types";
 import { calcDistance, fetchRutasCercanas } from "../api/planificarApi";
+import { groupSegmentsIntoLegs } from "../utils/transitLegs";
 
 interface PredictMultiParams {
   origin: Coordinates;
@@ -36,61 +37,58 @@ function predictionToOption(
   const normalizedPrediction = withPredictionStations(prediction);
   const walkTime = Math.min(7, Math.max(3, Math.round(dist * 0.8)));
   const code = deriveLineName(normalizedPrediction);
-  const legType: RouteLeg["type"] =
-    normalizedPrediction.mode === "transmilenio"
-      ? "transmilenio"
-      : normalizedPrediction.mode === "sitp"
-        ? "sitp"
-        : normalizedPrediction.mode === "vehiculo"
-          ? "drive"
-          : "transmilenio";
+
+  // Use the same leg grouping as the detail view
+  const transitLegs = groupSegmentsIntoLegs(normalizedPrediction);
 
   const legs: RouteLeg[] = [];
-  if (normalizedPrediction.stations.length > 0) {
-    legs.push({
-      type: "walk",
-      from: "Tu ubicación",
-      to: normalizedPrediction.stations[0],
-      duration_minutes: walkTime,
-      distance_km: dist * 0.15,
-    });
-    legs.push({
-      type: legType,
-      from: normalizedPrediction.stations[0],
-      to: normalizedPrediction.stations[
-        normalizedPrediction.stations.length - 1
-      ],
-      duration_minutes: Math.max(
-        1,
-        Math.round(normalizedPrediction.total_time_minutes - walkTime * 2),
-      ),
-      distance_km: normalizedPrediction.total_distance_km * 0.85,
-      stations: normalizedPrediction.stations,
-      line: code || normalizedPrediction.mode.toUpperCase(),
-    });
-    legs.push({
-      type: "walk",
-      from: normalizedPrediction.stations[
-        normalizedPrediction.stations.length - 1
-      ],
-      to: "Destino",
-      duration_minutes: walkTime,
-      distance_km: dist * 0.15,
-    });
-  } else {
+
+  // Initial walk
+  const firstStation =
+    transitLegs[0]?.stations[0] || normalizedPrediction.stations[0] || "Parada";
+  legs.push({
+    type: "walk",
+    from: "Tu ubicación",
+    to: firstStation,
+    duration_minutes: walkTime,
+    distance_km: dist * 0.1,
+  });
+
+  // Transit legs from groupSegmentsIntoLegs
+  for (const tLeg of transitLegs) {
+    const legType: RouteLeg["type"] =
+      tLeg.mode === "sitp" ? "sitp" : "transmilenio";
     legs.push({
       type: legType,
-      from: "Origen",
-      to: "Destino",
-      duration_minutes: normalizedPrediction.total_time_minutes,
-      distance_km: normalizedPrediction.total_distance_km,
+      from: tLeg.stations[0] || "",
+      to: tLeg.stations[tLeg.stations.length - 1] || "",
+      duration_minutes: tLeg.durationMin,
+      distance_km: normalizedPrediction.total_distance_km / transitLegs.length,
+      stations: tLeg.stations,
+      line: code || tLeg.mode.toUpperCase(),
     });
   }
+
+  // Final walk
+  const lastLeg = transitLegs[transitLegs.length - 1];
+  const lastStation =
+    lastLeg?.stations[lastLeg.stations.length - 1] ||
+    normalizedPrediction.stations[normalizedPrediction.stations.length - 1] ||
+    "Destino";
+  legs.push({
+    type: "walk",
+    from: lastStation,
+    to: "Destino",
+    duration_minutes: walkTime,
+    distance_km: dist * 0.1,
+  });
+
+  const totalTransitTime = transitLegs.reduce((s, l) => s + l.durationMin, 0);
 
   return {
     id,
     label,
-    total_time_minutes: normalizedPrediction.total_time_minutes,
+    total_time_minutes: totalTransitTime + walkTime * 2,
     total_distance_km: normalizedPrediction.total_distance_km,
     cost: normalizedPrediction.cost || "$3.550",
     transfers: normalizedPrediction.transfers ?? 0,
