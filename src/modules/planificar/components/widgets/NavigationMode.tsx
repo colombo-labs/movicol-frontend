@@ -3,10 +3,11 @@ import {
   MapContainer,
   TileLayer,
   Polyline,
-  CircleMarker,
+  Marker,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { makeUserGpsIcon } from "@shared/ui/map-components/make-icon";
 import {
   X,
   Volume2,
@@ -103,6 +104,7 @@ function RouteMapView({
   routeColor,
   routeWeight = 5,
   userPos,
+  heading = null,
   children,
   className = "h-[35vh]",
 }: {
@@ -112,6 +114,7 @@ function RouteMapView({
   routeColor: string;
   routeWeight?: number;
   userPos: { lat: number; lng: number } | null;
+  heading?: number | null;
   children?: React.ReactNode;
   className?: string;
 }) {
@@ -137,15 +140,10 @@ function RouteMapView({
           />
         )}
         {userPos && (
-          <CircleMarker
-            center={[userPos.lat, userPos.lng]}
-            radius={10}
-            pathOptions={{
-              color: "#3b82f6",
-              fillColor: "#3b82f6",
-              fillOpacity: 0.9,
-              weight: 3,
-            }}
+          <Marker
+            position={[userPos.lat, userPos.lng]}
+            icon={makeUserGpsIcon(heading)}
+            interactive={false}
           />
         )}
       </MapContainer>
@@ -196,6 +194,8 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
     null,
   );
+  const [heading, setHeading] = useState<number | null>(null);
+  const prevPosRef = useRef<{ lat: number; lng: number } | null>(null);
   const watchRef = useRef<number | null>(null);
 
   const stations = useMemo(
@@ -224,6 +224,16 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
       (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
         setUserPos({ lat, lng });
+
+        // Calculate heading from movement
+        if (prevPosRef.current) {
+          const dLat = lat - prevPosRef.current.lat;
+          const dLng = lng - prevPosRef.current.lng;
+          if (Math.abs(dLat) > 0.00002 || Math.abs(dLng) > 0.00002) {
+            setHeading((Math.atan2(dLng, dLat) * 180) / Math.PI);
+          }
+        }
+        prevPosRef.current = { lat, lng };
 
         // Find closest station to user
         // We only advance forward (never go back)
@@ -315,6 +325,7 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
         zoom={14}
         routeCoords={routeCoords}
         routeColor={mode === "transmilenio" ? "#ef4444" : "#3b82f6"}
+        heading={heading}
         userPos={userPos}
       />
 
