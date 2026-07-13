@@ -199,8 +199,11 @@ function buildOptions(
 
   if (sitp && getPredictionStationNames(sitp).length > 0) {
     const sitpCode = sitp.route_code || "sitp";
-    // Skip if same route as TM result
-    if (!addedCodes.has(sitpCode)) {
+    // Skip if backend returned a TM fallback instead of real SITP
+    const isRealSitp =
+      sitp.mode === "sitp" ||
+      sitp.risk_segments?.some((s) => s.mode === "sitp");
+    if (isRealSitp && !addedCodes.has(sitpCode)) {
       const label = classifyRoute(sitp);
       addedCodes.add(sitpCode);
       options.push(
@@ -212,9 +215,10 @@ function buildOptions(
 
   if (multimodal && getPredictionStationNames(multimodal).length > 0) {
     const mmCode = multimodal.route_code || "mm";
-    // Skip if same route already shown
+    // Show as alternative if it has a different route code than TM
     if (!addedCodes.has(mmCode)) {
       const label = classifyRoute(multimodal);
+      addedCodes.add(mmCode);
       options.push(
         predictionToOption(multimodal, "multimodal", label, dist, "cheapest"),
       );
