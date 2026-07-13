@@ -171,6 +171,22 @@ export function RouteOptionsList({
           >
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">
+                {/* Transit logo + route code */}
+                {opt.prediction?.mode === "transmilenio" ||
+                opt.label.includes("TM") ? (
+                  <img
+                    src="/icons/tm-logo.svg"
+                    alt="TM"
+                    className="w-4 h-4 rounded-full bg-white p-px"
+                  />
+                ) : opt.prediction?.mode === "sitp" ||
+                  opt.label.includes("SITP") ? (
+                  <img
+                    src="/icons/sitp-logo.svg"
+                    alt="SITP"
+                    className="w-4 h-4 rounded-full bg-white p-px"
+                  />
+                ) : null}
                 <span className="text-[11px] font-semibold text-foreground">
                   {t(opt.label)}
                 </span>
