@@ -203,28 +203,32 @@ export function RouteOptionsList({
               </span>
             </div>
 
-            {/* Legs timeline — Google Maps style */}
+            {/* Legs: walk → transit → walk (compact) */}
             <div className="flex items-center gap-1 mb-1.5 flex-wrap">
               {opt.legs
-                .filter((l) => l.type !== "walk" || l.duration_minutes > 3)
+                .filter((l) => l.type !== "walk" || l.duration_minutes > 2)
                 .map((leg, i) => (
                   <div
                     key={`leg-${opt.id}-${i}`}
                     className="flex items-center gap-1"
                   >
                     {i > 0 && (
-                      <ArrowRightLeft size={8} className="text-default-300" />
+                      <span className="text-[9px] text-default-300">›</span>
                     )}
-                    <span
-                      className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded-full ${getLegBg(leg.type)}`}
-                    >
-                      <LegIcon type={leg.type} size={11} />
-                      <span className="text-foreground">
-                        {leg.type === "walk"
-                          ? `${leg.duration_minutes}'`
-                          : leg.line || leg.type.toUpperCase()}
+                    {leg.type === "walk" ? (
+                      <span className="text-[9px] text-default-400">
+                        {Math.max(1, Math.round(leg.duration_minutes))}' 🚶
                       </span>
-                    </span>
+                    ) : (
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${getLegBg(leg.type)}`}
+                      >
+                        <LegIcon type={leg.type} size={10} />
+                        <span className="text-foreground font-bold">
+                          {leg.line || ""}
+                        </span>
+                      </span>
+                    )}
                   </div>
                 ))}
             </div>

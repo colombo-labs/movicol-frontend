@@ -43,7 +43,8 @@ function groupSegmentsIntoLegs(prediction: RoutePrediction): TransitLeg[] {
   const legs: TransitLeg[] = [];
   let currentMode = "";
   let currentStations: string[] = [];
-  const timePerSeg = prediction.total_time_minutes / segments.length;
+  const totalTransitTime = prediction.total_time_minutes;
+  const totalStations = segments.length + 1; // approximate
 
   for (const seg of segments) {
     const segMode = seg.mode || prediction.mode;
@@ -51,10 +52,16 @@ function groupSegmentsIntoLegs(prediction: RoutePrediction): TransitLeg[] {
     if (segMode !== currentMode) {
       // Save previous leg
       if (currentStations.length > 0) {
+        const legTime = Math.max(
+          1,
+          Math.round(
+            (currentStations.length / totalStations) * totalTransitTime,
+          ),
+        );
         legs.push({
           mode: currentMode as "transmilenio" | "sitp" | "walk",
           stations: currentStations,
-          durationMin: Math.round(currentStations.length * timePerSeg),
+          durationMin: legTime,
         });
       }
       // Start new leg
@@ -68,10 +75,14 @@ function groupSegmentsIntoLegs(prediction: RoutePrediction): TransitLeg[] {
   }
   // Push last leg
   if (currentStations.length > 0) {
+    const legTime = Math.max(
+      1,
+      Math.round((currentStations.length / totalStations) * totalTransitTime),
+    );
     legs.push({
       mode: currentMode as "transmilenio" | "sitp" | "walk",
       stations: currentStations,
-      durationMin: Math.round(currentStations.length * timePerSeg),
+      durationMin: legTime,
     });
   }
 
