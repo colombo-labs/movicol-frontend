@@ -352,43 +352,48 @@ async function fetchVehicleRoute(
 async function fetchTransitRoute(
   params: PredictMultiParams,
 ): Promise<RouteOption[]> {
-  const [tmResult, sitpResult, multimodalResult, rutasCercanasResult] =
-    await Promise.allSettled([
-      routePredictionApi.predict({
-        origin: params.origin,
-        destination: params.destination,
-        departure_time: params.departureTime,
-        mode: "transmilenio",
-      }),
-      routePredictionApi.predict({
-        origin: params.origin,
-        destination: params.destination,
-        departure_time: params.departureTime,
-        mode: "sitp",
-      }),
-      routePredictionApi.predict({
-        origin: params.origin,
-        destination: params.destination,
-        departure_time: params.departureTime,
-        mode: "multimodal",
-      }),
-      fetchRutasCercanas(
-        params.origin.lat,
-        params.origin.lng ?? params.origin.lon ?? 0,
-        800,
-      ),
-    ]);
+  // Fire rutas-cercanas separately (non-blocking, used only for SITP label enrichment)
+  const rutasCercanasPromise = fetchRutasCercanas(
+    params.origin.lat,
+    params.origin.lng ?? params.origin.lon ?? 0,
+    800,
+  ).catch(() => [] as { ruta: string }[]);
+
+  // Only wait for the route predictions (fast: <1s each)
+  const [tmResult, sitpResult, multimodalResult] = await Promise.allSettled([
+    routePredictionApi.predict({
+      origin: params.origin,
+      destination: params.destination,
+      departure_time: params.departureTime,
+      mode: "transmilenio",
+    }),
+    routePredictionApi.predict({
+      origin: params.origin,
+      destination: params.destination,
+      departure_time: params.departureTime,
+      mode: "sitp",
+    }),
+    routePredictionApi.predict({
+      origin: params.origin,
+      destination: params.destination,
+      departure_time: params.departureTime,
+      mode: "multimodal",
+    }),
+  ]);
 
   const tm = tmResult.status === "fulfilled" ? tmResult.value : null;
   let sitp = sitpResult.status === "fulfilled" ? sitpResult.value : null;
   const multimodal =
     multimodalResult.status === "fulfilled" ? multimodalResult.value : null;
 
+  // Try to enrich SITP route_code with cercanas data (non-blocking, may not be ready)
   if (sitp && !sitp.route_code) {
-    const cercanas =
-      rutasCercanasResult.status === "fulfilled"
-        ? rutasCercanasResult.value
-        : [];
+    const cercanas = await Promise.race([
+      rutasCercanasPromise,
+      new Promise<{ ruta: string }[]>((resolve) =>
+        setTimeout(() => resolve([]), 2000),
+      ),
+    ]);
     if (cercanas.length > 0) {
       sitp = { ...sitp, route_code: cercanas[0].ruta };
     }
