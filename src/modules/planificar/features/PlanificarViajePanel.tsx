@@ -346,9 +346,11 @@ export function PlanificarViajePanel({
                   destinationLat={destination?.lat}
                   destinationLng={destination?.lng}
                 />
-                <TravelTips
-                  mode={mode === "publico" ? "transmilenio" : "vehiculo"}
-                />
+                {mode === "publico" && (
+                  <TravelTips
+                    mode={mode === "publico" ? "transmilenio" : "vehiculo"}
+                  />
+                )}
               </>
             )}
           </div>
