@@ -332,7 +332,7 @@ export function SelectedRouteDetail({
               </p>
             </div>
             <span className="text-[9px] text-default-400 shrink-0">
-              {leg.duration_minutes} min
+              {Math.max(1, Math.round(leg.duration_minutes))} min
             </span>
           </div>
         ))}

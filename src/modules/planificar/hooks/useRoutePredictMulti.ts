@@ -60,7 +60,10 @@ function predictionToOption(
       to: normalizedPrediction.stations[
         normalizedPrediction.stations.length - 1
       ],
-      duration_minutes: normalizedPrediction.total_time_minutes - walkTime * 2,
+      duration_minutes: Math.max(
+        1,
+        Math.round(normalizedPrediction.total_time_minutes - walkTime * 2),
+      ),
       distance_km: normalizedPrediction.total_distance_km * 0.85,
       stations: normalizedPrediction.stations,
       line: code || normalizedPrediction.mode.toUpperCase(),
