@@ -4,17 +4,23 @@ import { API_URL } from "@/shared/config";
 
 interface SiniestroPoint {
   lat: number;
-  lon: number;
-  intensity: number;
+  lng: number;
+  gravedad: string;
+  clase: string;
   localidad: string;
-  paradero: string;
 }
 
-function getHeatColor(norm: number): string {
-  if (norm > 0.7) return "#ef4444";
-  if (norm > 0.4) return "#f59e0b";
-  return "#22c55e";
-}
+const GRAVEDAD_COLORS: Record<string, string> = {
+  "CON MUERTOS": "#ef4444",
+  "CON HERIDOS": "#f59e0b",
+  "SOLO DAÑOS": "#22c55e",
+};
+
+const GRAVEDAD_RADIUS: Record<string, number> = {
+  "CON MUERTOS": 10,
+  "CON HERIDOS": 6,
+  "SOLO DAÑOS": 4,
+};
 
 // Module-level cache
 let cachedSiniestros: SiniestroPoint[] | null = null;
@@ -37,31 +43,32 @@ export function SiniestroLayer() {
 
   if (!points.length) return null;
 
-  // Normalize intensity for radius/opacity
-  const maxIntensity = Math.max(...points.map((p) => p.intensity));
+  // Limit to 2000 points for performance
+  const displayed = points.slice(0, 2000);
 
   return (
     <>
-      {points
-        .filter((p) => p.lat != null && p.lon != null)
-        .map((p) => {
-          const norm = p.intensity / maxIntensity;
+      {displayed
+        .filter((p) => p.lat != null && p.lng != null)
+        .map((p, i) => {
+          const color = GRAVEDAD_COLORS[p.gravedad] || "#f59e0b";
+          const radius = GRAVEDAD_RADIUS[p.gravedad] || 5;
           return (
             <CircleMarker
-              key={`${p.lat}-${p.lon}`}
-              center={[p.lat, p.lon]}
-              radius={4 + norm * 8}
+              key={`sin-${i}-${p.lat}-${p.lng}`}
+              center={[p.lat, p.lng]}
+              radius={radius}
               pathOptions={{
                 color: "transparent",
-                fillColor: getHeatColor(norm),
-                fillOpacity: 0.3 + norm * 0.4,
+                fillColor: color,
+                fillOpacity: 0.4,
               }}
             >
               <Tooltip>
                 <div className="text-xs">
-                  <p className="font-semibold">{p.paradero}</p>
-                  <p>{p.localidad}</p>
-                  <p>Intensidad: {(p.intensity ?? 0).toFixed(0)} siniestros</p>
+                  <p className="font-semibold">{p.clase}</p>
+                  <p>{p.gravedad}</p>
+                  <p className="text-default-400">{p.localidad}</p>
                 </div>
               </Tooltip>
             </CircleMarker>
