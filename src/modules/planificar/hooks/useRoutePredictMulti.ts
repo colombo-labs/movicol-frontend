@@ -34,7 +34,7 @@ function predictionToOption(
   tag?: RouteOption["tag"],
 ): RouteOption {
   const normalizedPrediction = withPredictionStations(prediction);
-  const walkTime = Math.round(dist * 0.15 * 12);
+  const walkTime = Math.min(7, Math.max(3, Math.round(dist * 0.8)));
   const code = deriveLineName(normalizedPrediction);
   const legType: RouteLeg["type"] =
     normalizedPrediction.mode === "transmilenio"

@@ -25,7 +25,13 @@ export function EcoInfo({
         <Flame size={14} className="text-orange-500" />
         <div>
           <p className="text-[10px] font-bold text-orange-600">
-            {Math.round(prediction.total_distance_km * 0.15 * 12 * 3.5)} cal
+            {Math.round(
+              Math.min(
+                7,
+                Math.max(3, Math.round(prediction.total_distance_km * 0.8)),
+              ) * 3.5,
+            )}{" "}
+            cal
           </p>
           <p className="text-[8px] text-orange-500/70">
             {t("route.caloriesBurned")}

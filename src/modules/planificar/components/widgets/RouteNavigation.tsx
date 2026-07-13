@@ -188,7 +188,10 @@ function LegAccordion({
 
 export function NavigationSteps({ prediction, getETA }: Props) {
   const legs = groupSegmentsIntoLegs(prediction);
-  const walkTime = Math.round(prediction.total_distance_km * 0.15 * 12);
+  const walkTime = Math.min(
+    7,
+    Math.max(3, Math.round(prediction.total_distance_km * 0.8)),
+  );
 
   // Calculate cumulative time for each leg
   let cumulativeTime = walkTime; // start after initial walk

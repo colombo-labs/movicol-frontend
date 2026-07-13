@@ -207,7 +207,11 @@ export function TripDetails({
       <div className="flex flex-col items-center p-2 rounded-lg bg-default-100">
         <Footprints size={14} className="text-default-500" />
         <p className="text-[10px] font-bold">
-          {Math.round(prediction.total_distance_km * 0.15 * 12)} min
+          {Math.min(
+            7,
+            Math.max(3, Math.round(prediction.total_distance_km * 0.8)),
+          )}{" "}
+          min
         </p>
         <p className="text-[8px] text-default-400">{t("planner.walking")}</p>
       </div>
