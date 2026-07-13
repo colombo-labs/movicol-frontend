@@ -20,8 +20,10 @@ interface Props {
 }
 
 /** A grouped transit leg (consecutive segments of same mode) */
+type LegMode = "transmilenio" | "sitp" | "walk";
+
 interface TransitLeg {
-  mode: "transmilenio" | "sitp" | "walk";
+  mode: LegMode;
   stations: string[];
   durationMin: number;
 }
@@ -40,10 +42,10 @@ function groupSegmentsIntoLegs(prediction: RoutePrediction): TransitLeg[] {
   }
 
   // First pass: determine the dominant transit mode
-  const transitModes = segments
-    .map((s) => s.mode)
-    .filter((m) => m && m !== "walk");
-  const dominantMode = transitModes[0] || prediction.mode || "transmilenio";
+  const dominantMode =
+    segments.find((s) => s.mode && s.mode !== "walk")?.mode ||
+    prediction.mode ||
+    "transmilenio";
 
   // Second pass: treat all segments as ONE transit leg unless there's a REAL
   // mode change (e.g. transmilenio → sitp). Walk segments between same-mode

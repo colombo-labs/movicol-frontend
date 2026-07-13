@@ -654,11 +654,9 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
           </div>
           <div className="flex-1">
             <p className="text-base font-bold">
-              {prediction.mode === "bicicleta"
-                ? "🚴 En bici"
-                : prediction.mode === "caminando"
-                  ? "🚶 A pie"
-                  : "🚗 En camino"}
+              {{ bicicleta: "🚴 En bici", caminando: "🚶 A pie" }[
+                prediction.mode
+              ] || "🚗 En camino"}
             </p>
             <p className="text-sm opacity-80">
               {formatDistance(prediction.total_distance_km * 1000)} ·{" "}
@@ -679,11 +677,8 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
           zoom={15}
           routeCoords={routeCoords}
           routeColor={
-            prediction.mode === "bicicleta"
-              ? "#06b6d4"
-              : prediction.mode === "caminando"
-                ? "#9ca3af"
-                : "#22c55e"
+            { bicicleta: "#06b6d4", caminando: "#9ca3af" }[prediction.mode] ||
+            "#22c55e"
           }
           routeWeight={5}
           userPos={userPos}

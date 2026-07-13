@@ -10,6 +10,28 @@ import {
 import { GlassCard } from "@shared/ui/GlassCard";
 import type { TransportMode, RouteOption, RouteLeg } from "../../models/types";
 
+function TransitLogo({ mode, label }: { mode?: string; label?: string }) {
+  const isTm = mode === "transmilenio" || (label || "").includes("TM");
+  const isSitp = mode === "sitp" || (label || "").includes("SITP");
+  if (isTm)
+    return (
+      <img
+        src="/icons/tm-logo.svg"
+        alt="TM"
+        className="w-5 h-5 rounded-full bg-white p-px"
+      />
+    );
+  if (isSitp)
+    return (
+      <img
+        src="/icons/sitp-logo.svg"
+        alt="SITP"
+        className="w-5 h-5 rounded-full bg-white p-px"
+      />
+    );
+  return null;
+}
+
 function formatTime(min: number): string {
   const m = Math.round(min);
   if (m < 60) return `${m} min`;
@@ -172,21 +194,7 @@ export function RouteOptionsList({
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">
                 {/* Transit logo + route code */}
-                {opt.prediction?.mode === "transmilenio" ||
-                opt.label.includes("TM") ? (
-                  <img
-                    src="/icons/tm-logo.svg"
-                    alt="TM"
-                    className="w-5 h-5 rounded-full bg-white p-px"
-                  />
-                ) : opt.prediction?.mode === "sitp" ||
-                  opt.label.includes("SITP") ? (
-                  <img
-                    src="/icons/sitp-logo.svg"
-                    alt="SITP"
-                    className="w-5 h-5 rounded-full bg-white p-px"
-                  />
-                ) : null}
+                <TransitLogo mode={opt.prediction?.mode} label={opt.label} />
                 <span className="text-[11px] font-bold text-foreground">
                   {opt.prediction?.route_code || ""}
                 </span>
