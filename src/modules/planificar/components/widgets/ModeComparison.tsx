@@ -177,18 +177,23 @@ export function RouteOptionsList({
                   <img
                     src="/icons/tm-logo.svg"
                     alt="TM"
-                    className="w-4 h-4 rounded-full bg-white p-px"
+                    className="w-5 h-5 rounded-full bg-white p-px"
                   />
                 ) : opt.prediction?.mode === "sitp" ||
                   opt.label.includes("SITP") ? (
                   <img
                     src="/icons/sitp-logo.svg"
                     alt="SITP"
-                    className="w-4 h-4 rounded-full bg-white p-px"
+                    className="w-5 h-5 rounded-full bg-white p-px"
                   />
                 ) : null}
-                <span className="text-[11px] font-semibold text-foreground">
-                  {t(opt.label)}
+                <span className="text-[11px] font-bold text-foreground">
+                  {opt.prediction?.route_code || ""}
+                </span>
+                <span className="text-[10px] text-default-500 truncate max-w-[120px]">
+                  {opt.prediction?.stations?.[
+                    opt.prediction.stations.length - 1
+                  ] || ""}
                 </span>
                 {opt.tag && TAG_LABELS[opt.tag] && (
                   <span
