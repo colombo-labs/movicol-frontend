@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   MapContainer,
   TileLayer,
@@ -150,6 +151,34 @@ function RouteMapView({
 
 // ═══════════════════════════════════════════════════════════════════
 
+/** Get the dot color class for a station in the navigation list */
+function getStationDotClass(
+  idx: number,
+  total: number,
+  isCurrent: boolean,
+  isPast: boolean,
+  modeBg: string,
+): string {
+  if (idx === 0) return "bg-success";
+  if (idx === total - 1) return "bg-danger";
+  if (isCurrent) return `${modeBg} animate-pulse`;
+  if (isPast) return "bg-default-300";
+  return "bg-default-200";
+}
+
+/** Get the text class for a station label */
+function getStationTextClass(
+  idx: number,
+  total: number,
+  isCurrent: boolean,
+  isPast: boolean,
+): string {
+  if (isCurrent) return "font-bold text-foreground";
+  if (isPast) return "text-default-400 line-through";
+  if (idx === 0 || idx === total - 1) return "font-semibold text-foreground";
+  return "text-default-500";
+}
+
 function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const [currentStopIdx, setCurrentStopIdx] = useState(0);
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
@@ -296,29 +325,83 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
       {/* Spacer to push bottom bar down */}
       <div className="flex-1" />
 
-      {/* Bottom bar */}
-      <div className="px-4 py-3 bg-background/90 backdrop-blur-md border-t border-divider flex items-center gap-3 shrink-0 z-10">
-        <button
-          onClick={onExit}
-          className="w-11 h-11 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center text-danger active:scale-90"
-        >
-          <X size={20} />
-        </button>
-        <div className="flex-1 text-center">
-          <p className="text-sm font-bold text-foreground">
-            {currentStopIdx >= stations.length - 1
-              ? "¡Llegaste! 🎉"
-              : `${remainingStops} paradas restantes`}
-          </p>
-          <p className="text-[10px] text-default-400">
-            {formatMinutes(remainingTime)} ·{" "}
-            {formatDistance(totalDist * 1000 * (1 - progress / 100))}
-          </p>
+      {/* Bottom detail panel */}
+      <div className="bg-background/95 backdrop-blur-md border-t border-divider z-10 max-h-[40%] flex flex-col">
+        {/* Walk to station info (when at start) */}
+        {currentStopIdx === 0 && (
+          <div className="px-4 py-2 border-b border-divider flex items-center gap-2 text-xs">
+            <span className="text-success">🚶</span>
+            <span className="text-default-500">
+              Camina hasta{" "}
+              <span className="font-semibold text-foreground">
+                {stations[0] || "la parada"}
+              </span>
+            </span>
+          </div>
+        )}
+
+        {/* Compact station list */}
+        <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1">
+          {stations.map((station, i) => {
+            const isPast = i < currentStopIdx;
+            const isCurrent = i === currentStopIdx;
+            if (isPast && i > 0 && i < stations.length - 1) return null; // Hide past intermediate stops
+            return (
+              <div
+                key={`nav-st-${station}-${i}`}
+                className="flex items-center gap-2"
+              >
+                <div
+                  className={`w-2.5 h-2.5 rounded-full shrink-0 ${getStationDotClass(i, stations.length, isCurrent, isPast, modeBg)}`}
+                />
+                <span
+                  className={`text-[11px] leading-tight ${getStationTextClass(i, stations.length, isCurrent, isPast)}`}
+                >
+                  {station}
+                  {isCurrent && !isPast && i > 0 && i < stations.length - 1 && (
+                    <span className={`ml-1 ${modeColor} font-medium`}>
+                      ← aquí
+                    </span>
+                  )}
+                </span>
+              </div>
+            );
+          })}
         </div>
-        <div
-          className={`w-11 h-11 rounded-full ${modeBgLight} border border-divider flex items-center justify-center ${modeColor}`}
-        >
-          {modeIcon}
+
+        {/* Walk to destination (when at last stop) */}
+        {currentStopIdx >= stations.length - 1 && (
+          <div className="px-4 py-2 border-t border-divider flex items-center gap-2 text-xs">
+            <span className="text-danger">🚶</span>
+            <span className="text-default-500">Camina hasta tu destino</span>
+          </div>
+        )}
+
+        {/* Summary bar */}
+        <div className="px-4 py-3 border-t border-divider flex items-center gap-3 shrink-0">
+          <button
+            onClick={onExit}
+            className="w-10 h-10 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center text-danger active:scale-90"
+          >
+            <X size={18} />
+          </button>
+          <div className="flex-1 text-center">
+            <p className="text-sm font-bold text-foreground">
+              {currentStopIdx >= stations.length - 1
+                ? "¡Llegaste! 🎉"
+                : `${remainingStops} paradas restantes`}
+            </p>
+            <p className="text-[10px] text-default-400">
+              {formatMinutes(remainingTime)} ·{" "}
+              {formatDistance(totalDist * 1000 * (1 - progress / 100))} · Llegas
+              ~{formatETA(remainingTime * 60)}
+            </p>
+          </div>
+          <div
+            className={`w-10 h-10 rounded-full ${modeBgLight} border border-divider flex items-center justify-center ${modeColor}`}
+          >
+            {modeIcon}
+          </div>
         </div>
       </div>
     </div>
@@ -713,8 +796,12 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
 // ═══════════════════════════════════════════════════════════════════
 
 export function NavigationMode({ prediction, onExit }: NavigationModeProps) {
-  if (isTransitMode(prediction.mode)) {
-    return <TransitNavigation prediction={prediction} onExit={onExit} />;
-  }
-  return <VehicleNavigation prediction={prediction} onExit={onExit} />;
+  const content = isTransitMode(prediction.mode) ? (
+    <TransitNavigation prediction={prediction} onExit={onExit} />
+  ) : (
+    <VehicleNavigation prediction={prediction} onExit={onExit} />
+  );
+
+  // Portal to document.body to escape SidePanel's transform stacking context
+  return createPortal(content, document.body);
 }

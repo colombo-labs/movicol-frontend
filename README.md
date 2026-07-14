@@ -1,6 +1,7 @@
 # MoviCol Frontend
 
-Aplicación de movilidad urbana inteligente para Bogotá — React + Vite + TypeScript + Leaflet.
+Aplicación de movilidad urbana inteligente para Bogotá —
+React + Vite + TypeScript + Leaflet.
 
 ## Stack
 

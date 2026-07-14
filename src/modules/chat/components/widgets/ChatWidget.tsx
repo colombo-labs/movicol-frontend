@@ -114,7 +114,7 @@ function ChatClosed({ onOpen }: { readonly onOpen: () => void }) {
   return (
     <button
       onClick={onOpen}
-      className="fixed bottom-20 md:bottom-6 right-4 md:right-[10px] w-12 h-12 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center hover:scale-110 transition-transform z-[450] md:z-[600] shadow-lg shadow-primary/20"
+      className="fixed bottom-20 md:bottom-6 right-4 md:right-[10px] w-12 h-12 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center hover:scale-110 transition-transform z-[550] md:z-[600] shadow-lg shadow-primary/20"
       title="Chat con MoviBot"
     >
       <Bot size={22} className="text-primary" />
@@ -143,7 +143,7 @@ function ChatMinimized({
     <button
       type="button"
       onClick={onOpen}
-      className="fixed bottom-20 md:bottom-6 right-4 md:right-[10px] z-[450] md:z-[600] flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-divider shadow-xl cursor-pointer hover:border-primary/50 transition-all max-w-[240px]"
+      className="fixed bottom-20 md:bottom-6 right-4 md:right-[10px] z-[550] md:z-[600] flex items-center gap-2 px-3 py-2 rounded-xl bg-background border border-divider shadow-xl cursor-pointer hover:border-primary/50 transition-all max-w-[240px]"
     >
       <Bot size={16} className="text-primary shrink-0" />
       <span className="text-[10px] text-default-400 truncate">{preview}</span>
@@ -268,7 +268,7 @@ export function ChatWidget({
   }
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-[10px] w-80 h-[28rem] z-[450] md:z-[600] flex flex-col rounded-xl overflow-hidden border border-divider bg-background/95 backdrop-blur-xl shadow-xl">
+    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-[10px] w-80 h-[28rem] z-[550] md:z-[600] flex flex-col rounded-xl overflow-hidden border border-divider bg-background/95 backdrop-blur-xl shadow-xl">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-divider">
         <span className="text-sm font-semibold flex items-center gap-1.5">

@@ -15,11 +15,11 @@ npm run test:e2e            # Headless (CI)
 npm run test:e2e:headed     # Ver el browser
 npm run test:e2e:ui         # Playwright UI (debug)
 npm run test:e2e:report     # Ver último reporte
-```
+```text
 
 ## Estructura
 
-```
+```text
 e2e/
 ├── pages/              → Page Object Model (encapsula selectores)
 │   ├── MapPage.ts      → Layout principal, mapa, paneles
@@ -33,7 +33,7 @@ e2e/
 ├── fixtures/           → Data mock para tests
 ├── results/            → Screenshots/videos on failure
 └── report/             → Reporte HTML
-```
+```text
 
 ## Convenciones
 

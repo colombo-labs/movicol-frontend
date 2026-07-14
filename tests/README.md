@@ -2,7 +2,7 @@
 
 ## Estructura
 
-```
+```text
 tests/              → Tests unitarios (Vitest)
 ├── auth/           → useAuth, AuthButton
 ├── chat/           → useChatWs, useVoice, ChatMessage
@@ -22,7 +22,7 @@ e2e/                → Tests E2E (Playwright)
 ├── fixtures/       → Data de prueba
 ├── results/        → Screenshots y videos (gitignored)
 └── report/         → Reporte HTML (gitignored)
-```
+```text
 
 ## Correr tests
 
@@ -40,7 +40,7 @@ npm run test:e2e:report     # Ver reporte HTML
 
 # Performance
 ./tests/performance/run_lighthouse.sh
-```
+```text
 
 ## Convenciones
 
