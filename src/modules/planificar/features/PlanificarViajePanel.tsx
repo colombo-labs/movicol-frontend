@@ -322,6 +322,12 @@ export function PlanificarViajePanel({
                   tripPoints={tripPoints}
                   onClear={onClear}
                   onStartNavigation={() => {
+                    // Unlock speechSynthesis with user gesture (required on mobile)
+                    if ("speechSynthesis" in window) {
+                      const unlock = new SpeechSynthesisUtterance("");
+                      unlock.volume = 0;
+                      speechSynthesis.speak(unlock);
+                    }
                     setNavigating(true);
                     // Increment trip counter for TuLlave balance estimation
                     const today = new Date().toISOString().slice(0, 10);

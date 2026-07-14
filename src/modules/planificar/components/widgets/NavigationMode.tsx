@@ -267,6 +267,17 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
     };
   }, [currentStopIdx, stations, segments]);
 
+  // Initial voice announcement
+  useEffect(() => {
+    if (voiceEnabled && "speechSynthesis" in window && stations.length > 0) {
+      const msg = `Navegación iniciada. Toma la ruta ${code || modeLabel} hacia ${stations[stations.length - 1] || "tu destino"}. ${stations.length - 1} paradas.`;
+      const u = new SpeechSynthesisUtterance(msg);
+      u.lang = "es-CO";
+      u.rate = 1.0;
+      setTimeout(() => speechSynthesis.speak(u), 500);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const remainingStops = Math.max(0, stations.length - 1 - currentStopIdx);
   const progress =
     stations.length > 1 ? (currentStopIdx / (stations.length - 1)) * 100 : 0;
