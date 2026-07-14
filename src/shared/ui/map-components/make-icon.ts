@@ -20,19 +20,26 @@ export function makeUserGpsIcon(heading: number | null) {
   const showCone = heading !== null;
   return L.divIcon({
     className: "",
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    html: `<div style="width:40px;height:40px;position:relative;display:flex;align-items:center;justify-content:center;">
+    iconSize: [48, 48],
+    iconAnchor: [24, 24],
+    html: `<div style="width:48px;height:48px;position:relative;display:flex;align-items:center;justify-content:center;">
       ${
         showCone
-          ? `<div style="position:absolute;width:40px;height:40px;transform:rotate(${rotation - 90}deg);">
-        <svg width="40" height="40" viewBox="0 0 40 40">
-          <path d="M20 4 L32 20 L20 14 L8 20 Z" fill="#3b82f6" opacity="0.25"/>
+          ? `<div style="position:absolute;width:48px;height:48px;transform:rotate(${rotation - 90}deg);">
+        <svg width="48" height="48" viewBox="0 0 48 48">
+          <defs>
+            <radialGradient id="cone-grad" cx="50%" cy="70%" r="60%">
+              <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <path d="M24 2 L38 22 L24 16 L10 22 Z" fill="url(#cone-grad)"/>
+          <path d="M24 2 L38 22 L24 16 L10 22 Z" fill="none" stroke="#3b82f6" stroke-width="0.5" opacity="0.6"/>
         </svg>
       </div>`
           : ""
       }
-      <div style="width:16px;height:16px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 0 0 3px rgba(59,130,246,0.3),0 2px 8px rgba(0,0,0,0.3);"></div>
+      <div style="width:18px;height:18px;border-radius:50%;background:#3b82f6;border:3px solid #fff;box-shadow:0 0 0 4px rgba(59,130,246,0.3),0 0 12px rgba(59,130,246,0.4),0 2px 8px rgba(0,0,0,0.3);"></div>
     </div>`,
   });
 }

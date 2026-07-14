@@ -185,6 +185,7 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
     null,
   );
   const [heading, setHeading] = useState<number | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
   const prevPosRef = useRef<{ lat: number; lng: number } | null>(null);
   const watchRef = useRef<number | null>(null);
 
@@ -241,6 +242,17 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
             if (dist < 100) {
               setCurrentStopIdx(i);
               if ("vibrate" in navigator) navigator.vibrate([50, 30, 50]);
+              // Voice announcement
+              if (voiceEnabled && "speechSynthesis" in window) {
+                const msg =
+                  i >= stations.length - 1
+                    ? "Has llegado a tu destino"
+                    : `Próxima parada: ${stations[i + 1] || ""}`;
+                const u = new SpeechSynthesisUtterance(msg);
+                u.lang = "es-CO";
+                u.rate = 1.1;
+                speechSynthesis.speak(u);
+              }
               break;
             }
           }
@@ -264,8 +276,6 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
     mode === "transmilenio" ? <Train size={18} /> : <Bus size={18} />;
   const modeColor = mode === "transmilenio" ? "text-red-500" : "text-blue-500";
   const modeBg = mode === "transmilenio" ? "bg-red-500" : "bg-blue-500";
-  const modeBgLight =
-    mode === "transmilenio" ? "bg-red-500/10" : "bg-blue-500/10";
   const modeLabel = mode === "transmilenio" ? "TransMilenio" : "SITP";
 
   const mapCenter: [number, number] = userPos
@@ -345,7 +355,13 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
           {stations.map((station, i) => {
             const isPast = i < currentStopIdx;
             const isCurrent = i === currentStopIdx;
-            if (isPast && i > 0 && i < stations.length - 1) return null; // Hide past intermediate stops
+            if (
+              isPast &&
+              i > 0 &&
+              i < stations.length - 1 &&
+              stations.length > 10
+            )
+              return null;
             return (
               <div
                 key={`nav-st-${station}-${i}`}
@@ -397,11 +413,12 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
               ~{formatETA(remainingTime * 60)}
             </p>
           </div>
-          <div
-            className={`w-10 h-10 rounded-full ${modeBgLight} border border-divider flex items-center justify-center ${modeColor}`}
+          <button
+            onClick={() => setVoiceEnabled((v) => !v)}
+            className={`w-10 h-10 rounded-full border flex items-center justify-center active:scale-90 ${voiceEnabled ? "bg-primary/10 border-primary/30 text-primary" : "bg-default-100 border-divider text-default-400"}`}
           >
-            {modeIcon}
-          </div>
+            {voiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          </button>
         </div>
       </div>
     </div>
