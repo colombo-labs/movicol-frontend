@@ -179,12 +179,63 @@ function getStationTextClass(
   return "text-default-500";
 }
 
+/** Calculate heading from previous and current position */
+function calcHeading(
+  prev: { lat: number; lng: number },
+  lat: number,
+  lng: number,
+): number | null {
+  const dLat = lat - prev.lat;
+  const dLng = lng - prev.lng;
+  if (Math.abs(dLat) > 0.00002 || Math.abs(dLng) > 0.00002) {
+    return (Math.atan2(dLng, dLat) * 180) / Math.PI;
+  }
+  return null;
+}
+
+/** Find the next station reached based on GPS position */
+function findReachedStation(
+  lat: number,
+  lng: number,
+  currentIdx: number,
+  stations: string[],
+  segments: { coordinates: number[][] }[],
+): number | null {
+  for (let i = currentIdx + 1; i < stations.length; i++) {
+    if (i - 1 < segments.length && segments[i - 1]?.coordinates?.length > 0) {
+      const lastCoord =
+        segments[i - 1].coordinates[segments[i - 1].coordinates.length - 1];
+      const dist = haversineM(lat, lng, lastCoord[0], lastCoord[1]);
+      if (dist < 100) return i;
+    }
+  }
+  return null;
+}
+
+/** Announce station via speech synthesis */
+function announceStation(
+  stationIdx: number,
+  stations: string[],
+  enabled: boolean,
+): void {
+  if (!enabled || !("speechSynthesis" in window)) return;
+  const msg =
+    stationIdx >= stations.length - 1
+      ? "Has llegado a tu destino"
+      : `Próxima parada: ${stations[stationIdx + 1] || ""}`;
+  const u = new SpeechSynthesisUtterance(msg);
+  u.lang = "es-CO";
+  u.rate = 1.1;
+  speechSynthesis.speak(u);
+}
+
 function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const [currentStopIdx, setCurrentStopIdx] = useState(0);
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
     null,
   );
   const [heading, setHeading] = useState<number | null>(null);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
   const prevPosRef = useRef<{ lat: number; lng: number } | null>(null);
   const watchRef = useRef<number | null>(null);
 
@@ -215,35 +266,23 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
         const { latitude: lat, longitude: lng } = pos.coords;
         setUserPos({ lat, lng });
 
-        // Calculate heading from movement
         if (prevPosRef.current) {
-          const dLat = lat - prevPosRef.current.lat;
-          const dLng = lng - prevPosRef.current.lng;
-          if (Math.abs(dLat) > 0.00002 || Math.abs(dLng) > 0.00002) {
-            setHeading((Math.atan2(dLng, dLat) * 180) / Math.PI);
-          }
+          const h = calcHeading(prevPosRef.current, lat, lng);
+          if (h !== null) setHeading(h);
         }
         prevPosRef.current = { lat, lng };
 
-        // Find closest station to user
-        // We only advance forward (never go back)
-        for (let i = currentStopIdx + 1; i < stations.length; i++) {
-          // Use segment coords to approximate station positions
-          if (
-            i - 1 < segments.length &&
-            segments[i - 1]?.coordinates?.length > 0
-          ) {
-            const lastCoord =
-              segments[i - 1].coordinates[
-                segments[i - 1].coordinates.length - 1
-              ];
-            const dist = haversineM(lat, lng, lastCoord[0], lastCoord[1]);
-            if (dist < 100) {
-              setCurrentStopIdx(i);
-              if ("vibrate" in navigator) navigator.vibrate([50, 30, 50]);
-              break;
-            }
-          }
+        const reached = findReachedStation(
+          lat,
+          lng,
+          currentStopIdx,
+          stations,
+          segments,
+        );
+        if (reached !== null) {
+          setCurrentStopIdx(reached);
+          if ("vibrate" in navigator) navigator.vibrate([50, 30, 50]);
+          announceStation(reached, stations, voiceEnabled);
         }
       },
       () => {},
@@ -255,6 +294,17 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
     };
   }, [currentStopIdx, stations, segments]);
 
+  // Initial voice announcement
+  useEffect(() => {
+    if (voiceEnabled && "speechSynthesis" in window && stations.length > 0) {
+      const msg = `Navegación iniciada. Toma la ruta ${code || modeLabel} hacia ${stations[stations.length - 1] || "tu destino"}. ${stations.length - 1} paradas.`;
+      const u = new SpeechSynthesisUtterance(msg);
+      u.lang = "es-CO";
+      u.rate = 1.0;
+      setTimeout(() => speechSynthesis.speak(u), 500);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const remainingStops = Math.max(0, stations.length - 1 - currentStopIdx);
   const progress =
     stations.length > 1 ? (currentStopIdx / (stations.length - 1)) * 100 : 0;
@@ -264,8 +314,6 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
     mode === "transmilenio" ? <Train size={18} /> : <Bus size={18} />;
   const modeColor = mode === "transmilenio" ? "text-red-500" : "text-blue-500";
   const modeBg = mode === "transmilenio" ? "bg-red-500" : "bg-blue-500";
-  const modeBgLight =
-    mode === "transmilenio" ? "bg-red-500/10" : "bg-blue-500/10";
   const modeLabel = mode === "transmilenio" ? "TransMilenio" : "SITP";
 
   const mapCenter: [number, number] = userPos
@@ -275,7 +323,7 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
       : [4.65, -74.1];
 
   return (
-    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col">
+    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[1000] flex flex-col">
       {/* Map — fullscreen behind overlays */}
       <div className="absolute inset-0 z-0">
         <RouteMapView
@@ -345,7 +393,13 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
           {stations.map((station, i) => {
             const isPast = i < currentStopIdx;
             const isCurrent = i === currentStopIdx;
-            if (isPast && i > 0 && i < stations.length - 1) return null; // Hide past intermediate stops
+            if (
+              isPast &&
+              i > 0 &&
+              i < stations.length - 1 &&
+              stations.length > 10
+            )
+              return null;
             return (
               <div
                 key={`nav-st-${station}-${i}`}
@@ -397,11 +451,12 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
               ~{formatETA(remainingTime * 60)}
             </p>
           </div>
-          <div
-            className={`w-10 h-10 rounded-full ${modeBgLight} border border-divider flex items-center justify-center ${modeColor}`}
+          <button
+            onClick={() => setVoiceEnabled((v) => !v)}
+            className={`w-10 h-10 rounded-full border flex items-center justify-center active:scale-90 ${voiceEnabled ? "bg-primary/10 border-primary/30 text-primary" : "bg-default-100 border-divider text-default-400"}`}
           >
-            {modeIcon}
-          </div>
+            {voiceEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          </button>
         </div>
       </div>
     </div>
@@ -608,7 +663,7 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
       ? ([userPos.lat, userPos.lng] as [number, number])
       : routeCoords[0] || ([4.65, -74.1] as [number, number]);
     return (
-      <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
+      <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[1000] flex flex-col bg-background">
         {/* Header */}
         <div className="bg-primary text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10">
           <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
@@ -683,7 +738,7 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
     : routeCoords[0] || ([4.65, -74.1] as [number, number]);
 
   return (
-    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
+    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[1000] flex flex-col bg-background">
       {/* Instruction banner */}
       <div
         className={`${getManeuverColor(currentStep?.maneuver || "")} text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10`}

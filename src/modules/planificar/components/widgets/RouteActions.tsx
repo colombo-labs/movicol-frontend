@@ -396,17 +396,17 @@ function PoiIcon({ type }: { readonly type: string }) {
 }
 
 async function fetchNearbyPois(destLat: number, destLng: number) {
-  const radius = 200;
-  const query = `[out:json][timeout:5];(
+  const radius = 400;
+  const query = `[out:json][timeout:10];(
     node["amenity"="cafe"](around:${radius},${destLat},${destLng});
     node["amenity"="atm"](around:${radius},${destLat},${destLng});
     node["shop"](around:${radius},${destLat},${destLng});
     node["amenity"="pharmacy"](around:${radius},${destLat},${destLng});
     node["amenity"="restaurant"](around:${radius},${destLat},${destLng});
-  );out body 6;`;
+  );out body 8;`;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  const timeout = setTimeout(() => controller.abort(), 10000);
   try {
     const r = await fetch("https://overpass-api.de/api/interpreter", {
       method: "POST",
