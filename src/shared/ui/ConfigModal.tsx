@@ -9,7 +9,7 @@ interface Props {
   onClose: () => void;
 }
 
-export function ConfigModal({ isOpen, onClose }: Props) {
+export function ConfigModal({ isOpen, onClose }: Readonly<Props>) {
   const { theme, toggle } = useTheme();
   const { t, i18n } = useTranslation();
   const { isAuthenticated, login } = useAuth();

@@ -32,7 +32,7 @@ export function SidePanel({
   children,
   snapOverride,
   onSnapChange,
-}: SidePanelProps) {
+}: Readonly<SidePanelProps>) {
   const startY = useRef(0);
   const [snap, setSnap] = useState<SnapPoint>("half");
   const { t } = useTranslation();
@@ -111,6 +111,7 @@ export function SidePanel({
         className={`absolute z-[500] border-divider bg-background flex flex-col transition-all duration-300 ease-out
           md:top-0 md:left-0 md:h-full md:w-[360px] md:border-r md:translate-y-0 md:rounded-none md:shadow-none
           ${isOpen ? "md:translate-x-0" : "md:-translate-x-full"}
+          ${isOpen && snap === "peek" ? "md:-translate-x-full" : ""}
           top-auto bottom-0 left-0 right-0 ${SNAP_HEIGHTS[snap]} rounded-t-2xl border-t shadow-[0_-4px_20px_rgba(0,0,0,0.3)]
           ${isOpen ? "translate-y-0" : "translate-y-full"}
         `}

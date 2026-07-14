@@ -20,7 +20,7 @@ export function StationAutocomplete({
   icon = "origin",
   value,
   onChange,
-}: StationAutocompleteProps) {
+}: Readonly<StationAutocompleteProps>) {
   const { stations, isLoading, query, setQuery } = useStationSearch();
 
   const iconColor = icon === "origin" ? "text-green-400" : "text-red-400";

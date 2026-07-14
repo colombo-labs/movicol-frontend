@@ -30,7 +30,7 @@ interface TransportModeSelectorProps {
 export function TransportModeSelector({
   activeMode,
   onSelect,
-}: TransportModeSelectorProps) {
+}: Readonly<TransportModeSelectorProps>) {
   return (
     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 bg-background/95 backdrop-blur-xl rounded-2xl px-3 py-2 border border-divider shadow-xl">
       {modes.map((m) => {
