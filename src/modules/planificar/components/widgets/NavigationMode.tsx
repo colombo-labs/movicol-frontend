@@ -285,7 +285,7 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
       : [4.65, -74.1];
 
   return (
-    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col">
+    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[1000] flex flex-col">
       {/* Map — fullscreen behind overlays */}
       <div className="absolute inset-0 z-0">
         <RouteMapView
@@ -625,7 +625,7 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
       ? ([userPos.lat, userPos.lng] as [number, number])
       : routeCoords[0] || ([4.65, -74.1] as [number, number]);
     return (
-      <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
+      <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[1000] flex flex-col bg-background">
         {/* Header */}
         <div className="bg-primary text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10">
           <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
@@ -700,7 +700,7 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
     : routeCoords[0] || ([4.65, -74.1] as [number, number]);
 
   return (
-    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
+    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[1000] flex flex-col bg-background">
       {/* Instruction banner */}
       <div
         className={`${getManeuverColor(currentStep?.maneuver || "")} text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10`}
