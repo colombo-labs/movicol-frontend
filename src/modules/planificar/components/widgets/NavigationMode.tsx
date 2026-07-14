@@ -151,6 +151,34 @@ function RouteMapView({
 
 // ═══════════════════════════════════════════════════════════════════
 
+/** Get the dot color class for a station in the navigation list */
+function getStationDotClass(
+  idx: number,
+  total: number,
+  isCurrent: boolean,
+  isPast: boolean,
+  modeBg: string,
+): string {
+  if (idx === 0) return "bg-success";
+  if (idx === total - 1) return "bg-danger";
+  if (isCurrent) return `${modeBg} animate-pulse`;
+  if (isPast) return "bg-default-300";
+  return "bg-default-200";
+}
+
+/** Get the text class for a station label */
+function getStationTextClass(
+  idx: number,
+  total: number,
+  isCurrent: boolean,
+  isPast: boolean,
+): string {
+  if (isCurrent) return "font-bold text-foreground";
+  if (isPast) return "text-default-400 line-through";
+  if (idx === 0 || idx === total - 1) return "font-semibold text-foreground";
+  return "text-default-500";
+}
+
 function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const [currentStopIdx, setCurrentStopIdx] = useState(0);
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
@@ -324,28 +352,10 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
                 className="flex items-center gap-2"
               >
                 <div
-                  className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-                    i === 0
-                      ? "bg-success"
-                      : i === stations.length - 1
-                        ? "bg-danger"
-                        : isCurrent
-                          ? `${modeBg} animate-pulse`
-                          : isPast
-                            ? "bg-default-300"
-                            : "bg-default-200"
-                  }`}
+                  className={`w-2.5 h-2.5 rounded-full shrink-0 ${getStationDotClass(i, stations.length, isCurrent, isPast, modeBg)}`}
                 />
                 <span
-                  className={`text-[11px] leading-tight ${
-                    isCurrent
-                      ? "font-bold text-foreground"
-                      : isPast
-                        ? "text-default-400 line-through"
-                        : i === 0 || i === stations.length - 1
-                          ? "font-semibold text-foreground"
-                          : "text-default-500"
-                  }`}
+                  className={`text-[11px] leading-tight ${getStationTextClass(i, stations.length, isCurrent, isPast)}`}
                 >
                   {station}
                   {isCurrent && !isPast && i > 0 && i < stations.length - 1 && (
