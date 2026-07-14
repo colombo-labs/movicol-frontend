@@ -261,13 +261,13 @@ export function MapView({
                       MODE_COLORS[segment.mode || prediction.mode] ?? "#22c55e",
                   }}
                 >
-                  {segment.mode === "walk"
-                    ? "🚶 Caminando"
-                    : segment.mode === "transmilenio"
-                      ? "🚇 TransMilenio"
-                      : segment.mode === "sitp"
-                        ? "🚌 SITP"
-                        : "🚗 Vehículo"}
+                  {(
+                    {
+                      walk: "🚶 Caminando",
+                      transmilenio: "🚇 TransMilenio",
+                      sitp: "🚌 SITP",
+                    } as Record<string, string>
+                  )[segment.mode ?? ""] ?? "🚗 Vehículo"}
                 </span>
               </div>
             </Popup>
@@ -275,7 +275,7 @@ export function MapView({
         ))}
 
         {/* Direction arrows along route */}
-        {prediction?.risk_segments.map((segment, segIdx) => {
+        {prediction?.risk_segments.map((segment) => {
           if (segment.mode === "walk") return null;
           const coords = segment.coordinates;
           if (coords.length < 4) return null;
@@ -290,7 +290,7 @@ export function MapView({
             MODE_COLORS[segment.mode || prediction.mode] ?? "#22c55e";
           return (
             <Marker
-              key={`arrow-${segIdx}`}
+              key={`arrow-${p1[0]}-${p1[1]}`}
               position={[p1[0], p1[1]] as [number, number]}
               icon={makeArrowIcon(angle, color)}
               interactive={false}

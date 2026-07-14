@@ -23,7 +23,7 @@ export function AppModal({
   children,
   footer,
   size = "lg",
-}: AppModalProps) {
+}: Readonly<AppModalProps>) {
   return (
     <Modal
       isOpen={isOpen}

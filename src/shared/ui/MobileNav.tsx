@@ -25,7 +25,10 @@ const items: {
   { id: "metricas", icon: BarChart3, label: "nav.datos" },
 ];
 
-export function MobileNav({ activePanel, onTogglePanel }: MobileNavProps) {
+export function MobileNav({
+  activePanel,
+  onTogglePanel,
+}: Readonly<MobileNavProps>) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const isAdmin = user?.role?.name === "admin";

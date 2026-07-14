@@ -29,7 +29,7 @@ export function TroncalesLegend({
   onToggleTroncales,
   onToggleEstaciones,
   panelOpen,
-}: Props) {
+}: Readonly<Props>) {
   const [collapsed, setCollapsed] = useState(true);
 
   return (
@@ -42,7 +42,7 @@ export function TroncalesLegend({
           className="sm:hidden bg-gray-900/90 backdrop-blur-sm rounded-lg shadow-lg px-2.5 py-1.5 text-[10px] text-white/90 font-semibold flex items-center gap-1.5"
         >
           <span className="w-2 h-2 rounded-full bg-emerald-400" />
-          Capas
+          <span>Capas</span>
         </button>
       )}
 
