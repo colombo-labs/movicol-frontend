@@ -179,6 +179,56 @@ function getStationTextClass(
   return "text-default-500";
 }
 
+/** Calculate heading from previous and current position */
+function calcHeading(
+  prev: { lat: number; lng: number },
+  lat: number,
+  lng: number,
+): number | null {
+  const dLat = lat - prev.lat;
+  const dLng = lng - prev.lng;
+  if (Math.abs(dLat) > 0.00002 || Math.abs(dLng) > 0.00002) {
+    return (Math.atan2(dLng, dLat) * 180) / Math.PI;
+  }
+  return null;
+}
+
+/** Find the next station reached based on GPS position */
+function findReachedStation(
+  lat: number,
+  lng: number,
+  currentIdx: number,
+  stations: string[],
+  segments: { coordinates: number[][] }[],
+): number | null {
+  for (let i = currentIdx + 1; i < stations.length; i++) {
+    if (i - 1 < segments.length && segments[i - 1]?.coordinates?.length > 0) {
+      const lastCoord =
+        segments[i - 1].coordinates[segments[i - 1].coordinates.length - 1];
+      const dist = haversineM(lat, lng, lastCoord[0], lastCoord[1]);
+      if (dist < 100) return i;
+    }
+  }
+  return null;
+}
+
+/** Announce station via speech synthesis */
+function announceStation(
+  stationIdx: number,
+  stations: string[],
+  enabled: boolean,
+): void {
+  if (!enabled || !("speechSynthesis" in window)) return;
+  const msg =
+    stationIdx >= stations.length - 1
+      ? "Has llegado a tu destino"
+      : `Próxima parada: ${stations[stationIdx + 1] || ""}`;
+  const u = new SpeechSynthesisUtterance(msg);
+  u.lang = "es-CO";
+  u.rate = 1.1;
+  speechSynthesis.speak(u);
+}
+
 function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const [currentStopIdx, setCurrentStopIdx] = useState(0);
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
@@ -216,46 +266,23 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
         const { latitude: lat, longitude: lng } = pos.coords;
         setUserPos({ lat, lng });
 
-        // Calculate heading from movement
         if (prevPosRef.current) {
-          const dLat = lat - prevPosRef.current.lat;
-          const dLng = lng - prevPosRef.current.lng;
-          if (Math.abs(dLat) > 0.00002 || Math.abs(dLng) > 0.00002) {
-            setHeading((Math.atan2(dLng, dLat) * 180) / Math.PI);
-          }
+          const h = calcHeading(prevPosRef.current, lat, lng);
+          if (h !== null) setHeading(h);
         }
         prevPosRef.current = { lat, lng };
 
-        // Find closest station to user
-        // We only advance forward (never go back)
-        for (let i = currentStopIdx + 1; i < stations.length; i++) {
-          // Use segment coords to approximate station positions
-          if (
-            i - 1 < segments.length &&
-            segments[i - 1]?.coordinates?.length > 0
-          ) {
-            const lastCoord =
-              segments[i - 1].coordinates[
-                segments[i - 1].coordinates.length - 1
-              ];
-            const dist = haversineM(lat, lng, lastCoord[0], lastCoord[1]);
-            if (dist < 100) {
-              setCurrentStopIdx(i);
-              if ("vibrate" in navigator) navigator.vibrate([50, 30, 50]);
-              // Voice announcement
-              if (voiceEnabled && "speechSynthesis" in window) {
-                const msg =
-                  i >= stations.length - 1
-                    ? "Has llegado a tu destino"
-                    : `Próxima parada: ${stations[i + 1] || ""}`;
-                const u = new SpeechSynthesisUtterance(msg);
-                u.lang = "es-CO";
-                u.rate = 1.1;
-                speechSynthesis.speak(u);
-              }
-              break;
-            }
-          }
+        const reached = findReachedStation(
+          lat,
+          lng,
+          currentStopIdx,
+          stations,
+          segments,
+        );
+        if (reached !== null) {
+          setCurrentStopIdx(reached);
+          if ("vibrate" in navigator) navigator.vibrate([50, 30, 50]);
+          announceStation(reached, stations, voiceEnabled);
         }
       },
       () => {},
