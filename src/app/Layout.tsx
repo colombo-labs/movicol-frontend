@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/shared/hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, Eye } from "lucide-react";
 
@@ -68,6 +69,19 @@ export function Layout() {
     [navigate],
   );
   const [showTroncales, setShowTroncales] = useState(false);
+  const { can } = useAuth();
+
+  // Protect /admin route — redirect non-admin users
+  useEffect(() => {
+    if (activePanel === "admin") {
+      const isAdmin =
+        can("admin.users") || can("admin.roles") || can("admin.permissions");
+      if (!isAdmin) {
+        navigate("/planificar", { replace: true });
+      }
+    }
+  }, [activePanel, can, navigate]);
+
   const [showEstaciones, setShowEstaciones] = useState(false);
   const [showSitpOnMap, setShowSitpOnMap] = useState(false);
   const [selectedTroncal, setSelectedTroncal] = useState<string | null>(null);
@@ -95,6 +109,7 @@ export function Layout() {
 
   const togglePanel = useCallback(
     (id: PanelId) => {
+      setPanelSnap(null);
       setActivePanel(id);
       // Reset contexto de rutas al salir del módulo rutas
       if (id !== "rutas") {
@@ -300,7 +315,10 @@ export function Layout() {
               <MetricasPanel />
             </SidePanel>
 
-            {activePanel === "admin" ? (
+            {activePanel === "admin" &&
+            (can("admin.users") ||
+              can("admin.roles") ||
+              can("admin.permissions")) ? (
               <div className="absolute inset-0 z-[600] bg-background overflow-y-auto pb-20 md:pb-0">
                 <div className="w-full max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-5 min-h-full flex flex-col">
                   <div className="flex items-center justify-between mb-4 md:mb-5 shrink-0">

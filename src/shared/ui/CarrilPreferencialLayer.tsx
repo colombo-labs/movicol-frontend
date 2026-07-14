@@ -28,7 +28,7 @@ export function CarrilPreferencialLayer({ show }: { readonly show: boolean }) {
     <>
       {data.map((f, i) => (
         <Polyline
-          key={`carril-${i}`}
+          key={`carril-${f.geometry.coordinates[0]?.[0] ?? i}`}
           positions={f.geometry.coordinates.map(([lng, lat]) => [lat, lng])}
           pathOptions={{
             color: "#f59e0b",

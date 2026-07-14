@@ -21,9 +21,6 @@ import {
   Navigation,
   Bus,
   Train,
-  Footprints,
-  MapPin,
-  Clock,
 } from "lucide-react";
 import type { RoutePrediction } from "@modules/predicciones/models";
 
@@ -153,42 +150,6 @@ function RouteMapView({
 
 // ═══════════════════════════════════════════════════════════════════
 
-function TimelineDot({
-  isFirst,
-  isLast,
-  isCurrent,
-  isPast,
-  modeBg,
-}: {
-  isFirst: boolean;
-  isLast: boolean;
-  isCurrent: boolean;
-  isPast: boolean;
-  modeBg: string;
-}) {
-  if (isFirst)
-    return (
-      <div className="w-4 h-4 rounded-full bg-success border-2 border-success/30 shrink-0 mt-2.5" />
-    );
-  if (isLast)
-    return (
-      <div className="w-4 h-4 rounded-full bg-danger border-2 border-danger/30 shrink-0 mt-2.5" />
-    );
-  if (isCurrent)
-    return (
-      <div
-        className={`w-4 h-4 rounded-full ${modeBg} border-2 border-white shadow-lg shrink-0 mt-2.5 animate-pulse`}
-      />
-    );
-  if (isPast)
-    return (
-      <div className="w-2.5 h-2.5 rounded-full bg-default-300 shrink-0 mt-3" />
-    );
-  return (
-    <div className="w-2.5 h-2.5 rounded-full bg-default-200 shrink-0 mt-3" />
-  );
-}
-
 function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
   const [currentStopIdx, setCurrentStopIdx] = useState(0);
   const [userPos, setUserPos] = useState<{ lat: number; lng: number } | null>(
@@ -285,8 +246,21 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
       : [4.65, -74.1];
 
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-16 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
-      {/* Header */}
+    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col">
+      {/* Map — fullscreen behind overlays */}
+      <div className="absolute inset-0 z-0">
+        <RouteMapView
+          center={mapCenter}
+          zoom={14}
+          routeCoords={routeCoords}
+          routeColor={mode === "transmilenio" ? "#ef4444" : "#3b82f6"}
+          heading={heading}
+          userPos={userPos}
+          className="h-full"
+        />
+      </div>
+
+      {/* Top overlay: route info card */}
       <div
         className={`${modeBg} text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10`}
       >
@@ -319,106 +293,11 @@ function TransitNavigation({ prediction, onExit }: NavigationModeProps) {
         />
       </div>
 
-      {/* Map */}
-      <RouteMapView
-        center={mapCenter}
-        zoom={14}
-        routeCoords={routeCoords}
-        routeColor={mode === "transmilenio" ? "#ef4444" : "#3b82f6"}
-        heading={heading}
-        userPos={userPos}
-      />
-
-      {/* Journey timeline */}
-      <div className="flex-1 overflow-y-auto px-4 py-3">
-        {/* ETA card */}
-        <div
-          className={`${modeBgLight} rounded-xl p-3 mb-3 flex items-center justify-between`}
-        >
-          <div className="flex items-center gap-2">
-            <Clock size={14} className={modeColor} />
-            <span className="text-xs font-medium">Llegas aprox.</span>
-          </div>
-          <div className="text-right">
-            <span className="text-sm font-bold">
-              {formatETA(remainingTime * 60)}
-            </span>
-            <span className="text-[10px] text-default-400 ml-2">
-              {formatMinutes(remainingTime)} ·{" "}
-              {formatDistance(totalDist * 1000 * (1 - progress / 100))}
-            </span>
-          </div>
-        </div>
-
-        {/* Station list as timeline */}
-        <div className="space-y-0">
-          {stations.map((station, i) => {
-            const isPast = i < currentStopIdx;
-            const isCurrent = i === currentStopIdx;
-            const isLast = i === stations.length - 1;
-            const isFirst = i === 0;
-
-            return (
-              <div key={`nav-stop-${i}`} className="flex items-stretch gap-3">
-                {/* Timeline dot + line */}
-                <div className="flex flex-col items-center w-5 shrink-0">
-                  <TimelineDot
-                    isFirst={isFirst}
-                    isLast={isLast}
-                    isCurrent={isCurrent}
-                    isPast={isPast}
-                    modeBg={modeBg}
-                  />
-                  {!isLast && (
-                    <div
-                      className={`w-0.5 flex-1 min-h-[20px] ${isPast ? "bg-default-300" : modeBg + "/30"}`}
-                    />
-                  )}
-                </div>
-
-                {/* Station content */}
-                <div
-                  className={`flex-1 pb-2 pt-1.5 ${isCurrent ? "scale-[1.02]" : ""}`}
-                >
-                  <p
-                    className={`text-[12px] leading-tight ${
-                      isCurrent
-                        ? "font-bold text-foreground"
-                        : isPast
-                          ? "text-default-400 line-through"
-                          : isFirst || isLast
-                            ? "font-semibold text-foreground"
-                            : "text-default-500"
-                    }`}
-                  >
-                    {station || `Parada ${i + 1}`}
-                  </p>
-                  {isFirst && (
-                    <p className="text-[10px] text-success mt-0.5 flex items-center gap-1">
-                      <Footprints size={10} /> Camina hasta aquí
-                    </p>
-                  )}
-                  {isCurrent && !isFirst && !isLast && (
-                    <p
-                      className={`text-[10px] ${modeColor} mt-0.5 font-medium`}
-                    >
-                      ← Estás aquí
-                    </p>
-                  )}
-                  {isLast && (
-                    <p className="text-[10px] text-danger mt-0.5 flex items-center gap-1">
-                      <MapPin size={10} /> Baja aquí
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Spacer to push bottom bar down */}
+      <div className="flex-1" />
 
       {/* Bottom bar */}
-      <div className="px-4 py-3 bg-background border-t border-divider flex items-center gap-3 shrink-0">
+      <div className="px-4 py-3 bg-background/90 backdrop-blur-md border-t border-divider flex items-center gap-3 shrink-0 z-10">
         <button
           onClick={onExit}
           className="w-11 h-11 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center text-danger active:scale-90"
@@ -646,7 +525,7 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
       ? ([userPos.lat, userPos.lng] as [number, number])
       : routeCoords[0] || ([4.65, -74.1] as [number, number]);
     return (
-      <div className="fixed top-0 left-0 right-0 bottom-16 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
+      <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
         {/* Header */}
         <div className="bg-primary text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10">
           <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
@@ -721,7 +600,7 @@ function VehicleNavigation({ prediction, onExit }: NavigationModeProps) {
     : routeCoords[0] || ([4.65, -74.1] as [number, number]);
 
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-16 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
+    <div className="fixed top-12 md:top-14 left-0 right-0 bottom-14 md:bottom-0 md:left-[60px] z-[700] flex flex-col bg-background">
       {/* Instruction banner */}
       <div
         className={`${getManeuverColor(currentStep?.maneuver || "")} text-white px-4 py-3 flex items-center gap-3 shadow-lg z-10`}
